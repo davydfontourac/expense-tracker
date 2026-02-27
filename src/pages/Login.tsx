@@ -99,7 +99,12 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-sm font-medium text-gray-700">Senha</label>
+                <Link to="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-500">
+                  Esqueceu a senha?
+                </Link>
+              </div>
             <input
               type="password"
               {...register('password')}
