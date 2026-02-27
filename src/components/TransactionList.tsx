@@ -106,7 +106,11 @@ export default function TransactionList() {
       <h2 className="text-xl font-bold text-gray-800 mb-6">Últimas Transações</h2>
       <div className="flex flex-col space-y-2">
         {transactions.map((transaction) => (
-          <TransactionItem key={transaction.id} transaction={transaction} />
+          <TransactionItem 
+            key={transaction.id} 
+            transaction={transaction} 
+            onDelete={() => setFilters(prev => ({ ...prev }))} 
+          />
         ))}
       </div>
     </div>

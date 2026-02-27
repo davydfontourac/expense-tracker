@@ -1,10 +1,10 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '@/services/api';
 import { cn } from '@/utils/cn';
 import { X, ArrowUpCircle, ArrowDownCircle, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
   description: z.string().min(1, 'A descrição é obrigatória.'),
@@ -22,7 +22,6 @@ interface Props {
 }
 
 export default function TransactionForm({ isOpen, onClose, onSuccess }: Props) {
-  const [globalError, setGlobalError] = useState('');
   
   const { register, handleSubmit, formState: { errors, isSubmitting }, setValue, watch, reset } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -38,18 +37,18 @@ export default function TransactionForm({ isOpen, onClose, onSuccess }: Props) {
 
   async function onSubmit(data: FormValues) {
     try {
-      setGlobalError('');
       await api.post('/transactions', {
         ...data,
         amount: Number(data.amount), // Prepara para a API
         category_id: null, // Issue separada pra categorias
       });
       
+      toast.success('Transação salva com sucesso!');
       reset();
       onSuccess();
       onClose();
     } catch (err: any) {
-      setGlobalError(err.response?.data?.error || 'Erro ao salvar transação.');
+      toast.error(err.response?.data?.error || 'Erro ao salvar transação.');
     }
   }
 
@@ -68,12 +67,6 @@ export default function TransactionForm({ isOpen, onClose, onSuccess }: Props) {
         {/* Formulário */}
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
           
-          {/* Alerta de Erro de API */}
-          {globalError && (
-            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg">
-              {globalError}
-            </div>
-          )}
 
           {/* Toggle de Tipo */}
           <div className="grid grid-cols-2 gap-3 p-1 bg-gray-100 rounded-2xl">
