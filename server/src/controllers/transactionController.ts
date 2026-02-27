@@ -117,15 +117,24 @@ export const transactionController = {
     }
   },
 
-  // GET /transactions/summary
+  // GET /transactions/summary?month=X&year=Y
   async getSummary(req: AuthRequest, res: Response) {
     try {
+      const { month, year } = req.query;
       const userId = req.user.id;
 
-      const { data, error } = await supabaseAdmin
+      let query = supabaseAdmin
         .from('transactions')
         .select('amount, type')
         .eq('user_id', userId);
+
+      if (month && year) {
+        const startDate = new Date(Number(year), Number(month) - 1, 1).toISOString();
+        const endDate = new Date(Number(year), Number(month), 0, 23, 59, 59).toISOString();
+        query = query.gte('date', startDate).lte('date', endDate);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
