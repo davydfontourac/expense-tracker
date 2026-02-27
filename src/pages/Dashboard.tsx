@@ -5,6 +5,7 @@ import TransactionList from '@/components/TransactionList';
 import TransactionForm from '@/components/TransactionForm';
 import SummaryCards from '@/components/SummaryCards';
 import TransactionFilters from '@/components/TransactionFilters';
+import CategoryPieChart from '@/components/CategoryPieChart';
 import { api } from '@/services/api';
 import type { Transaction } from '@/types';
 
@@ -101,22 +102,29 @@ export default function Dashboard() {
         {/* Cards de Resumo */}
         <SummaryCards summary={summary} isLoading={isLoading} />
 
-        {/* Listagem e Filtros */}
-        <div className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100 mt-10">
-          <TransactionFilters 
-            filters={filters}
-            onSearchChange={(v) => setFilters(prev => ({ ...prev, search: v }))}
-            onTypeChange={(v) => setFilters(prev => ({ ...prev, type: v }))}
-            onMonthChange={(v) => setFilters(prev => ({ ...prev, month: v }))}
-            onYearChange={(v) => setFilters(prev => ({ ...prev, year: v }))}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-10">
+          {/* Gráfico de Gastos (Fica à esquerda em telas grandes) */}
+          <div className="lg:col-span-1">
+            <CategoryPieChart transactions={transactions} />
+          </div>
 
-          <TransactionList 
-            transactions={transactions} 
-            isLoading={isLoading} 
-            filters={filters}
-            onDelete={fetchData}
-          />
+          {/* Listagem e Filtros (Fica à direita em telas grandes) */}
+          <div className="lg:col-span-2 bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
+            <TransactionFilters 
+              filters={filters}
+              onSearchChange={(v) => setFilters(prev => ({ ...prev, search: v }))}
+              onTypeChange={(v) => setFilters(prev => ({ ...prev, type: v }))}
+              onMonthChange={(v) => setFilters(prev => ({ ...prev, month: v }))}
+              onYearChange={(v) => setFilters(prev => ({ ...prev, year: v }))}
+            />
+
+            <TransactionList 
+              transactions={transactions} 
+              isLoading={isLoading} 
+              filters={filters}
+              onDelete={fetchData}
+            />
+          </div>
         </div>
         
         {/* Floating Action Button */}
