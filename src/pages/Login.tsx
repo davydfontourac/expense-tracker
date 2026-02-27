@@ -39,7 +39,7 @@ export default function Login() {
       if (signInError) throw signInError;
       
       console.log('Login bem-sucedido!');
-      // TODO: navigate to dashboard
+      navigate('/');
     } catch (err: any) {
       setError(err.message || 'Erro ao realizar login');
     } finally {
