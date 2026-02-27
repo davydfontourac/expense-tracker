@@ -22,11 +22,11 @@ function App() {
         {/* Rotas Privadas (apenas logados) */}
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Route>
         
         {/* Fallback de rotas inexistentes redireciona pra home para o App processar */}
         <Route path="*" element={<Navigate to="/" replace />} />
-        <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </AuthProvider>
   );
