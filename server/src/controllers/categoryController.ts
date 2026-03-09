@@ -42,30 +42,26 @@ export const categoryController = {
       { name: 'Vestuário', icon: 'shirt', color: '#D946EF', user_id: userId },
     ];
 
-    // Filtrar apenas as categorias que ainda não existem para este usuário
-    const categoriesToInsert = defaultCategories.filter(defCat => 
-      !existingCategories.some(existing => existing.name.toLowerCase() === defCat.name.toLowerCase())
-    );
-
-    if (categoriesToInsert.length > 0) {
+    // Só insere categorias padrão se o usuário não tiver NENHUMA categoria cadastrada
+    if (existingCategories && existingCategories.length === 0) {
       const { error: seedError } = await supabaseAdmin
         .from('categories')
-        .insert(categoriesToInsert);
+        .insert(defaultCategories);
 
       if (seedError) throw seedError;
 
-      // Buscar novamente após a inserção para retornar a lista completa e atualizada
-      const { data: updatedData, error: fetchError } = await supabaseAdmin
+      // Buscar novamente após a inserção para retornar a lista inicial
+      const { data: newData, error: fetchError } = await supabaseAdmin
         .from('categories')
         .select('*')
         .eq('user_id', userId)
         .order('name', { ascending: true });
 
       if (fetchError) throw fetchError;
-      return res.json(updatedData);
+      return res.json(newData || []);
     }
 
-    res.json(existingCategories);
+    res.json(existingCategories || []);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
