@@ -10,7 +10,7 @@
   ![Supabase](https://img.shields.io/badge/Supabase-Auth%20%2B%20DB-3ECF8E?style=flat-square&logo=supabase)
   ![Tailwind](https://img.shields.io/badge/Tailwind-4-06B6D4?style=flat-square&logo=tailwindcss)
 
-  [🌐 Ver Demo](https://controle-de-gastos.vercel.app) · [📋 Issues](https://github.com/davydfontourac/controle-de-gastos/issues)
+  [🌐 Ver Demo](https://controle-de-gastos-tan-six.vercel.app) · [📋 Issues](https://github.com/davydfontourac/controle-de-gastos/issues)
 </div>
 
 ---
