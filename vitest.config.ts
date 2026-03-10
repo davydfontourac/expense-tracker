@@ -7,5 +7,10 @@ export default mergeConfig(viteConfig, defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['lcov', 'text'],
+      exclude: ['src/main.tsx', 'src/vite-env.d.ts', '**/*.test.*', 'src/types/*'],
+    }
   },
 }));
