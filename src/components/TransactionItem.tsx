@@ -59,7 +59,7 @@ export default function TransactionItem({ transaction, onDelete, onEdit }: Props
             <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
               {transaction.description}
               {transaction.is_recurrent && (
-                <Repeat className="w-3.5 h-3.5 text-blue-500" title={`Recorrente: ${transaction.frequency}`} />
+                <Repeat className="w-3.5 h-3.5 text-blue-500" />
               )}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
