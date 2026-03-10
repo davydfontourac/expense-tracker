@@ -6,10 +6,10 @@ import TransactionList from '@/components/TransactionList';
 import TransactionForm from '@/components/TransactionForm';
 import SummaryCards from '@/components/SummaryCards';
 import type { Transaction } from '@/types';
+import { useTransactions } from '@/hooks/useTransactions';
 import TransactionFilters from '@/components/TransactionFilters';
 import CategoryPieChart from '@/components/CategoryPieChart';
 import MonthlyChart from '@/components/MonthlyChart';
-import { api } from '@/services/api';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import BottomNavigation from '@/components/BottomNavigation';
 import PageTransition from '@/components/PageTransition';
@@ -17,15 +17,7 @@ import PageTransition from '@/components/PageTransition';
 export default function Dashboard() {
   const { user, profile, signOut } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [summary, setSummary] = useState({ 
-    totalIncome: 0, 
-    totalExpense: 0, 
-    balance: 0,
-    yearBalance: 0
-  });
-  const [history, setHistory] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { transactions, summary, history, isLoading, fetchTransactions } = useTransactions();
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   
   // Estado Global de Filtros (Compartilhado entre Resumo e Lista)
@@ -37,38 +29,8 @@ export default function Dashboard() {
   });
 
   const fetchData = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      
-      const params = new URLSearchParams();
-      if (filters.type !== 'all') params.append('type', filters.type);
-      if (filters.month && filters.year) {
-        params.append('month', filters.month);
-        params.append('year', filters.year);
-      }
-      if (filters.search) params.append('search', filters.search);
-
-      // Busca transações, sumário e histórico em paralelo
-      const [transRes, sumRes, historyRes] = await Promise.all([
-        api.get<Transaction[]>(`/transactions?${params.toString()}`),
-        api.get(`/transactions/summary?month=${filters.month}&year=${filters.year}`),
-        api.get('/transactions/history')
-      ]);
-
-      setTransactions(transRes.data);
-      setSummary({
-        totalIncome: sumRes.data.income,
-        totalExpense: sumRes.data.expense,
-        balance: sumRes.data.totalBalance,
-        yearBalance: sumRes.data.yearBalance
-      });
-      setHistory(historyRes.data);
-    } catch (err) {
-      console.error('Erro ao carregar dados:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [filters]);
+    await fetchTransactions(filters);
+  }, [filters, fetchTransactions]);
 
   useEffect(() => {
     // Debounce apenas para a busca por texto

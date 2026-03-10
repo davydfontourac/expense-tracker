@@ -19,34 +19,16 @@ import PageTransition from '@/components/PageTransition';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface Category {
-  id: string;
-  name: string;
-  icon: string;
-  color: string;
-}
+import { useCategories } from '@/hooks/useCategories';
+import type { Category } from '@/hooks/useCategories';
 
 export default function Categories() {
   const { profile } = useAuth();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { categories, isLoading, fetchCategories } = useCategories();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  const fetchCategories = async () => {
-    try {
-      setIsLoading(true);
-      const response = await api.get<Category[]>('/categories');
-      setCategories(response.data);
-    } catch (err) {
-      console.error(err);
-      toast.error('Erro ao carregar categorias');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
     fetchCategories();
