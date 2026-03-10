@@ -44,22 +44,37 @@ export const transactionController = {
     }
   },
 
+  // Helper para gerar datas de recorrência
+  _generateRecurringTransactions(parsedBody: any, userId: string) {
+    const { frequency, installments = 1, date: startDateStr, ...rest } = parsedBody;
+    const baseDate = new Date(startDateStr);
+    
+    return Array.from({ length: installments }).map((_, i) => {
+      const currentDate = new Date(baseDate);
+      
+      if (frequency === 'weekly') currentDate.setUTCDate(baseDate.getUTCDate() + (i * 7));
+      if (frequency === 'monthly') currentDate.setUTCMonth(baseDate.getUTCMonth() + i);
+      if (frequency === 'yearly') currentDate.setUTCFullYear(baseDate.getUTCFullYear() + i);
+
+      return {
+        ...rest,
+        date: currentDate.toISOString(),
+        user_id: userId,
+        is_recurrent: true,
+        frequency,
+      };
+    });
+  },
+
   // POST /transactions
   async create(req: AuthRequest, res: Response) {
     try {
       const userId = req.user.id;
-      
-      // Validações pesadas no momento em que os dados batem
       const parsedBody = createTransactionSchema.parse(req.body);
       
-      const { 
-        is_recurrent, 
-        frequency, 
-        installments = 1, 
-        date: startDateStr,
-        ...rest 
-      } = parsedBody;
+      const { is_recurrent, frequency, installments = 1 } = parsedBody;
 
+      // Caso 1: Transação Única
       if (!is_recurrent || !frequency || installments <= 1) {
         const { data, error } = await supabaseAdmin
           .from('transactions')
@@ -71,31 +86,9 @@ export const transactionController = {
         return res.status(201).json(data);
       }
 
-      // Lógica de Recorrência (Materialização de N parcelas)
-      const transactionsToInsert = [];
-      const baseDate = new Date(startDateStr);
+      // Caso 2: Transações Recorrentes (Materialização)
+      const transactionsToInsert = transactionController._generateRecurringTransactions(parsedBody, userId);
 
-      for (let i = 0; i < installments; i++) {
-        const currentDate = new Date(baseDate);
-        
-        if (frequency === 'weekly') {
-          currentDate.setUTCDate(baseDate.getUTCDate() + (i * 7));
-        } else if (frequency === 'monthly') {
-          currentDate.setUTCMonth(baseDate.getUTCMonth() + i);
-        } else if (frequency === 'yearly') {
-          currentDate.setUTCFullYear(baseDate.getUTCFullYear() + i);
-        }
-
-        transactionsToInsert.push({
-          ...rest,
-          date: currentDate.toISOString(),
-          user_id: userId,
-          is_recurrent: true,
-          frequency,
-        });
-      }
-
-      // Inserir a primeira para pegar o ID que será o parent_id das outras
       const { data: firstRecord, error: firstError } = await supabaseAdmin
         .from('transactions')
         .insert([transactionsToInsert[0]])
@@ -104,20 +97,19 @@ export const transactionController = {
 
       if (firstError) throw firstError;
 
-      if (transactionsToInsert.length > 1) {
-        const otherTransactions = transactionsToInsert.slice(1).map(t => ({
-          ...t,
-          parent_id: firstRecord.id
-        }));
+      // Inserir parcelas restantes vinculadas ao parent_id
+      const otherTransactions = transactionsToInsert.slice(1).map(t => ({
+        ...t,
+        parent_id: firstRecord.id
+      }));
 
-        const { error: othersError } = await supabaseAdmin
-          .from('transactions')
-          .insert(otherTransactions);
+      const { error: othersError } = await supabaseAdmin
+        .from('transactions')
+        .insert(otherTransactions);
 
-        if (othersError) throw othersError;
-      }
+      if (othersError) throw othersError;
 
-      // Retornar a primeira com as categorias carregadas
+      // Retornar a primeira com categorias
       const { data: finalData, error: finalError } = await supabaseAdmin
         .from('transactions')
         .select('*, categories(name, icon, color)')
@@ -125,13 +117,12 @@ export const transactionController = {
         .single();
 
       if (finalError) throw finalError;
-      res.status(201).json(finalData);
+      return res.status(201).json(finalData);
 
     } catch (error: any) {
-      if (error.name === 'ZodError') {
-        return res.status(400).json({ error: error.errors });
-      }
-      res.status(500).json({ error: error.message });
+      const status = error.name === 'ZodError' ? 400 : 500;
+      const message = error.name === 'ZodError' ? error.errors : error.message;
+      res.status(status).json({ error: message });
     }
   },
 
