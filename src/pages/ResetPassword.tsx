@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Wallet, KeyRound, AlertCircle } from 'lucide-react';
+import { KeyRound, AlertCircle } from 'lucide-react';
 import { supabase } from '@/services/supabase';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import PageTransition from '@/components/PageTransition'; // Added this import

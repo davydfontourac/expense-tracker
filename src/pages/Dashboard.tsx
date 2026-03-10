@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { LogOut, Plus, Wallet, Tag, User } from 'lucide-react';
+import { LogOut, Plus, Tag, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import TransactionList from '@/components/TransactionList';
 import TransactionForm from '@/components/TransactionForm';

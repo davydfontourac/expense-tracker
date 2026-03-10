@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Wallet, UserPlus } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 import { supabase } from '@/services/supabase';
 import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/ThemeToggle';
