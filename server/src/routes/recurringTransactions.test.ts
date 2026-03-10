@@ -47,7 +47,6 @@ describe('Recurring Transactions Integration', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reinicia os retornos padrões para o mock encadeado
     const methods = ['from', 'select', 'eq', 'insert', 'match', 'delete', 'order', 'ilike', 'gte', 'lte', 'update'];
     methods.forEach(method => mockAdmin[method].mockReturnValue(mockAdmin));
   });
@@ -127,7 +126,6 @@ describe('Recurring Transactions Integration', () => {
       amount: 100,
       date: '2026-01-01T12:00:00.000Z',
       type: 'expense'
-      // is_recurrent default false
     };
 
     mockAdmin.single.mockResolvedValue({ data: { id: 'single-id', ...payload }, error: null });
@@ -162,19 +160,72 @@ describe('Recurring Transactions Integration', () => {
     expect(response.body.error).toBe('Database Failure');
   });
 
-  it('deve lidar com erro de banco de dados no passo inicial', async () => {
+  it('deve lidar com erro no fetch final (após inserções)', async () => {
     const payload = {
-      description: 'Erro Inicial',
+      description: 'Erro Final',
       amount: 10,
       date: '2026-01-01T12:00:00.000Z',
-      type: 'expense'
+      type: 'expense',
+      is_recurrent: true,
+      frequency: 'monthly',
+      installments: 2
     };
 
-    mockAdmin.single.mockResolvedValueOnce({ data: null, error: { message: 'Initial Failure' } });
+    mockAdmin.single
+      .mockResolvedValueOnce({ data: { id: 'ok-id' }, error: null }) // insert inicial
+      .mockResolvedValueOnce({ data: null, error: { message: 'Final Fetch Error' } }); // select final
     
-    const response = await request(app).post('/api/transactions').send(payload);
+    mockAdmin.insert.mockReturnValue(mockAdmin);
 
+    const response = await request(app).post('/api/transactions').send(payload);
     expect(response.status).toBe(500);
-    expect(response.body.error).toBe('Initial Failure');
+    expect(response.body.error).toBe('Final Fetch Error');
+  });
+
+  it('deve retornar 400 se a validação Zod falhar no create', async () => {
+    const invalidPayload = { amount: -10, type: 'invalid' };
+    const response = await request(app).post('/api/transactions').send(invalidPayload);
+    expect(response.status).toBe(400);
+  });
+
+  it('deve atualizar com sucesso', async () => {
+    const payload = { description: 'Novo' };
+    mockAdmin.single.mockResolvedValue({ data: { id: '1', ...payload }, error: null });
+    const response = await request(app).put('/api/transactions/1').send(payload);
+    expect(response.status).toBe(200);
+    expect(response.body.description).toBe('Novo');
+  });
+
+  it('deve retornar 400 se a validação Zod falhar no update', async () => {
+    const invalidUpdate = { date: 'data-invalida' };
+    mockAdmin.single.mockResolvedValue({ data: { id: '1' }, error: null });
+    
+    const response = await request(app).put('/api/transactions/1').send(invalidUpdate);
+    expect(response.status).toBe(400);
+  });
+
+  it('deve deletar com sucesso', async () => {
+    mockAdmin.match.mockResolvedValue({ error: null, count: 1 });
+    const response = await request(app).delete('/api/transactions/1');
+    expect(response.status).toBe(204);
+  });
+
+  it('deve retornar 404 se deletar inexistente', async () => {
+    mockAdmin.match.mockResolvedValue({ error: null, count: 0 });
+    const response = await request(app).delete('/api/transactions/999');
+    expect(response.status).toBe(404);
+  });
+
+  it('deve listar transações (getAll)', async () => {
+    mockAdmin.order.mockResolvedValue({ data: [], error: null });
+    const response = await request(app).get('/api/transactions');
+    expect(response.status).toBe(200);
+    expect(Array.isArray(response.body)).toBe(true);
+  });
+
+  it('deve lidar com erro no getAll', async () => {
+    mockAdmin.order.mockResolvedValue({ data: null, error: { message: 'DB Error' } });
+    const response = await request(app).get('/api/transactions');
+    expect(response.status).toBe(500);
   });
 });
