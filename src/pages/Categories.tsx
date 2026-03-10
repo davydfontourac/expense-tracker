@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import ConfirmModal from '@/components/ConfirmModal';
 import CategoryForm from '@/components/CategoryForm';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import BottomNavigation from '@/components/BottomNavigation';
 
 interface Category {
   id: string;
@@ -112,7 +113,7 @@ export default function Categories() {
         </div>
       </nav>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24 lg:pb-10">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
@@ -191,6 +192,8 @@ export default function Categories() {
         description={`Tem certeza que deseja excluir "${deletingCategory?.name}"? Transações vinculadas a esta categoria ficarão "Sem categoria".`}
         isLoading={isDeleting}
       />
+
+      <BottomNavigation />
     </div>
   );
 }

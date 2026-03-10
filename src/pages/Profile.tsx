@@ -4,18 +4,20 @@ import { supabase } from '@/services/supabase';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { api } from '@/services/api';
-import { 
-  Trash2, 
+import {
+  Trash2,
   AlertTriangle,
-  User, 
-  Mail, 
-  Camera, 
-  ArrowLeft, 
-  Save, 
+  User,
+  Mail,
+  Camera,
+  ArrowLeft,
+  Save,
   Loader2,
   CheckCircle2
 } from 'lucide-react';
+import ConfirmModal from '@/components/ConfirmModal';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import BottomNavigation from '@/components/BottomNavigation';
 
 export default function Profile() {
   const { user, profile, isLoading: isAuthLoading, refreshProfile, signOut } = useAuth();
@@ -64,11 +66,11 @@ export default function Profile() {
     try {
       setIsDeleting(true);
       const response = await api.delete('/users');
-      
+
       if (response.status === 200) {
         toast.success('Sua conta foi excluída permanentemente.');
         await signOut();
-        navigate('/login');
+        navigate('/');
       }
     } catch (error: any) {
       toast.error('Erro ao excluir conta. Tente novamente mais tarde.');
@@ -133,8 +135,8 @@ export default function Profile() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-4">
-              <Link 
-                to="/dashboard" 
+              <Link
+                to="/dashboard"
                 className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -158,7 +160,7 @@ export default function Profile() {
         </div>
       </nav>
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24 lg:pb-10">
         <div className="space-y-8">
           {/* Sessão de Avatar */}
           <section className="bg-white dark:bg-gray-900 p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col items-center text-center transition-colors">
@@ -170,16 +172,16 @@ export default function Profile() {
                   <User className="w-16 h-16 text-gray-400 dark:text-gray-500" />
                 )}
               </div>
-              <label 
-                htmlFor="avatar-upload" 
+              <label
+                htmlFor="avatar-upload"
                 className="absolute bottom-0 right-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:bg-blue-700 transition-colors border-4 border-white dark:border-gray-900 active:scale-90 disabled:opacity-50"
               >
                 {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
-                <input 
-                  type="file" 
-                  id="avatar-upload" 
-                  accept="image/*" 
-                  className="hidden" 
+                <input
+                  type="file"
+                  id="avatar-upload"
+                  accept="image/*"
+                  className="hidden"
                   onChange={uploadAvatar}
                   disabled={uploading}
                 />
@@ -254,7 +256,6 @@ export default function Profile() {
             </div>
           </section>
 
-          {/* Zona de Perigo */}
           <section className="bg-white dark:bg-gray-900 p-8 rounded-3xl border border-red-100 dark:border-red-900/20 shadow-sm space-y-6 transition-colors">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg">
@@ -264,56 +265,31 @@ export default function Profile() {
             </div>
 
             <div className="p-4 bg-red-50/50 dark:bg-red-500/5 rounded-2xl border border-red-100 dark:border-red-900/20">
-              <p className="text-sm text-red-800 dark:text-red-400 font-medium">
+              <p className="text-sm text-red-800 dark:text-red-400 font-medium mb-4">
                 Ao excluir sua conta, todos os seus dados (transações, categorias e perfil) serão removidos permanentemente. Esta ação não pode ser desfeita.
               </p>
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="w-full sm:w-auto px-6 py-3 bg-white dark:bg-gray-800 border-2 border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 font-bold rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-900/50 transition-all flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-5 h-5" />
+                Excluir Minha Conta
+              </button>
             </div>
-
-            <button
-              onClick={() => setShowDeleteModal(true)}
-              className="w-full sm:w-auto px-6 py-3 bg-white dark:bg-gray-800 border-2 border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 font-bold rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-900/50 transition-all flex items-center justify-center gap-2"
-            >
-              <Trash2 className="w-5 h-5" />
-              Excluir Minha Conta
-            </button>
           </section>
         </div>
       </main>
 
-      {/* Modal de Confirmação de Exclusão */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-gray-900 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border border-transparent dark:border-gray-800">
-            <div className="p-8 text-center">
-              <div className="w-20 h-20 bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mx-auto mb-6">
-                <AlertTriangle className="w-10 h-10" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">Tem certeza absoluta?</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-8">
-                Esta ação é irreversível. Todos os seus dados de gastos e categorias serão perdidos para sempre.
-              </p>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  disabled={isDeleting}
-                  className="px-6 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-xl transition-all disabled:opacity-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={deleteAccount}
-                  disabled={isDeleting}
-                  className="px-6 py-3 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-red-200 dark:shadow-none flex items-center justify-center gap-2 disabled:opacity-70"
-                >
-                  {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
-                  <span>Sim, excluir</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={deleteAccount}
+        title="Tem certeza absoluta?"
+        description="Esta ação é irreversível. Todos os seus dados de gastos e categorias serão perdidos para sempre."
+        isLoading={isDeleting}
+      />
+
+      <BottomNavigation />
     </div>
   );
 }

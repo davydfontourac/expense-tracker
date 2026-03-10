@@ -11,6 +11,7 @@ import CategoryPieChart from '@/components/CategoryPieChart';
 import MonthlyChart from '@/components/MonthlyChart';
 import { api } from '@/services/api';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import BottomNavigation from '@/components/BottomNavigation';
 
 export default function Dashboard() {
   const { user, profile, signOut } = useAuth();
@@ -114,7 +115,7 @@ export default function Dashboard() {
               
               <Link 
                 to="/profile"
-                className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800 shadow-md relative overflow-hidden group/avatar bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0 hover:border-blue-100 dark:hover:border-gray-600 transition-all"
+                className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800 shadow-md relative overflow-hidden group/avatar bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0 hover:border-blue-100 dark:hover:border-gray-600 transition-all md:hidden"
               >
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
@@ -132,7 +133,7 @@ export default function Dashboard() {
               </Link>
               <button
                 onClick={() => signOut()}
-                className="flex items-center gap-2 text-sm text-red-500 font-bold hover:bg-red-50 dark:hover:bg-red-500/10 py-2.5 px-4 rounded-xl transition-all border border-transparent hover:border-red-100 dark:hover:border-red-500/20"
+                className="hidden md:flex items-center gap-2 text-sm text-red-500 font-bold hover:bg-red-50 dark:hover:bg-red-500/10 py-2.5 px-4 rounded-xl transition-all border border-transparent hover:border-red-100 dark:hover:border-red-500/20"
               >
                 Sair
                 <LogOut className="w-4 h-4" />
@@ -143,7 +144,7 @@ export default function Dashboard() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24 md:pb-10">
         
         {/* Cards de Resumo */}
         <SummaryCards summary={summary} isLoading={isLoading} />
@@ -173,7 +174,7 @@ export default function Dashboard() {
         </div>
         
         {/* Floating Action Menu */}
-        <div className="fixed bottom-8 right-8 flex flex-col items-end gap-3 group z-50 pointer-events-none">
+        <div className="fixed bottom-20 md:bottom-8 right-8 flex flex-col items-end gap-3 group z-50 pointer-events-none">
           {/* Menu Items (Hidden by default, shown on hover) */}
           <div className="flex flex-col items-end gap-3 mb-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 group-hover:pointer-events-auto">
             {/* Opção: Nova Transação */}
@@ -221,6 +222,8 @@ export default function Dashboard() {
           transaction={editingTransaction}
         />
       </main>
+
+      <BottomNavigation />
     </div>
   );
 }
