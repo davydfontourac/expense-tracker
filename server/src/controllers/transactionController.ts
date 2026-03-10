@@ -51,15 +51,82 @@ export const transactionController = {
       
       // Validações pesadas no momento em que os dados batem
       const parsedBody = createTransactionSchema.parse(req.body);
+      
+      const { 
+        is_recurrent, 
+        frequency, 
+        installments = 1, 
+        date: startDateStr,
+        ...rest 
+      } = parsedBody;
 
-      const { data, error } = await supabaseAdmin
+      if (!is_recurrent || !frequency || installments <= 1) {
+        const { data, error } = await supabaseAdmin
+          .from('transactions')
+          .insert([{ ...parsedBody, user_id: userId }])
+          .select('*, categories(name, icon, color)')
+          .single();
+
+        if (error) throw error;
+        return res.status(201).json(data);
+      }
+
+      // Lógica de Recorrência (Materialização de N parcelas)
+      const transactionsToInsert = [];
+      const baseDate = new Date(startDateStr);
+
+      for (let i = 0; i < installments; i++) {
+        const currentDate = new Date(baseDate);
+        
+        if (frequency === 'weekly') {
+          currentDate.setUTCDate(baseDate.getUTCDate() + (i * 7));
+        } else if (frequency === 'monthly') {
+          currentDate.setUTCMonth(baseDate.getUTCMonth() + i);
+        } else if (frequency === 'yearly') {
+          currentDate.setUTCFullYear(baseDate.getUTCFullYear() + i);
+        }
+
+        transactionsToInsert.push({
+          ...rest,
+          date: currentDate.toISOString(),
+          user_id: userId,
+          is_recurrent: true,
+          frequency,
+        });
+      }
+
+      // Inserir a primeira para pegar o ID que será o parent_id das outras
+      const { data: firstRecord, error: firstError } = await supabaseAdmin
         .from('transactions')
-        .insert([{ ...parsedBody, user_id: userId }])
-        .select('*, categories(name, icon, color)')
+        .insert([transactionsToInsert[0]])
+        .select()
         .single();
 
-      if (error) throw error;
-      res.status(201).json(data);
+      if (firstError) throw firstError;
+
+      if (transactionsToInsert.length > 1) {
+        const otherTransactions = transactionsToInsert.slice(1).map(t => ({
+          ...t,
+          parent_id: firstRecord.id
+        }));
+
+        const { error: othersError } = await supabaseAdmin
+          .from('transactions')
+          .insert(otherTransactions);
+
+        if (othersError) throw othersError;
+      }
+
+      // Retornar a primeira com as categorias carregadas
+      const { data: finalData, error: finalError } = await supabaseAdmin
+        .from('transactions')
+        .select('*, categories(name, icon, color)')
+        .eq('id', firstRecord.id)
+        .single();
+
+      if (finalError) throw finalError;
+      res.status(201).json(finalData);
+
     } catch (error: any) {
       if (error.name === 'ZodError') {
         return res.status(400).json({ error: error.errors });
