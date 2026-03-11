@@ -207,14 +207,12 @@ describe('TransactionForm', () => {
 
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
 
-    await waitFor(() => {
-      expect(api.get).toHaveBeenCalledWith('/categories');
-    });
+    // Wait for the categories to actually appear in the DOM (not just the API call)
+    const alimentacaoOption = await screen.findByText('Alimentação');
+    expect(alimentacaoOption).toBeInTheDocument();
+    expect(screen.getByText('Transporte')).toBeInTheDocument();
 
     const select = screen.getByLabelText(/Categoria/i);
-    expect(screen.getByText('Alimentação')).toBeInTheDocument();
-    expect(screen.getByText('Transporte')).toBeInTheDocument();
-    
     fireEvent.change(select, { target: { value: 'cat-1' } });
     expect((select as HTMLSelectElement).value).toBe('cat-1');
   });
