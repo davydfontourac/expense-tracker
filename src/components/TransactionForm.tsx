@@ -59,30 +59,39 @@ export default function TransactionForm({ isOpen, onClose, onSuccess, transactio
 
   // Carrega dados se estiver editando
   useEffect(() => {
-    if (transaction && isOpen) {
-      reset({
-        description: transaction.description,
-        amount: String(transaction.amount),
-        date: new Date(transaction.date).toISOString().split('T')[0],
-        type: transaction.type,
-        category_id: transaction.category_id ? String(transaction.category_id) : null,
-        is_recurrent: transaction.is_recurrent || false,
-        frequency: transaction.frequency || 'monthly',
-        installments: '1', // Edição não gera parcelas novas
-      });
-    } else if (!transaction && isOpen) {
-      reset({
-        description: '',
-        amount: '',
-        date: new Date().toISOString().split('T')[0],
-        type: 'expense',
-        category_id: null,
-        is_recurrent: false,
-        frequency: 'monthly',
-        installments: '1',
-      });
+    if (isOpen) {
+      if (transaction) {
+        reset({
+          description: transaction.description,
+          amount: String(transaction.amount),
+          date: new Date(transaction.date).toISOString().split('T')[0],
+          type: transaction.type,
+          category_id: transaction.category_id ? String(transaction.category_id) : null,
+          is_recurrent: transaction.is_recurrent || false,
+          frequency: transaction.frequency || 'monthly',
+          installments: '1',
+        });
+      } else {
+        reset({
+          description: '',
+          amount: '',
+          date: new Date().toISOString().split('T')[0],
+          type: 'expense',
+          category_id: null,
+          is_recurrent: false,
+          frequency: 'monthly',
+          installments: '1',
+        });
+      }
     }
   }, [transaction, isOpen, reset]);
+
+  // Garante que o valor da categoria seja aplicado quando as categorias carregarem
+  useEffect(() => {
+    if (transaction && isOpen && categories.length > 0) {
+      setValue('category_id', transaction.category_id ? String(transaction.category_id) : null);
+    }
+  }, [transaction, isOpen, categories, setValue]);
 
   if (!isOpen) return null;
 
@@ -149,10 +158,11 @@ export default function TransactionForm({ isOpen, onClose, onSuccess, transactio
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Valor</label>
+              <label htmlFor="amount" className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Valor</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 font-semibold text-gray-400 dark:text-gray-500">R$</span>
                 <input
+                  id="amount"
                   type="number"
                   step="0.01"
                   placeholder="0,00"
@@ -167,8 +177,9 @@ export default function TransactionForm({ isOpen, onClose, onSuccess, transactio
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Descrição</label>
+              <label htmlFor="description" className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Descrição</label>
               <input
+                id="description"
                 type="text"
                 placeholder="Ex: Freela, Aluguel..."
                 {...register('description')}
@@ -181,10 +192,11 @@ export default function TransactionForm({ isOpen, onClose, onSuccess, transactio
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Categoria</label>
+              <label htmlFor="category_id" className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Categoria</label>
               <div className="relative">
                 <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                 <select
+                  id="category_id"
                   {...register('category_id')}
                   className="w-full pl-11 pr-4 py-3 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/30 focus:border-blue-400 dark:focus:border-blue-500 focus:outline-none transition-all appearance-none text-gray-700 dark:text-gray-300 font-medium"
                 >
@@ -242,8 +254,9 @@ export default function TransactionForm({ isOpen, onClose, onSuccess, transactio
 
             <div className="grid grid-cols-1 gap-4 pt-2">
               <div>
-                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Data da primeira</label>
+                <label htmlFor="date" className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Data da primeira</label>
                 <input
+                  id="date"
                   type="date"
                   {...register('date')}
                   className={cn(
