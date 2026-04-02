@@ -134,7 +134,7 @@ describe('Recurring Transactions Integration', () => {
 
     expect(response.status).toBe(201);
     expect(mockAdmin.insert).toHaveBeenCalledTimes(1);
-    expect(mockAdmin.insert).toHaveBeenCalledWith([{ ...payload, user_id: 'user-123', is_recurrent: false, installments: 1 }]);
+    expect(mockAdmin.insert).toHaveBeenCalledWith([{ ...payload, user_id: 'user-123', is_recurrent: false }]);
   });
 
   it('deve lidar com erro de banco de dados no passo secundário', async () => {

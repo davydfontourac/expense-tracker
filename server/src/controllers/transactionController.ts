@@ -76,9 +76,10 @@ export const transactionController = {
 
       // Caso 1: Transação Única
       if (!is_recurrent || !frequency || installments <= 1) {
+        const { installments: _installments, ...insertData } = parsedBody;
         const { data, error } = await supabaseAdmin
           .from('transactions')
-          .insert([{ ...parsedBody, user_id: userId }])
+          .insert([{ ...insertData, user_id: userId }])
           .select('*, categories(name, icon, color)')
           .single();
 
@@ -182,10 +183,12 @@ async getSummary(req: AuthRequest, res: Response) {
     const userId = req.user.id;
 
     // 1. Saldo Acumulado (All-time)
+    const todayISO = new Date().toISOString();
     const { data: allData, error: allError } = await supabaseAdmin
       .from('transactions')
       .select('amount, type')
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .lte('date', todayISO);
 
     if (allError) throw allError;
 
