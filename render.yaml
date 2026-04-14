@@ -11,8 +11,8 @@ services:
       - key: PORT
         value: 3000
       - key: CORS_ORIGIN
-        generateValue: false
+        value: "REPLACE_WITH_VERCEL_URL"
       - key: SUPABASE_URL
-        generateValue: false
+        value: "REPLACE_WITH_SUPABASE_URL"
       - key: SUPABASE_SERVICE_ROLE_KEY
-        generateValue: false
+        value: "REPLACE_WITH_SERVICE_ROLE_KEY"
