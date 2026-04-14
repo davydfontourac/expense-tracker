@@ -1,6 +1,7 @@
 services:
   - type: web
     name: expense-tracker-backend
+    plan: free 
     env: node
     rootDir: server
     buildCommand: npm install && npm run build
