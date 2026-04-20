@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { api } from '@/services/api';
+import { supabase } from '@/services/supabase';
 import { 
   Plus, 
   Trash2, 
@@ -40,7 +40,8 @@ export default function Categories() {
     if (!deletingCategory) return;
     try {
       setIsDeleting(true);
-      await api.delete(`/categories/${deletingCategory.id}`);
+      const { error } = await supabase.from('categories').delete().eq('id', deletingCategory.id);
+      if (error) throw error;
       toast.success('Categoria excluída com sucesso');
       fetchCategories();
       setDeletingCategory(null);

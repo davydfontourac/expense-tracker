@@ -1,7 +1,7 @@
 import { ArrowDownRight, ArrowUpRight, Tag, Trash2, Edit2, Repeat } from 'lucide-react';
 import type { Transaction } from '@/types';
 import { useState } from 'react';
-import { api } from '@/services/api';
+import { supabase } from '@/services/supabase';
 import { toast } from 'sonner';
 import ConfirmModal from './ConfirmModal';
 
@@ -30,12 +30,17 @@ export default function TransactionItem({ transaction, onDelete, onEdit }: Reado
   async function handleDelete() {
     try {
       setIsDeleting(true);
-      await api.delete(`/transactions/${transaction.id}`);
+      const { error } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('id', transaction.id);
+
+      if (error) throw error;
+      
       toast.success('Transação excluída com sucesso!');
       onDelete();
     } catch (error) {
-      const axiosError = error as { response?: { data?: { error?: string } } };
-      toast.error(axiosError.response?.data?.error ?? 'Erro ao excluir transação.');
+      toast.error('Erro ao excluir transação.');
     } finally {
       setIsDeleting(false);
       setIsModalOpen(false);

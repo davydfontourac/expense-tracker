@@ -3,7 +3,6 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/services/supabase';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { api } from '@/services/api';
 import {
   Trash2,
   AlertTriangle,
@@ -66,9 +65,9 @@ export default function Profile() {
   async function deleteAccount() {
     try {
       setIsDeleting(true);
-      const response = await api.delete('/users');
+      const { error } = await supabase.rpc('delete_user');
 
-      if (response.status === 200) {
+      if (!error) {
         toast.success('Sua conta foi excluída permanentemente.');
         await signOut();
         navigate('/');

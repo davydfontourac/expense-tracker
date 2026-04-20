@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { api } from '@/services/api';
+import { supabase } from '@/services/supabase';
 import { cn } from '@/utils/cn';
 import { X, Loader2, Palette, Tag } from 'lucide-react';
 import { toast } from 'sonner';
@@ -75,10 +75,15 @@ export default function CategoryForm({ isOpen, onClose, onSuccess, category }: R
     try {
       const data = formData as any;
       if (category) {
-        await api.put(`/categories/${category.id}`, data);
+        const { error } = await supabase.from('categories').update(data).eq('id', category.id);
+        if (error) throw error;
         toast.success('Categoria atualizada!');
       } else {
-        await api.post('/categories', data);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Usuário não autenticado');
+        const finalPayload = { ...data, user_id: user.id };
+        const { error } = await supabase.from('categories').insert([finalPayload]);
+        if (error) throw error;
         toast.success('Categoria criada!');
       }
       onSuccess();
