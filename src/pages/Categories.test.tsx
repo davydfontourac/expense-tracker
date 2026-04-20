@@ -18,8 +18,14 @@ vi.mock('@/context/AuthContext', () => ({
   useAuth: () => ({ profile: null }),
 }));
 
-vi.mock('@/services/api', () => ({
-  api: { delete: vi.fn().mockResolvedValue({}) },
+vi.mock('@/services/supabase', () => ({
+  supabase: {
+    from: vi.fn(() => ({
+      delete: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      then: vi.fn().mockImplementation((cb) => cb({ error: null })),
+    })),
+  },
 }));
 
 vi.mock('sonner', () => ({

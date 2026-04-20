@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import TransactionItem from './TransactionItem';
 import type { Transaction } from '@/types';
-import { api } from '@/services/api';
+import { supabase } from '@/services/supabase';
 
 // Mock components and external dependencies
 vi.mock('./ConfirmModal', () => ({
@@ -15,9 +15,15 @@ vi.mock('./ConfirmModal', () => ({
     ) : null,
 }));
 
-vi.mock('@/services/api', () => ({
-  api: {
-    delete: vi.fn(),
+const mockQuery = {
+  delete: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  then: vi.fn(),
+};
+
+vi.mock('@/services/supabase', () => ({
+  supabase: {
+    from: vi.fn(() => mockQuery),
   },
 }));
 
@@ -80,7 +86,7 @@ describe('TransactionItem', () => {
 
   it('deve chamar onDelete após exclusão bem-sucedida', async () => {
     const toast = await import('sonner');
-    (api.delete as any).mockResolvedValue({ data: {} });
+    mockQuery.then.mockImplementationOnce((callback) => callback({ error: null }));
 
     const onDelete = vi.fn();
     render(<TransactionItem transaction={transaction} onDelete={onDelete} onEdit={() => {}} />);
@@ -93,7 +99,9 @@ describe('TransactionItem', () => {
     fireEvent.click(confirmButton);
 
     await waitFor(() => {
-      expect(api.delete).toHaveBeenCalledWith('/transactions/t-123');
+      expect(supabase.from).toHaveBeenCalledWith('transactions');
+      expect(mockQuery.delete).toHaveBeenCalled();
+      expect(mockQuery.eq).toHaveBeenCalledWith('id', 't-123');
       expect(toast.toast.success).toHaveBeenCalledWith('Transação excluída com sucesso!');
       expect(onDelete).toHaveBeenCalled();
     });

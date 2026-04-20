@@ -1,14 +1,22 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import TransactionForm from './TransactionForm';
-import { api } from '@/services/api';
+import { supabase } from '@/services/supabase';
 
 // Mock API and external libraries
-vi.mock('@/services/api', () => ({
-  api: {
-    get: vi.fn(),
-    post: vi.fn(),
-    put: vi.fn(),
+const mockQuery = {
+  select: vi.fn().mockReturnThis(),
+  order: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  insert: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  then: vi.fn(),
+};
+
+vi.mock('@/services/supabase', () => ({
+  supabase: {
+    from: vi.fn(() => mockQuery),
+    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'u-123' } }, error: null }) },
   },
 }));
 
@@ -22,7 +30,7 @@ vi.mock('sonner', () => ({
 describe('TransactionForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (api.get as any).mockResolvedValue({ data: [] });
+    mockQuery.then.mockImplementation((cb) => cb({ data: [], error: null }));
   });
 
   it('deve renderizar o formulário quando estiver aberto', () => {
@@ -77,7 +85,7 @@ describe('TransactionForm', () => {
       type: 'expense',
       is_recurrent: true,
       frequency: 'weekly',
-    };
+    } as any;
 
     render(
       <TransactionForm
@@ -97,7 +105,8 @@ describe('TransactionForm', () => {
   });
 
   it('deve enviar o formulário com dados de recorrência corretamente', async () => {
-    (api.post as any).mockResolvedValue({ data: { id: 'new-1' } });
+    mockQuery.then.mockImplementationOnce((cb) => cb({ data: [], error: null })); // get categories
+    mockQuery.then.mockImplementationOnce((cb) => cb({ error: null })); // insert
 
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
 
@@ -120,8 +129,8 @@ describe('TransactionForm', () => {
     fireEvent.click(screen.getByText('Salvar Transação'));
 
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith(
-        '/transactions',
+      expect(supabase.from).toHaveBeenCalledWith('transactions');
+      expect(mockQuery.insert).toHaveBeenCalledWith([
         expect.objectContaining({
           description: 'Compra Recorrente',
           amount: 150,
@@ -129,7 +138,7 @@ describe('TransactionForm', () => {
           frequency: 'monthly',
           installments: 10,
         }),
-      );
+      ]);
     });
   });
 
@@ -138,18 +147,13 @@ describe('TransactionForm', () => {
       <TransactionForm isOpen={false} onClose={() => {}} onSuccess={() => {}} />,
     );
     expect(container.firstChild).toBeNull();
-    expect(api.get).not.toHaveBeenCalled();
+    expect(supabase.from).not.toHaveBeenCalled();
   });
 
   it('deve chamar onClose ao clicar no botão de fechar', () => {
     const onClose = vi.fn();
     render(<TransactionForm isOpen={true} onClose={onClose} onSuccess={() => {}} />);
 
-    fireEvent.click(screen.getByRole('button', { name: '' })); // O botão X tem a classe p-2 e ícone X. No Lucide, geralmente não tem label.
-    // Olhando o código: <button onClick={onClose} ...><X className="w-5 h-5" /></button>
-    // Vou tentar buscar pelo contêiner ou pelo ícone se possível, ou apenas clicar no botão que tem o X.
-    // Lucide X component usually renders an svg with data-testid="x" or similar if configured, but here it's just a class.
-    // Let's use the first button in the header or find by selector.
     const closeButtons = screen.getAllByRole('button');
     fireEvent.click(closeButtons[0]); // O primeiro botão é o de fechar
     expect(onClose).toHaveBeenCalled();
@@ -162,11 +166,12 @@ describe('TransactionForm', () => {
       amount: 100,
       date: '2026-03-10',
       type: 'expense',
-    };
+    } as any;
     const onSuccess = vi.fn();
     const onClose = vi.fn();
 
-    (api.put as any).mockResolvedValue({ data: { id: '1' } });
+    mockQuery.then.mockImplementationOnce((cb) => cb({ data: [], error: null })); // get categories
+    mockQuery.then.mockImplementationOnce((cb) => cb({ error: null })); // update
 
     render(
       <TransactionForm
@@ -180,13 +185,14 @@ describe('TransactionForm', () => {
     fireEvent.click(screen.getByText('Salvar Transação'));
 
     await waitFor(() => {
-      expect(api.put).toHaveBeenCalledWith(
-        '/transactions/1',
+      expect(supabase.from).toHaveBeenCalledWith('transactions');
+      expect(mockQuery.update).toHaveBeenCalledWith(
         expect.objectContaining({
           description: 'Teste Edição',
           amount: 100,
         }),
       );
+      expect(mockQuery.eq).toHaveBeenCalledWith('id', '1');
       expect(onSuccess).toHaveBeenCalled();
       expect(onClose).toHaveBeenCalled();
     });
@@ -217,7 +223,7 @@ describe('TransactionForm', () => {
       { id: 'cat-1', name: 'Alimentação' },
       { id: 'cat-2', name: 'Transporte' },
     ];
-    (api.get as any).mockResolvedValue({ data: mockCategories });
+    mockQuery.then.mockImplementationOnce((cb) => cb({ data: mockCategories, error: null }));
 
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
 
@@ -234,9 +240,6 @@ describe('TransactionForm', () => {
   it('deve validar campos obrigatórios ao submeter vazio', async () => {
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
 
-    // Limpar campos que podem vir com default (como data)
-    // Mas a descrição vem vazia. O valor vem vazio.
-
     fireEvent.click(screen.getByText('Salvar Transação'));
 
     expect(await screen.findByText('A descrição é obrigatória.')).toBeInTheDocument();
@@ -244,7 +247,8 @@ describe('TransactionForm', () => {
   });
 
   it('deve enviar o formulário com categoria null se nenhuma for selecionada', async () => {
-    (api.post as any).mockResolvedValue({ data: { id: 'new-1' } });
+    mockQuery.then.mockImplementationOnce((cb) => cb({ data: [], error: null })); // get categories
+    mockQuery.then.mockImplementationOnce((cb) => cb({ error: null })); // insert
 
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
 
@@ -253,43 +257,24 @@ describe('TransactionForm', () => {
     });
     fireEvent.change(screen.getByPlaceholderText('0,00'), { target: { value: '100' } });
 
-    // category_id por padrão é null no formState, e o select inicia em "" (Sem categoria)
-
     fireEvent.click(screen.getByText('Salvar Transação'));
 
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith(
-        '/transactions',
+      expect(supabase.from).toHaveBeenCalledWith('transactions');
+      expect(mockQuery.insert).toHaveBeenCalledWith([
         expect.objectContaining({
           description: 'Sem Categoria',
           amount: 100,
           category_id: null,
         }),
-      );
-    });
-  });
-
-  it('deve lidar com erro específico retornado pelo servidor', async () => {
-    const toast = await import('sonner');
-    (api.post as any).mockRejectedValue({
-      response: { data: { error: 'Mensagem de Erro do Servidor' } },
-    });
-
-    render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
-
-    fireEvent.change(screen.getByPlaceholderText(/Ex: Freela/), { target: { value: 'Erro' } });
-    fireEvent.change(screen.getByPlaceholderText('0,00'), { target: { value: '10' } });
-
-    fireEvent.click(screen.getByText('Salvar Transação'));
-
-    await waitFor(() => {
-      expect(toast.toast.error).toHaveBeenCalledWith('Mensagem de Erro do Servidor');
+      ]);
     });
   });
 
   it('deve lidar com erro na submissão sem mensagem do servidor', async () => {
     const toast = await import('sonner');
-    (api.post as any).mockRejectedValue(new Error('Generic Error'));
+    mockQuery.then.mockImplementationOnce((cb) => cb({ data: [], error: null })); // get categories
+    mockQuery.then.mockImplementationOnce((cb) => cb({ error: new Error('Generic Error') })); // insert error
 
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
 
@@ -306,7 +291,6 @@ describe('TransactionForm', () => {
   it('deve validar data obrigatória', async () => {
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
 
-    // O valor default é o dia de hoje. Vamos limpar.
     const dateInput = screen.getByLabelText(/Data da primeira/);
     fireEvent.change(dateInput, { target: { value: '' } });
 
@@ -317,7 +301,7 @@ describe('TransactionForm', () => {
 
   it('deve carregar categoria na edição se presente', async () => {
     const mockCategories = [{ id: 'cat-123', name: 'Lazer' }];
-    (api.get as any).mockResolvedValue({ data: mockCategories });
+    mockQuery.then.mockImplementationOnce((cb) => cb({ data: mockCategories, error: null }));
 
     const mockTransaction = {
       id: '1',
@@ -326,7 +310,7 @@ describe('TransactionForm', () => {
       date: '2026-03-10',
       type: 'expense',
       category_id: 'cat-123',
-    };
+    } as any;
 
     render(
       <TransactionForm
@@ -347,8 +331,8 @@ describe('TransactionForm', () => {
 
   it('deve enviar o formulário com uma categoria selecionada', async () => {
     const mockCategories = [{ id: 'cat-789', name: 'Saúde' }];
-    (api.get as any).mockResolvedValue({ data: mockCategories });
-    (api.post as any).mockResolvedValue({ data: { id: 'new-2' } });
+    mockQuery.then.mockImplementationOnce((cb) => cb({ data: mockCategories, error: null })); // get
+    mockQuery.then.mockImplementationOnce((cb) => cb({ error: null })); // insert
 
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
 
@@ -363,20 +347,19 @@ describe('TransactionForm', () => {
     fireEvent.click(screen.getByText('Salvar Transação'));
 
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith(
-        '/transactions',
+      expect(mockQuery.insert).toHaveBeenCalledWith([
         expect.objectContaining({
           description: 'Consulta',
           amount: 250,
           category_id: 'cat-789',
         }),
-      );
+      ]);
     });
   });
 
   it('deve lidar com edição de transação sem categoria', async () => {
     const mockCategories = [{ id: 'cat-1', name: 'Alimentação' }];
-    (api.get as any).mockResolvedValue({ data: mockCategories });
+    mockQuery.then.mockImplementationOnce((cb) => cb({ data: mockCategories, error: null }));
 
     const mockTransaction = {
       id: '1',
@@ -385,7 +368,7 @@ describe('TransactionForm', () => {
       date: '2026-03-10',
       type: 'expense',
       category_id: null,
-    };
+    } as any;
 
     render(
       <TransactionForm
