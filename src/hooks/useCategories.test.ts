@@ -7,13 +7,13 @@ import { toast } from 'sonner';
 vi.mock('@/services/api', () => ({
   api: {
     get: vi.fn(),
-  }
+  },
 }));
 
 vi.mock('sonner', () => ({
   toast: {
     error: vi.fn(),
-  }
+  },
 }));
 
 describe('useCategories', () => {
@@ -28,9 +28,7 @@ describe('useCategories', () => {
   });
 
   it('carrega categorias com sucesso', async () => {
-    const mockCategories = [
-      { id: '1', name: 'Alimentação', icon: 'food', color: '#ff0000' }
-    ];
+    const mockCategories = [{ id: '1', name: 'Alimentação', icon: 'food', color: '#ff0000' }];
 
     (api.get as any).mockResolvedValueOnce({ data: mockCategories });
 

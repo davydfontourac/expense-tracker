@@ -1,14 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/services/supabase';
-import { 
-  Plus, 
-  Trash2, 
-  Edit2, 
-  ArrowLeft,
-  Tag,
-  User
-} from 'lucide-react';
+import { Plus, Trash2, Edit2, ArrowLeft, Tag, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import ConfirmModal from '@/components/ConfirmModal';
@@ -57,14 +50,15 @@ export default function Categories() {
     setIsFormOpen(true);
   };
 
-
-
   const renderContent = () => {
     if (isLoading) {
       return (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {SKELETON_CAT_IDS.map((id) => (
-            <div key={id} className="bg-white dark:bg-gray-900 p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm flex items-center justify-between">
+            <div
+              key={id}
+              className="bg-white dark:bg-gray-900 p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm flex items-center justify-between"
+            >
               <div className="flex items-center gap-4">
                 <Skeleton className="w-12 h-12 rounded-xl" />
                 <div className="space-y-2">
@@ -88,7 +82,9 @@ export default function Categories() {
           <div className="w-16 h-16 bg-blue-50 dark:bg-blue-500/10 text-blue-500 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
             <Tag className="w-8 h-8" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">Nenhuma categoria</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            Nenhuma categoria
+          </h2>
           <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-sm mx-auto">
             Crie categorias para organizar melhor suas finanças e ver relatórios por tipo de gasto.
           </p>
@@ -128,7 +124,9 @@ export default function Categories() {
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900 dark:text-gray-100">{category.name}</h3>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-wider">{category.color}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-wider">
+                    {category.color}
+                  </p>
                 </div>
               </div>
 
@@ -159,8 +157,8 @@ export default function Categories() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-4">
-              <Link 
-                to="/dashboard" 
+              <Link
+                to="/dashboard"
                 className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -177,7 +175,11 @@ export default function Categories() {
                 title="Meu Perfil"
               >
                 {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                  <img
+                    src={profile.avatar_url}
+                    alt="Avatar"
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <User className="w-5 h-5 text-gray-400 group-hover/avatar:text-blue-500 transition-colors" />
                 )}
@@ -202,14 +204,14 @@ export default function Categories() {
       </main>
 
       {/* Modais */}
-      <CategoryForm 
+      <CategoryForm
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         onSuccess={fetchCategories}
         category={editingCategory}
       />
 
-      <ConfirmModal 
+      <ConfirmModal
         isOpen={!!deletingCategory}
         onClose={() => setDeletingCategory(null)}
         onConfirm={handleDelete}

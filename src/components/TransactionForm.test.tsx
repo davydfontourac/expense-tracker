@@ -9,7 +9,7 @@ vi.mock('@/services/api', () => ({
     get: vi.fn(),
     post: vi.fn(),
     put: vi.fn(),
-  }
+  },
 }));
 
 vi.mock('sonner', () => ({
@@ -32,11 +32,11 @@ describe('TransactionForm', () => {
 
   it('deve mostrar campos de recorrência apenas quando o checkbox está marcado', () => {
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
-    
+
     // Recurrence checkbox
     const checkbox = screen.getByLabelText(/Repetir transação/);
     expect(checkbox).not.toBeChecked();
-    
+
     // Frequency and installments fields should not be visible
     expect(screen.queryByText('Frequência')).not.toBeInTheDocument();
     expect(screen.queryByText('Ocorrências')).not.toBeInTheDocument();
@@ -52,12 +52,12 @@ describe('TransactionForm', () => {
 
   it('deve permitir selecionar as frequências disponíveis', async () => {
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
-    
+
     const checkbox = screen.getByLabelText(/Repetir transação/);
     fireEvent.click(checkbox);
 
     const freqSelect = screen.getByRole('combobox', { name: /Frequência/i }) as HTMLSelectElement;
-    
+
     fireEvent.change(freqSelect, { target: { value: 'weekly' } });
     expect(freqSelect.value).toBe('weekly');
 
@@ -76,21 +76,21 @@ describe('TransactionForm', () => {
       date: '2026-03-10',
       type: 'expense',
       is_recurrent: true,
-      frequency: 'weekly'
+      frequency: 'weekly',
     };
 
     render(
-      <TransactionForm 
-        isOpen={true} 
-        onClose={() => {}} 
-        onSuccess={() => {}} 
-        transaction={mockTransaction} 
-      />
+      <TransactionForm
+        isOpen={true}
+        onClose={() => {}}
+        onSuccess={() => {}}
+        transaction={mockTransaction}
+      />,
     );
 
     expect(screen.getByPlaceholderText(/Ex: Freela/)).toHaveValue('Teste Edição');
     expect(screen.getByLabelText(/Repetir transação/)).toBeChecked();
-    
+
     // Frequency must be set as weekly
     const freqSelect = screen.getByRole('combobox', { name: /Frequência/i }) as HTMLSelectElement;
     expect(freqSelect.value).toBe('weekly');
@@ -98,34 +98,45 @@ describe('TransactionForm', () => {
 
   it('deve enviar o formulário com dados de recorrência corretamente', async () => {
     (api.post as any).mockResolvedValue({ data: { id: 'new-1' } });
-    
+
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
-    
-    fireEvent.change(screen.getByPlaceholderText(/Ex: Freela/), { target: { value: 'Compra Recorrente' } });
+
+    fireEvent.change(screen.getByPlaceholderText(/Ex: Freela/), {
+      target: { value: 'Compra Recorrente' },
+    });
     fireEvent.change(screen.getByPlaceholderText('0,00'), { target: { value: '150' } });
-    
+
     // Open recurrence
     fireEvent.click(screen.getByLabelText(/Repetir transação/));
-    
+
     // Selecionar frequência e parcelas
-    fireEvent.change(screen.getByRole('combobox', { name: /Frequência/i }), { target: { value: 'monthly' } });
-    fireEvent.change(screen.getByRole('spinbutton', { name: /Ocorrências/i }), { target: { value: '10' } });
+    fireEvent.change(screen.getByRole('combobox', { name: /Frequência/i }), {
+      target: { value: 'monthly' },
+    });
+    fireEvent.change(screen.getByRole('spinbutton', { name: /Ocorrências/i }), {
+      target: { value: '10' },
+    });
 
     fireEvent.click(screen.getByText('Salvar Transação'));
 
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith('/transactions', expect.objectContaining({
-        description: 'Compra Recorrente',
-        amount: 150,
-        is_recurrent: true,
-        frequency: 'monthly',
-        installments: 10
-      }));
+      expect(api.post).toHaveBeenCalledWith(
+        '/transactions',
+        expect.objectContaining({
+          description: 'Compra Recorrente',
+          amount: 150,
+          is_recurrent: true,
+          frequency: 'monthly',
+          installments: 10,
+        }),
+      );
     });
   });
 
   it('não deve renderizar nada quando isOpen for false', () => {
-    const { container } = render(<TransactionForm isOpen={false} onClose={() => {}} onSuccess={() => {}} />);
+    const { container } = render(
+      <TransactionForm isOpen={false} onClose={() => {}} onSuccess={() => {}} />,
+    );
     expect(container.firstChild).toBeNull();
     expect(api.get).not.toHaveBeenCalled();
   });
@@ -133,7 +144,7 @@ describe('TransactionForm', () => {
   it('deve chamar onClose ao clicar no botão de fechar', () => {
     const onClose = vi.fn();
     render(<TransactionForm isOpen={true} onClose={onClose} onSuccess={() => {}} />);
-    
+
     fireEvent.click(screen.getByRole('button', { name: '' })); // O botão X tem a classe p-2 e ícone X. No Lucide, geralmente não tem label.
     // Olhando o código: <button onClick={onClose} ...><X className="w-5 h-5" /></button>
     // Vou tentar buscar pelo contêiner ou pelo ícone se possível, ou apenas clicar no botão que tem o X.
@@ -150,29 +161,32 @@ describe('TransactionForm', () => {
       description: 'Teste Edição',
       amount: 100,
       date: '2026-03-10',
-      type: 'expense'
+      type: 'expense',
     };
     const onSuccess = vi.fn();
     const onClose = vi.fn();
-    
+
     (api.put as any).mockResolvedValue({ data: { id: '1' } });
 
     render(
-      <TransactionForm 
-        isOpen={true} 
-        onClose={onClose} 
-        onSuccess={onSuccess} 
-        transaction={mockTransaction} 
-      />
+      <TransactionForm
+        isOpen={true}
+        onClose={onClose}
+        onSuccess={onSuccess}
+        transaction={mockTransaction}
+      />,
     );
 
     fireEvent.click(screen.getByText('Salvar Transação'));
 
     await waitFor(() => {
-      expect(api.put).toHaveBeenCalledWith('/transactions/1', expect.objectContaining({
-        description: 'Teste Edição',
-        amount: 100
-      }));
+      expect(api.put).toHaveBeenCalledWith(
+        '/transactions/1',
+        expect.objectContaining({
+          description: 'Teste Edição',
+          amount: 100,
+        }),
+      );
       expect(onSuccess).toHaveBeenCalled();
       expect(onClose).toHaveBeenCalled();
     });
@@ -180,13 +194,13 @@ describe('TransactionForm', () => {
 
   it('deve alternar entre despesa e receita ao clicar nos botões', () => {
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
-    
+
     const expenseBtn = screen.getByText('Despesa').closest('button')!;
     const incomeBtn = screen.getByText('Receita').closest('button')!;
 
     // Inicialmente é despesa (default)
     expect(expenseBtn).toHaveClass('text-red-600');
-    
+
     // Clica em Receita
     fireEvent.click(incomeBtn);
     expect(incomeBtn).toHaveClass('text-emerald-600');
@@ -201,7 +215,7 @@ describe('TransactionForm', () => {
   it('deve carregar e renderizar categorias', async () => {
     const mockCategories = [
       { id: 'cat-1', name: 'Alimentação' },
-      { id: 'cat-2', name: 'Transporte' }
+      { id: 'cat-2', name: 'Transporte' },
     ];
     (api.get as any).mockResolvedValue({ data: mockCategories });
 
@@ -219,10 +233,10 @@ describe('TransactionForm', () => {
 
   it('deve validar campos obrigatórios ao submeter vazio', async () => {
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
-    
+
     // Limpar campos que podem vir com default (como data)
     // Mas a descrição vem vazia. O valor vem vazio.
-    
+
     fireEvent.click(screen.getByText('Salvar Transação'));
 
     expect(await screen.findByText('A descrição é obrigatória.')).toBeInTheDocument();
@@ -231,36 +245,41 @@ describe('TransactionForm', () => {
 
   it('deve enviar o formulário com categoria null se nenhuma for selecionada', async () => {
     (api.post as any).mockResolvedValue({ data: { id: 'new-1' } });
-    
+
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
-    
-    fireEvent.change(screen.getByPlaceholderText(/Ex: Freela/), { target: { value: 'Sem Categoria' } });
+
+    fireEvent.change(screen.getByPlaceholderText(/Ex: Freela/), {
+      target: { value: 'Sem Categoria' },
+    });
     fireEvent.change(screen.getByPlaceholderText('0,00'), { target: { value: '100' } });
-    
+
     // category_id por padrão é null no formState, e o select inicia em "" (Sem categoria)
-    
+
     fireEvent.click(screen.getByText('Salvar Transação'));
 
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith('/transactions', expect.objectContaining({
-        description: 'Sem Categoria',
-        amount: 100,
-        category_id: null
-      }));
+      expect(api.post).toHaveBeenCalledWith(
+        '/transactions',
+        expect.objectContaining({
+          description: 'Sem Categoria',
+          amount: 100,
+          category_id: null,
+        }),
+      );
     });
   });
 
   it('deve lidar com erro específico retornado pelo servidor', async () => {
     const toast = await import('sonner');
-    (api.post as any).mockRejectedValue({ 
-      response: { data: { error: 'Mensagem de Erro do Servidor' } } 
+    (api.post as any).mockRejectedValue({
+      response: { data: { error: 'Mensagem de Erro do Servidor' } },
     });
-    
+
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
-    
+
     fireEvent.change(screen.getByPlaceholderText(/Ex: Freela/), { target: { value: 'Erro' } });
     fireEvent.change(screen.getByPlaceholderText('0,00'), { target: { value: '10' } });
-    
+
     fireEvent.click(screen.getByText('Salvar Transação'));
 
     await waitFor(() => {
@@ -271,12 +290,12 @@ describe('TransactionForm', () => {
   it('deve lidar com erro na submissão sem mensagem do servidor', async () => {
     const toast = await import('sonner');
     (api.post as any).mockRejectedValue(new Error('Generic Error'));
-    
+
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
-    
+
     fireEvent.change(screen.getByPlaceholderText(/Ex: Freela/), { target: { value: 'Erro' } });
     fireEvent.change(screen.getByPlaceholderText('0,00'), { target: { value: '10' } });
-    
+
     fireEvent.click(screen.getByText('Salvar Transação'));
 
     await waitFor(() => {
@@ -286,7 +305,7 @@ describe('TransactionForm', () => {
 
   it('deve validar data obrigatória', async () => {
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
-    
+
     // O valor default é o dia de hoje. Vamos limpar.
     const dateInput = screen.getByLabelText(/Data da primeira/);
     fireEvent.change(dateInput, { target: { value: '' } });
@@ -306,16 +325,16 @@ describe('TransactionForm', () => {
       amount: 100,
       date: '2026-03-10',
       type: 'expense',
-      category_id: 'cat-123'
+      category_id: 'cat-123',
     };
 
     render(
-      <TransactionForm 
-        isOpen={true} 
-        onClose={() => {}} 
-        onSuccess={() => {}} 
-        transaction={mockTransaction} 
-      />
+      <TransactionForm
+        isOpen={true}
+        onClose={() => {}}
+        onSuccess={() => {}}
+        transaction={mockTransaction}
+      />,
     );
 
     await waitFor(() => {
@@ -344,11 +363,14 @@ describe('TransactionForm', () => {
     fireEvent.click(screen.getByText('Salvar Transação'));
 
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith('/transactions', expect.objectContaining({
-        description: 'Consulta',
-        amount: 250,
-        category_id: 'cat-789'
-      }));
+      expect(api.post).toHaveBeenCalledWith(
+        '/transactions',
+        expect.objectContaining({
+          description: 'Consulta',
+          amount: 250,
+          category_id: 'cat-789',
+        }),
+      );
     });
   });
 
@@ -362,10 +384,17 @@ describe('TransactionForm', () => {
       amount: 50,
       date: '2026-03-10',
       type: 'expense',
-      category_id: null
+      category_id: null,
     };
 
-    render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} transaction={mockTransaction} />);
+    render(
+      <TransactionForm
+        isOpen={true}
+        onClose={() => {}}
+        onSuccess={() => {}}
+        transaction={mockTransaction}
+      />,
+    );
 
     await waitFor(() => {
       expect(screen.getByText('Alimentação')).toBeInTheDocument();

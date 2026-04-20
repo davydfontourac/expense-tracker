@@ -7,13 +7,13 @@ import { toast } from 'sonner';
 vi.mock('@/services/api', () => ({
   api: {
     get: vi.fn(),
-  }
+  },
 }));
 
 vi.mock('sonner', () => ({
   toast: {
     error: vi.fn(),
-  }
+  },
 }));
 
 describe('useTransactions', () => {
@@ -37,17 +37,25 @@ describe('useTransactions', () => {
     // Simulates Promise.all calls
     (api.get as any)
       .mockResolvedValueOnce({ data: mockTransactions }) // transRes
-      .mockResolvedValueOnce({ data: mockSummary })      // sumRes
-      .mockResolvedValueOnce({ data: mockHistory });     // historyRes
+      .mockResolvedValueOnce({ data: mockSummary }) // sumRes
+      .mockResolvedValueOnce({ data: mockHistory }); // historyRes
 
     const { result } = renderHook(() => useTransactions());
 
     await act(async () => {
-      await result.current.fetchTransactions({ type: 'income', month: '10', year: '2023', search: 'teste' });
+      await result.current.fetchTransactions({
+        type: 'income',
+        month: '10',
+        year: '2023',
+        search: 'teste',
+      });
     });
 
     // Validate assembled query parameters
-    expect(api.get).toHaveBeenNthCalledWith(1, '/transactions?type=income&month=10&year=2023&search=teste');
+    expect(api.get).toHaveBeenNthCalledWith(
+      1,
+      '/transactions?type=income&month=10&year=2023&search=teste',
+    );
     expect(api.get).toHaveBeenNthCalledWith(2, '/transactions/summary?month=10&year=2023');
     expect(api.get).toHaveBeenNthCalledWith(3, '/transactions/history');
 
@@ -63,7 +71,12 @@ describe('useTransactions', () => {
     const { result } = renderHook(() => useTransactions());
 
     await act(async () => {
-      await result.current.fetchTransactions({ type: 'all', month: '10', year: '2023', search: '' });
+      await result.current.fetchTransactions({
+        type: 'all',
+        month: '10',
+        year: '2023',
+        search: '',
+      });
     });
 
     expect(toast.error).toHaveBeenCalledWith('Erro ao carregar transações');
