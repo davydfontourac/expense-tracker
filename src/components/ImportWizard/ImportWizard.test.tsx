@@ -1,9 +1,7 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ImportWizard from './ImportWizard';
-import { parseCSV, transformCSVData } from '@/utils/csvParser';
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/services/supabase';
 
 vi.mock('@/utils/csvParser', () => ({
   parseCSV: vi.fn(),

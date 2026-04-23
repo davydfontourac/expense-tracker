@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { parseCSV, transformCSVData, CSVMapping, ParsedCSVRow } from './csvParser';
+import { parseCSV, transformCSVData } from './csvParser';
+import type { CSVMapping, ParsedCSVRow } from './csvParser';
 import Papa from 'papaparse';
 
 vi.mock('papaparse', () => ({
@@ -12,7 +13,7 @@ describe('csvParser', () => {
   describe('parseCSV', () => {
     it('deve resolver com os dados quando o parse tem sucesso', async () => {
       const mockData = [{ Col1: 'Val1' }];
-      (Papa.parse as any).mockImplementationOnce((file: any, config: any) => {
+      (Papa.parse as any).mockImplementationOnce((_file: any, config: any) => {
         config.complete({ data: mockData });
       });
 
@@ -23,7 +24,7 @@ describe('csvParser', () => {
 
     it('deve rejeitar com erro quando o parse falha', async () => {
       const mockError = new Error('Parse error');
-      (Papa.parse as any).mockImplementationOnce((file: any, config: any) => {
+      (Papa.parse as any).mockImplementationOnce((_file: any, config: any) => {
         config.error(mockError);
       });
 

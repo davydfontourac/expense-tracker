@@ -4,7 +4,7 @@ import FileUpload from './FileUpload';
 
 describe('FileUpload', () => {
   it('deve renderizar o componente de upload corretamente', () => {
-    render(<FileUpload onFileSelect={() => {}} />);
+    render(<FileUpload file={null} onFileSelect={() => {}} />);
     expect(screen.getByText(/Arraste seu arquivo CSV aqui/i)).toBeInTheDocument();
   });
 
