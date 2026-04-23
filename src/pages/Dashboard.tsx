@@ -154,9 +154,11 @@ export default function Dashboard() {
         <div className="fixed bottom-20 md:bottom-8 right-8 flex flex-col items-end gap-3 z-50">
           {/* Backdrop for mobile to close when clicking outside */}
           {isFABOpen && (
-            <div 
-              className="fixed inset-0 bg-transparent" 
+            <button 
+              type="button"
+              className="fixed inset-0 bg-transparent w-full h-full cursor-default border-none outline-none" 
               onClick={() => setIsFABOpen(false)}
+              aria-label="Fechar menu"
             />
           )}
 
