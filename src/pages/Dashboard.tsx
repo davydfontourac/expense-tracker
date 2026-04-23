@@ -16,6 +16,7 @@ import PageTransition from '@/components/PageTransition';
 import ImportWizard from '@/components/ImportWizard/ImportWizard';
 import { FileDown } from 'lucide-react';
 import ConfirmModal from '@/components/ConfirmModal';
+import { cn } from '@/utils/cn';
 
 export default function Dashboard() {
   const { user, profile, signOut } = useAuth();
