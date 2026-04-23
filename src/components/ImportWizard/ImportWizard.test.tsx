@@ -106,7 +106,7 @@ describe('ImportWizard', () => {
   it('deve lidar com erro na importação', async () => {
     (supabase.from('transactions').insert as any).mockRejectedValueOnce(new Error('Insert error'));
     
-    const { container } = render(<ImportWizard isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
+    render(<ImportWizard isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
     
     // Simulate jumping to step 2 (import) by manually triggering states
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
