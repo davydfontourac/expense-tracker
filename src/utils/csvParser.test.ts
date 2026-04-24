@@ -61,9 +61,7 @@ describe('csvParser', () => {
     });
 
     it('deve lidar com separador decimal ponto corretamente mesmo configurado para virgula se detectar ponto', () => {
-      const data: ParsedCSVRow[] = [
-        { Data: '23/04/2026', Desc: 'Teste', Valor: '-1332.74' },
-      ];
+      const data: ParsedCSVRow[] = [{ Data: '23/04/2026', Desc: 'Teste', Valor: '-1332.74' }];
 
       const result = transformCSVData(data, defaultMapping, categories);
 
@@ -71,9 +69,7 @@ describe('csvParser', () => {
     });
 
     it('deve lidar com falha no parse da data fazendo fallback para hoje', () => {
-      const data: ParsedCSVRow[] = [
-        { Data: 'data-invalida', Desc: 'Teste', Valor: '10,00' },
-      ];
+      const data: ParsedCSVRow[] = [{ Data: 'data-invalida', Desc: 'Teste', Valor: '10,00' }];
 
       const result = transformCSVData(data, defaultMapping, categories);
 
@@ -82,9 +78,7 @@ describe('csvParser', () => {
     });
 
     it('deve mapear categoria Caixinha como transfer_in quando positivo', () => {
-      const data: ParsedCSVRow[] = [
-        { Data: '23/04/2026', Desc: 'Resgate RDB', Valor: '100,00' },
-      ];
+      const data: ParsedCSVRow[] = [{ Data: '23/04/2026', Desc: 'Resgate RDB', Valor: '100,00' }];
 
       const result = transformCSVData(data, defaultMapping, categories);
 

@@ -35,13 +35,17 @@ describe('SummaryCards', () => {
   });
 
   it('deve aplicar classe verde quando Patrimonio Total >= 0', () => {
-    const { container } = render(<SummaryCards summary={{ ...baseSummary, availableBalance: 500, caixinhaBalance: 0 }} />);
+    const { container } = render(
+      <SummaryCards summary={{ ...baseSummary, availableBalance: 500, caixinhaBalance: 0 }} />,
+    );
     const greenSpan = container.querySelector('.text-emerald-500, .text-emerald-400');
     expect(greenSpan).toBeInTheDocument();
   });
 
   it('deve aplicar classe vermelha quando Patrimonio Total < 0', () => {
-    const { container } = render(<SummaryCards summary={{ ...baseSummary, availableBalance: -1000, caixinhaBalance: 200 }} />);
+    const { container } = render(
+      <SummaryCards summary={{ ...baseSummary, availableBalance: -1000, caixinhaBalance: 200 }} />,
+    );
     const redSpan = container.querySelector('.text-red-500, .text-red-400');
     expect(redSpan).toBeInTheDocument();
   });

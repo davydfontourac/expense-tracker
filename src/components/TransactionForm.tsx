@@ -233,7 +233,9 @@ export default function TransactionForm({
                   onChange={() => setValue('type', 'transfer_out')}
                   className="w-4 h-4 text-blue-600"
                 />
-                <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Aplicação (Saída)</span>
+                <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                  Aplicação (Saída)
+                </span>
               </label>
               <label className="flex flex-1 items-center gap-2 cursor-pointer group">
                 <input
@@ -242,7 +244,9 @@ export default function TransactionForm({
                   onChange={() => setValue('type', 'transfer_in')}
                   className="w-4 h-4 text-blue-600"
                 />
-                <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Resgate (Entrada)</span>
+                <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                  Resgate (Entrada)
+                </span>
               </label>
             </div>
           )}

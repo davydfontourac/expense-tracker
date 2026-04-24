@@ -12,14 +12,15 @@
     <img src="./demo.gif" alt="Expense Tracker Demo" width="800"/>
   </div>
 
-  ![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)
-  ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript)
-  ![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=flat-square&logo=vite)
-  ![Supabase](https://img.shields.io/badge/Supabase-Full%20Stack-3ECF8E?style=flat-square&logo=supabase)
-  ![Tailwind](https://img.shields.io/badge/Tailwind-4-06B6D4?style=flat-square&logo=tailwindcss)
-  [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=davydfontourac_controle-de-gastos&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=davydfontourac_controle-de-gastos)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=flat-square&logo=vite)
+![Supabase](https://img.shields.io/badge/Supabase-Full%20Stack-3ECF8E?style=flat-square&logo=supabase)
+![Tailwind](https://img.shields.io/badge/Tailwind-4-06B6D4?style=flat-square&logo=tailwindcss)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=davydfontourac_controle-de-gastos&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=davydfontourac_controle-de-gastos)
 
-  [🌐 View Demo](https://controle-de-gastos-tan-six.vercel.app) · [📋 Issues](https://github.com/davydfontourac/expense-tracker/issues)
+[🌐 View Demo](https://controle-de-gastos-tan-six.vercel.app) · [📋 Issues](https://github.com/davydfontourac/expense-tracker/issues)
+
 </div>
 
 ---
@@ -40,54 +41,62 @@
 
 ## 🛠️ Technologies
 
-| Technology | Purpose |
-|---|---|
-| **React 19** | Modern UI library |
-| **TypeScript** | Type safety |
-| **Vite** | Fast build tool and dev server |
-| **Supabase** | Backend-as-a-Service (Auth, Database, RPCs) |
-| **Tailwind CSS 4** | Utility-first styling |
-| **Framer Motion** | Fluid animations |
-| **Recharts** | Interactive dashboard charts |
-| **React Hook Form** | Efficient form management |
-| **Zod** | Schema validation |
-| **Vitest** | Unit and integration testing |
+| Technology          | Purpose                                     |
+| ------------------- | ------------------------------------------- |
+| **React 19**        | Modern UI library                           |
+| **TypeScript**      | Type safety                                 |
+| **Vite**            | Fast build tool and dev server              |
+| **Supabase**        | Backend-as-a-Service (Auth, Database, RPCs) |
+| **Tailwind CSS 4**  | Utility-first styling                       |
+| **Framer Motion**   | Fluid animations                            |
+| **Recharts**        | Interactive dashboard charts                |
+| **React Hook Form** | Efficient form management                   |
+| **Zod**             | Schema validation                           |
+| **Vitest**          | Unit and integration testing                |
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 20+
 - [Supabase](https://supabase.com) account
 
 ### 1. Clone the repository
+
 ```bash
 git clone https://github.com/davydfontourac/expense-tracker.git
 cd expense-tracker
 ```
 
 ### 2. Install dependencies
+
 ```bash
 npm install
 ```
 
 ### 3. Environment Variables
+
 Create a `.env` file in the root directory:
+
 ```bash
 cp .env.example .env
 ```
 
 Fill in your Supabase credentials:
+
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
 ```
 
 ### 4. Database Setup
+
 The project uses PostgreSQL functions (RPCs) for optimized dashboard calculations. Run the SQL scripts found in `supabase/migrations` directly in the **Supabase SQL Editor**.
 
 ### 5. Run the app
+
 ```bash
 npm run dev
 ```

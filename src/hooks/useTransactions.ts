@@ -84,7 +84,7 @@ export function useTransactions() {
   const deleteTransactionsByMonth = async (month: number, year: number) => {
     try {
       setIsLoading(true);
-      
+
       const startDate = new Date(Date.UTC(year, month - 1, 1)).toISOString();
       const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59)).toISOString();
 
@@ -95,7 +95,7 @@ export function useTransactions() {
         .lte('date', endDate);
 
       if (error) throw error;
-      
+
       toast.success('Histórico do mês excluído com sucesso');
       return true;
     } catch (err: any) {
@@ -107,5 +107,12 @@ export function useTransactions() {
     }
   };
 
-  return { transactions, summary, history, isLoading, fetchTransactions, deleteTransactionsByMonth };
+  return {
+    transactions,
+    summary,
+    history,
+    isLoading,
+    fetchTransactions,
+    deleteTransactionsByMonth,
+  };
 }

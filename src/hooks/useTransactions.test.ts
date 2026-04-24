@@ -43,11 +43,19 @@ describe('useTransactions', () => {
 
   it('busca as transações com sucesso aplicando os filtros na query', async () => {
     const mockTransactions = [{ id: 't1', amount: 100, type: 'income' }];
-    const mockSummary = { income: 100, expense: 0, availableBalance: 100, caixinhaBalance: 0, yearBalance: 100 };
+    const mockSummary = {
+      income: 100,
+      expense: 0,
+      availableBalance: 100,
+      caixinhaBalance: 0,
+      yearBalance: 100,
+    };
     const mockHistory = [{ month: 'Jan', value: 100 }];
 
     // Resolves the promise from the mockQuery object for the 'transactions' fetch
-    mockQuery.then.mockImplementationOnce((callback) => callback({ data: mockTransactions, error: null }));
+    mockQuery.then.mockImplementationOnce((callback) =>
+      callback({ data: mockTransactions, error: null }),
+    );
 
     // Simulates rpc calls
     (supabase.rpc as any)
@@ -66,7 +74,10 @@ describe('useTransactions', () => {
     });
 
     expect(supabase.from).toHaveBeenCalledWith('transactions');
-    expect(supabase.rpc).toHaveBeenCalledWith('get_dashboard_summary', { p_month: 10, p_year: 2023 });
+    expect(supabase.rpc).toHaveBeenCalledWith('get_dashboard_summary', {
+      p_month: 10,
+      p_year: 2023,
+    });
     expect(supabase.rpc).toHaveBeenCalledWith('get_monthly_history', { p_year: 2023 });
 
     expect(result.current.transactions).toEqual(mockTransactions);
@@ -77,7 +88,9 @@ describe('useTransactions', () => {
   });
 
   it('lida com falhas no meio do paralelismo', async () => {
-    mockQuery.then.mockImplementationOnce((callback) => callback({ data: null, error: new Error('Network error') }));
+    mockQuery.then.mockImplementationOnce((callback) =>
+      callback({ data: null, error: new Error('Network error') }),
+    );
 
     const { result } = renderHook(() => useTransactions());
 

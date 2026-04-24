@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Expense Tracker — Controle suas finanças pessoais</title>
+    <link rel="icon" type="image/png" href="public/logo-expense-tracker.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif&display=swap"
+      rel="stylesheet"
+    />
+
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+      crossorigin="anonymous"
+    ></script>
+
+    <style>
+      :root {
+        /* Brand: deep indigo/violet primary, with the logo's cyan/blue as accent */
+        --brand-500: #6366f1; /* indigo */
+        --brand-600: #5b5bf0;
+        --brand-700: #4f46e5;
+        --brand-800: #3730a3;
+        --accent-400: #22d3ee; /* cyan from logo */
+        --accent-500: #0ea5e9; /* blue from logo */
+        --accent-600: #0284c7;
+
+        --ink-0: #ffffff;
+        --ink-50: #fafafb;
+        --ink-100: #f4f4f7;
+        --ink-200: #e6e6ee;
+        --ink-300: #d0d0dc;
+        --ink-400: #9a9ab0;
+        --ink-500: #6b6b82;
+        --ink-700: #3b3b52;
+        --ink-900: #0c0c1d;
+
+        --radius: 14px;
+        --radius-lg: 20px;
+
+        --maxw: 1200px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          'Geist',
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          sans-serif;
+        color: var(--ink-900);
+        background: var(--ink-0);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        font-feature-settings: 'ss01', 'cv11';
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      button {
+        font-family: inherit;
+      }
+
+      .mono {
+        font-family: 'Geist Mono', ui-monospace, monospace;
+      }
+      .serif {
+        font-family: 'Instrument Serif', serif;
+        font-style: italic;
+        font-weight: 400;
+      }
+
+      /* dark section override */
+      [data-theme='dark'] {
+        color: #e8e8f0;
+        background: #07070f;
+      }
+
+      #root {
+        min-height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel" src="tweaks-panel.jsx"></script>
+    <script type="text/babel" src="landing.jsx"></script>
+  </body>
+</html>

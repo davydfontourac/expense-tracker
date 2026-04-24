@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Login from '@/pages/Login';
-import Register from '@/pages/Register';
+import Auth from '@/pages/Auth';
+import Landing from '@/pages/Landing';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import Dashboard from '@/pages/Dashboard';
@@ -15,8 +15,9 @@ function App() {
       <Routes>
         {/* Rotas Públicas (apenas deslogados) */}
         <Route element={<PublicRoute />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Auth />} />
+          <Route path="/register" element={<Auth />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
         </Route>
@@ -26,9 +27,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Route>
-        
+
         {/* Fallback de rotas inexistentes redireciona pra home para o App processar */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

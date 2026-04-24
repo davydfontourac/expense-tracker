@@ -14,9 +14,7 @@ vi.mock('@/services/supabase', () => ({
   supabase: {
     from: vi.fn(() => mockQuery),
     auth: {
-      getUser: vi
-        .fn()
-        .mockResolvedValue({ data: { user: { id: 'u-123' } }, error: null }),
+      getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'u-123' } }, error: null }),
     },
   },
 }));
@@ -107,7 +105,12 @@ describe('CategoryForm', () => {
     const category = { id: 'c-1', name: 'Alimentação', icon: 'utensils', color: '#EF4444' };
 
     render(
-      <CategoryForm {...defaultProps} category={category} onSuccess={onSuccess} onClose={onClose} />,
+      <CategoryForm
+        {...defaultProps}
+        category={category}
+        onSuccess={onSuccess}
+        onClose={onClose}
+      />,
     );
 
     fireEvent.change(screen.getByPlaceholderText(/Ex: Alimentação/), {
@@ -127,9 +130,7 @@ describe('CategoryForm', () => {
 
   it('deve exibir erro ao falhar na criação', async () => {
     const toast = await import('sonner');
-    mockQuery.then.mockImplementationOnce((cb) =>
-      cb({ error: { message: 'Insert failed' } }),
-    );
+    mockQuery.then.mockImplementationOnce((cb) => cb({ error: { message: 'Insert failed' } }));
 
     render(<CategoryForm {...defaultProps} />);
 

@@ -10,19 +10,19 @@ const mockMapping: CSVMapping = {
   description: '',
   amount: 'Valor',
   dateFormat: 'dd/MM/yyyy',
-  decimalSeparator: ','
+  decimalSeparator: ',',
 };
 
 describe('ColumnMapper', () => {
   it('deve renderizar os controles de mapeamento corretamente', () => {
     const onChangeMock = vi.fn();
     const { container } = render(
-      <ColumnMapper 
-        headers={mockHeaders} 
-        sampleData={mockSampleData} 
-        mapping={mockMapping} 
-        onMappingChange={onChangeMock} 
-      />
+      <ColumnMapper
+        headers={mockHeaders}
+        sampleData={mockSampleData}
+        mapping={mockMapping}
+        onMappingChange={onChangeMock}
+      />,
     );
 
     const selects = container.querySelectorAll('select');
@@ -33,12 +33,12 @@ describe('ColumnMapper', () => {
   it('deve chamar onMappingChange ao alterar um select', () => {
     const onChangeMock = vi.fn();
     const { container } = render(
-      <ColumnMapper 
-        headers={mockHeaders} 
-        sampleData={mockSampleData} 
-        mapping={mockMapping} 
-        onMappingChange={onChangeMock} 
-      />
+      <ColumnMapper
+        headers={mockHeaders}
+        sampleData={mockSampleData}
+        mapping={mockMapping}
+        onMappingChange={onChangeMock}
+      />,
     );
 
     const selects = container.querySelectorAll('select');
@@ -46,8 +46,7 @@ describe('ColumnMapper', () => {
 
     expect(onChangeMock).toHaveBeenCalledWith({
       ...mockMapping,
-      description: 'Descricao'
+      description: 'Descricao',
     });
   });
 });
-

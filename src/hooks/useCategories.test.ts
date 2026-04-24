@@ -36,7 +36,9 @@ describe('useCategories', () => {
   it('carrega categorias com sucesso', async () => {
     const mockCategories = [{ id: '1', name: 'Alimentação', icon: 'food', color: '#ff0000' }];
 
-    mockQuery.then.mockImplementationOnce((callback) => callback({ data: mockCategories, error: null }));
+    mockQuery.then.mockImplementationOnce((callback) =>
+      callback({ data: mockCategories, error: null }),
+    );
 
     const { result } = renderHook(() => useCategories());
 
@@ -50,7 +52,9 @@ describe('useCategories', () => {
   });
 
   it('lida com erro na chamada do supabase utilizando toast', async () => {
-    mockQuery.then.mockImplementationOnce((callback) => callback({ data: null, error: new Error('API Error') }));
+    mockQuery.then.mockImplementationOnce((callback) =>
+      callback({ data: null, error: new Error('API Error') }),
+    );
 
     const { result } = renderHook(() => useCategories());
 

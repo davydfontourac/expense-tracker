@@ -13,14 +13,17 @@ export default function FileUpload({ file, onFileSelect }: FileUploadProps) {
     e.stopPropagation();
   }, []);
 
-  const onDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const droppedFile = e.dataTransfer.files?.[0];
-    if (droppedFile && droppedFile.type === 'text/csv' || droppedFile.name.endsWith('.csv')) {
-      onFileSelect(droppedFile);
-    }
-  }, [onFileSelect]);
+  const onDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const droppedFile = e.dataTransfer.files?.[0];
+      if ((droppedFile && droppedFile.type === 'text/csv') || droppedFile.name.endsWith('.csv')) {
+        onFileSelect(droppedFile);
+      }
+    },
+    [onFileSelect],
+  );
 
   const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];

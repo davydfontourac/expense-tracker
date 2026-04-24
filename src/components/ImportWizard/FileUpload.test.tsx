@@ -14,7 +14,7 @@ describe('FileUpload', () => {
 
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
     const file = new File(['test'], 'test.csv', { type: 'text/csv' });
-    
+
     fireEvent.change(input, { target: { files: [file] } });
 
     expect(onFileSelectMock).toHaveBeenCalledWith(file);
@@ -26,7 +26,7 @@ describe('FileUpload', () => {
 
     const dropZone = container.querySelector('.border-dashed');
     const file = new File(['test'], 'test.txt', { type: 'text/plain' });
-    
+
     fireEvent.drop(dropZone!, { dataTransfer: { files: [file] } });
 
     expect(onFileSelectMock).not.toHaveBeenCalled();
