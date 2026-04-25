@@ -13,7 +13,7 @@ vi.mock('@/hooks/useTransactions', () => ({
 }));
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to }: unknown) => <a href={to}>{children}</a>,
+  Link: ({ children, to }: any) => <a href={to}>{children}</a>,
   useNavigate: () => vi.fn(),
 }));
 
@@ -22,7 +22,7 @@ vi.mock('@/components/SummaryCards', () => ({
   default: () => <div data-testid="summary-cards" />,
 }));
 vi.mock('@/components/TransactionFilters', () => ({
-  default: ({ onSearchChange, onTypeChange, onMonthChange, onYearChange, onClearMonth }: unknown) => (
+  default: ({ onSearchChange, onTypeChange, onMonthChange, onYearChange, onClearMonth }: any) => (
     <div data-testid="filters">
       <button onClick={() => onSearchChange('test')}>Search</button>
       <button onClick={() => onTypeChange('income')}>Type</button>
@@ -33,7 +33,7 @@ vi.mock('@/components/TransactionFilters', () => ({
   ),
 }));
 vi.mock('@/components/TransactionList', () => ({
-  default: ({ onDelete, onEdit }: unknown) => (
+  default: ({ onDelete, onEdit }: any) => (
     <div data-testid="list">
       <button onClick={() => onDelete('1')}>Delete</button>
       <button onClick={() => onEdit({ id: '1' })}>Edit</button>
@@ -46,10 +46,10 @@ vi.mock('@/components/BottomNavigation', () => ({
   default: () => <div data-testid="bottom-nav" />,
 }));
 vi.mock('@/components/PageTransition', () => ({
-  default: ({ children }: unknown) => <div>{children}</div>,
+  default: ({ children }: any) => <div>{children}</div>,
 }));
 vi.mock('@/components/ImportWizard/ImportWizard', () => ({
-  default: ({ isOpen, onClose, onSuccess }: unknown) =>
+  default: ({ isOpen, onClose, onSuccess }: any) =>
     isOpen ? (
       <div data-testid="import-wizard">
         <button onClick={onClose}>Close Import</button>
@@ -58,7 +58,7 @@ vi.mock('@/components/ImportWizard/ImportWizard', () => ({
     ) : null,
 }));
 vi.mock('@/components/TransactionForm', () => ({
-  default: ({ isOpen, onClose, onSuccess }: unknown) =>
+  default: ({ isOpen, onClose, onSuccess }: any) =>
     isOpen ? (
       <div data-testid="transaction-form">
         <button onClick={onClose}>Close Form</button>

@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Categories from './Categories';
 
 const mockFetchCategories = vi.fn();
-const mockCategories: unknown[] = [];
+const mockCategories: any[] = [];
 let mockIsLoading = false;
 
 vi.mock('@/hooks/useCategories', () => ({
@@ -36,7 +36,7 @@ vi.mock('sonner', () => ({
 }));
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...props }: unknown) => (
+  Link: ({ children, to, ...props }: any) => (
     <a href={to} {...props}>
       {children}
     </a>
@@ -52,11 +52,11 @@ vi.mock('@/components/BottomNavigation', () => ({
 }));
 
 vi.mock('@/components/PageTransition', () => ({
-  default: ({ children, className }: unknown) => <div className={className}>{children}</div>,
+  default: ({ children, className }: any) => <div className={className}>{children}</div>,
 }));
 
 vi.mock('@/components/ConfirmModal', () => ({
-  default: ({ isOpen, onConfirm, onClose }: unknown) =>
+  default: ({ isOpen, onConfirm, onClose }: any) =>
     isOpen ? (
       <div data-testid="confirm-modal">
         <button onClick={onConfirm}>Confirmar</button>
@@ -66,7 +66,7 @@ vi.mock('@/components/ConfirmModal', () => ({
 }));
 
 vi.mock('@/components/CategoryForm', () => ({
-  default: ({ isOpen }: unknown) => (isOpen ? <div data-testid="category-form" /> : null),
+  default: ({ isOpen }: any) => (isOpen ? <div data-testid="category-form" /> : null),
 }));
 
 vi.mock('framer-motion', () => ({
@@ -75,7 +75,7 @@ vi.mock('framer-motion', () => ({
       <div {...props}>{children}</div>
     ),
   },
-  AnimatePresence: ({ children }: unknown) => <>{children}</>,
+  AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
 describe('Categories', () => {

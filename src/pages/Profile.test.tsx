@@ -29,7 +29,7 @@ vi.mock('@/services/supabase', () => ({
 }));
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...props }: unknown) => (
+  Link: ({ children, to, ...props }: any) => (
     <a href={to} {...props}>
       {children}
     </a>
@@ -53,11 +53,11 @@ vi.mock('@/components/BottomNavigation', () => ({
 }));
 
 vi.mock('@/components/PageTransition', () => ({
-  default: ({ children }: unknown) => <div>{children}</div>,
+  default: ({ children }: any) => <div>{children}</div>,
 }));
 
 vi.mock('@/components/ConfirmModal', () => ({
-  default: ({ isOpen, onConfirm, onClose }: unknown) =>
+  default: ({ isOpen, onConfirm, onClose }: any) =>
     isOpen ? (
       <div data-testid="confirm-modal">
         <button onClick={onConfirm}>Confirmar</button>
