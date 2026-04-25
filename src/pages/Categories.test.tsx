@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Categories from './Categories';
 
 const mockFetchCategories = vi.fn();
-const mockCategories: any[] = [];
+const mockCategories: unknown[] = [];
 let mockIsLoading = false;
 
 vi.mock('@/hooks/useCategories', () => ({
@@ -21,9 +21,12 @@ vi.mock('@/context/AuthContext', () => ({
 vi.mock('@/services/supabase', () => ({
   supabase: {
     from: vi.fn(() => ({
+      select: vi.fn().mockReturnThis(),
+      gte: vi.fn().mockReturnThis(),
+      lte: vi.fn().mockReturnThis(),
       delete: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      then: vi.fn().mockImplementation((cb) => cb({ error: null })),
+      then: vi.fn().mockImplementation((cb) => cb({ error: null, data: [] })),
     })),
   },
 }));
@@ -33,7 +36,7 @@ vi.mock('sonner', () => ({
 }));
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...props }: any) => (
+  Link: ({ children, to, ...props }: unknown) => (
     <a href={to} {...props}>
       {children}
     </a>
@@ -49,11 +52,11 @@ vi.mock('@/components/BottomNavigation', () => ({
 }));
 
 vi.mock('@/components/PageTransition', () => ({
-  default: ({ children, className }: any) => <div className={className}>{children}</div>,
+  default: ({ children, className }: unknown) => <div className={className}>{children}</div>,
 }));
 
 vi.mock('@/components/ConfirmModal', () => ({
-  default: ({ isOpen, onConfirm, onClose }: any) =>
+  default: ({ isOpen, onConfirm, onClose }: unknown) =>
     isOpen ? (
       <div data-testid="confirm-modal">
         <button onClick={onConfirm}>Confirmar</button>
@@ -63,16 +66,16 @@ vi.mock('@/components/ConfirmModal', () => ({
 }));
 
 vi.mock('@/components/CategoryForm', () => ({
-  default: ({ isOpen }: any) => (isOpen ? <div data-testid="category-form" /> : null),
+  default: ({ isOpen }: unknown) => (isOpen ? <div data-testid="category-form" /> : null),
 }));
 
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, layout, initial, animate, exit, transition, ...props }: any) => (
+    div: ({ children, ...props }: any) => (
       <div {...props}>{children}</div>
     ),
   },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
+  AnimatePresence: ({ children }: unknown) => <>{children}</>,
 }));
 
 describe('Categories', () => {

@@ -9,14 +9,24 @@ interface MonthYearPickerProps {
 }
 
 const MONTHS = [
-  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
 ];
 
 export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+
   const currentMonth = Number(month);
   const currentYear = Number(year);
 
@@ -32,7 +42,7 @@ export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps)
 
   const handlePrevYear = () => onChange(month, String(currentYear - 1));
   const handleNextYear = () => onChange(month, String(currentYear + 1));
-  
+
   const handleMonthSelect = (mIdx: number) => {
     onChange(String(mIdx + 1), year);
     setIsOpen(false);
@@ -42,10 +52,7 @@ export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps)
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className="A-chip whitespace-nowrap"
-      >
+      <button onClick={() => setIsOpen(!isOpen)} className="A-chip whitespace-nowrap">
         <Calendar size={14} className="text-indigo-500" />
         <span>{currentLabel}</span>
       </button>
@@ -53,15 +60,21 @@ export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps)
       {isOpen && (
         <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl z-[100] p-4 animate-in fade-in zoom-in duration-200">
           <div className="flex items-center justify-between mb-4">
-            <button onClick={handlePrevYear} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+            <button
+              onClick={handlePrevYear}
+              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            >
               <ChevronLeft size={16} />
             </button>
             <span className="font-bold text-gray-900 dark:text-white">{currentYear}</span>
-            <button onClick={handleNextYear} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+            <button
+              onClick={handleNextYear}
+              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            >
               <ChevronRight size={16} />
             </button>
           </div>
-          
+
           <div className="grid grid-cols-3 gap-2">
             {MONTHS.map((m, i) => {
               const isSelected = currentMonth === i + 1;
@@ -70,10 +83,10 @@ export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps)
                   key={m}
                   onClick={() => handleMonthSelect(i)}
                   className={cn(
-                    "py-2 text-[11px] font-medium rounded-lg transition-all",
-                    isSelected 
-                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none" 
-                      : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    'py-2 text-[11px] font-medium rounded-lg transition-all',
+                    isSelected
+                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none'
+                      : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800',
                   )}
                 >
                   {m.substring(0, 3)}
@@ -83,7 +96,7 @@ export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps)
           </div>
 
           <div className="mt-4 pt-4 border-t border-gray-50 dark:border-gray-800 flex justify-center">
-            <button 
+            <button
               onClick={() => {
                 const now = new Date();
                 onChange(String(now.getMonth() + 1), String(now.getFullYear()));

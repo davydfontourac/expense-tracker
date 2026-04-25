@@ -41,16 +41,86 @@ const PRESET_COLORS = [
 ];
 
 const PRESET_EMOJIS = [
-  '💰', '💵', '💳', '💎', '📈', '📉', '🏦', '🪙', 
-  '🍔', '🍕', '🍱', '🍦', '☕', '🍺', '🥤', '🍎',
-  '🏠', '🛋️', '🧹', '🔌', '🚿', '🔑', '🏢', '🏗️',
-  '🚗', '🚕', '🚌', '🚆', '✈️', '🚲', '⛽', '⚓',
-  '👕', '👗', '👟', '🕶️', '👜', '💄', '⌚', '💍',
-  '🏥', '💊', '🩹', '🦷', '🏋️', '🧘', '🚲', '🩺',
-  '🎬', '🎮', '🎧', '🎤', '🎨', '📸', '🎭', '🎪',
-  '📚', '🎓', '📝', '💻', '📱', '🖥️', '📡', '💾',
-  '🐶', '🐱', '🐾', '🌿', '🌻', '🌞', '🌙', '⭐',
-  '🎁', '🎈', '🎉', '🎊', '🧧', '✉️', '📦', '🛒'
+  '💰',
+  '💵',
+  '💳',
+  '💎',
+  '📈',
+  '📉',
+  '🏦',
+  '🪙',
+  '🍔',
+  '🍕',
+  '🍱',
+  '🍦',
+  '☕',
+  '🍺',
+  '🥤',
+  '🍎',
+  '🏠',
+  '🛋️',
+  '🧹',
+  '🔌',
+  '🚿',
+  '🔑',
+  '🏢',
+  '🏗️',
+  '🚗',
+  '🚕',
+  '🚌',
+  '🚆',
+  '✈️',
+  '🚲',
+  '⛽',
+  '⚓',
+  '👕',
+  '👗',
+  '👟',
+  '🕶️',
+  '👜',
+  '💄',
+  '⌚',
+  '💍',
+  '🏥',
+  '💊',
+  '🩹',
+  '🦷',
+  '🏋️',
+  '🧘',
+  '🚲',
+  '🩺',
+  '🎬',
+  '🎮',
+  '🎧',
+  '🎤',
+  '🎨',
+  '📸',
+  '🎭',
+  '🎪',
+  '📚',
+  '🎓',
+  '📝',
+  '💻',
+  '📱',
+  '🖥️',
+  '📡',
+  '💾',
+  '🐶',
+  '🐱',
+  '🐾',
+  '🌿',
+  '🌻',
+  '🌞',
+  '🌙',
+  '⭐',
+  '🎁',
+  '🎈',
+  '🎉',
+  '🎊',
+  '🧧',
+  '✉️',
+  '📦',
+  '🛒',
 ];
 
 export default function CategoryForm({ isOpen, onClose, onSuccess, category }: Readonly<Props>) {
@@ -139,11 +209,11 @@ export default function CategoryForm({ isOpen, onClose, onSuccess, category }: R
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
           {/* Nome e Icone */}
           <div className="flex gap-4">
-             <div className="shrink-0">
+            <div className="shrink-0">
               <label className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 block text-center">
                 Ícone
               </label>
-              <div 
+              <div
                 className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700"
                 style={{ color: selectedColor, backgroundColor: `${selectedColor}15` }}
               >
@@ -160,18 +230,23 @@ export default function CategoryForm({ isOpen, onClose, onSuccess, category }: R
                 type="text"
                 placeholder="Ex: Alimentação..."
                 className={cn(
-                  'w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 dark:placeholder:text-gray-600',
+                  'w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 dark:placeholder:text-gray-600',
                   errors.name &&
                     'border-red-300 focus:ring-red-500/10 focus:border-red-500 dark:border-red-500/50 dark:focus:ring-red-500/20',
                 )}
               />
+              {errors.name && (
+                <p className="mt-1 text-xs text-red-500 font-bold">{errors.name.message}</p>
+              )}
             </div>
           </div>
 
           {/* Limite Mensal */}
           <div className="space-y-2">
             <label className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-              <span className="w-4 h-4 flex items-center justify-center text-gray-400 dark:text-gray-500 font-mono text-[10px]">R$</span>
+              <span className="w-4 h-4 flex items-center justify-center text-gray-400 dark:text-gray-500 font-mono text-[10px]">
+                R$
+              </span>
               Limite Mensal (Budget)
             </label>
             <input
@@ -185,7 +260,9 @@ export default function CategoryForm({ isOpen, onClose, onSuccess, category }: R
                   'border-red-300 focus:ring-red-500/10 focus:border-red-500 dark:border-red-500/50 dark:focus:ring-red-500/20',
               )}
             />
-            <p className="text-[10px] text-gray-400 dark:text-gray-500 ml-1">Deixe como 0 para não definir limite.</p>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 ml-1">
+              Deixe como 0 para não definir limite.
+            </p>
           </div>
 
           {/* Emoji Picker */}
@@ -194,7 +271,7 @@ export default function CategoryForm({ isOpen, onClose, onSuccess, category }: R
               <label className="text-sm font-bold text-gray-700 dark:text-gray-300 block">
                 Escolha um Emoji
               </label>
-              <button 
+              <button
                 type="button"
                 onClick={() => setIsEmojiExpanded(!isEmojiExpanded)}
                 className="text-xs font-bold text-blue-500 hover:text-blue-600 transition-colors"
@@ -210,7 +287,8 @@ export default function CategoryForm({ isOpen, onClose, onSuccess, category }: R
                   onClick={() => setValue('icon', emoji)}
                   className={cn(
                     'w-9 h-9 rounded-xl flex items-center justify-center text-lg hover:bg-white dark:hover:bg-gray-700 transition-all active:scale-90',
-                    selectedEmoji === emoji && 'bg-white dark:bg-gray-700 shadow-sm ring-2 ring-blue-500/20'
+                    selectedEmoji === emoji &&
+                      'bg-white dark:bg-gray-700 shadow-sm ring-2 ring-blue-500/20',
                   )}
                 >
                   {emoji}
@@ -241,8 +319,8 @@ export default function CategoryForm({ isOpen, onClose, onSuccess, category }: R
                 />
               ))}
               <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-transparent hover:scale-110 transition-transform shadow-sm group">
-                <div 
-                  className="absolute inset-0 pointer-events-none" 
+                <div
+                  className="absolute inset-0 pointer-events-none"
                   style={{ background: 'linear-gradient(45deg, #f06, #9f6, #0cf, #f06)' }}
                 />
                 <input

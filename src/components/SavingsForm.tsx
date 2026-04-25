@@ -89,16 +89,21 @@ export default function SavingsForm({ isOpen, onClose, onConfirm, goal }: Readon
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
             {goal ? 'Editar Caixinha' : 'Nova Caixinha'}
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+          >
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
           <div className="flex gap-4">
-             <div className="shrink-0 text-center">
-              <label className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 block">Ícone</label>
-              <div 
+            <div className="shrink-0 text-center">
+              <label className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 block">
+                Ícone
+              </label>
+              <div
                 className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700"
                 style={{ color: selectedColor, backgroundColor: `${selectedColor}15` }}
               >
@@ -144,8 +149,10 @@ export default function SavingsForm({ isOpen, onClose, onConfirm, goal }: Readon
 
           <div>
             <div className="flex justify-between items-center mb-3">
-              <label className="text-sm font-bold text-gray-700 dark:text-gray-300 block">Escolha um Emoji</label>
-              <button 
+              <label className="text-sm font-bold text-gray-700 dark:text-gray-300 block">
+                Escolha um Emoji
+              </label>
+              <button
                 type="button"
                 onClick={() => setIsEmojiExpanded(!isEmojiExpanded)}
                 className="text-[10px] font-bold text-blue-500 uppercase tracking-wider"
@@ -154,14 +161,16 @@ export default function SavingsForm({ isOpen, onClose, onConfirm, goal }: Readon
               </button>
             </div>
             <div className="grid grid-cols-6 gap-2">
-              {visibleEmojis.map(emoji => (
+              {visibleEmojis.map((emoji) => (
                 <button
                   key={emoji}
                   type="button"
                   onClick={() => setValue('icon', emoji)}
                   className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-all",
-                    selectedEmoji === emoji ? "bg-white dark:bg-gray-700 shadow-md ring-2 ring-blue-500" : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                    'w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-all',
+                    selectedEmoji === emoji
+                      ? 'bg-white dark:bg-gray-700 shadow-md ring-2 ring-blue-500'
+                      : 'hover:bg-gray-100 dark:hover:bg-gray-800',
                   )}
                 >
                   {emoji}
@@ -171,22 +180,29 @@ export default function SavingsForm({ isOpen, onClose, onConfirm, goal }: Readon
           </div>
 
           <div>
-            <label className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 block">Cor Temática</label>
+            <label className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 block">
+              Cor Temática
+            </label>
             <div className="flex flex-wrap gap-3">
-              {PRESET_COLORS.map(color => (
+              {PRESET_COLORS.map((color) => (
                 <button
                   key={color}
                   type="button"
                   onClick={() => setValue('color', color)}
                   className={cn(
-                    "w-8 h-8 rounded-full border-2 transition-all hover:scale-110",
-                    selectedColor === color ? "border-white dark:border-gray-900 scale-110 shadow-lg ring-2 ring-gray-900 dark:ring-white" : "border-transparent"
+                    'w-8 h-8 rounded-full border-2 transition-all hover:scale-110',
+                    selectedColor === color
+                      ? 'border-white dark:border-gray-900 scale-110 shadow-lg ring-2 ring-gray-900 dark:ring-white'
+                      : 'border-transparent',
                   )}
                   style={{ backgroundColor: color }}
                 />
               ))}
               <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-transparent hover:scale-110 transition-transform shadow-sm">
-                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(45deg, #f06, #9f6, #0cf, #f06)' }} />
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{ background: 'linear-gradient(45deg, #f06, #9f6, #0cf, #f06)' }}
+                />
                 <input
                   type="color"
                   {...register('color')}

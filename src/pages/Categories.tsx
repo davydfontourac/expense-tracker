@@ -14,7 +14,16 @@ import { MonthYearPicker } from '@/components/MonthYearPicker';
 import { useCategories } from '@/hooks/useCategories';
 import type { Category } from '@/hooks/useCategories';
 
-const SKELETON_CAT_IDS = ['sk-c-1', 'sk-c-2', 'sk-c-3', 'sk-c-4', 'sk-c-5', 'sk-c-6', 'sk-c-7', 'sk-c-8'];
+const SKELETON_CAT_IDS = [
+  'sk-c-1',
+  'sk-c-2',
+  'sk-c-3',
+  'sk-c-4',
+  'sk-c-5',
+  'sk-c-6',
+  'sk-c-7',
+  'sk-c-8',
+];
 
 const fmt = (n: number) =>
   'R$ ' +
@@ -37,7 +46,14 @@ export default function Categories() {
   const fetchTotals = useCallback(async () => {
     try {
       const startDate = new Date(Number(filters.year), Number(filters.month) - 1, 1).toISOString();
-      const endDate = new Date(Number(filters.year), Number(filters.month), 0, 23, 59, 59).toISOString();
+      const endDate = new Date(
+        Number(filters.year),
+        Number(filters.month),
+        0,
+        23,
+        59,
+        59,
+      ).toISOString();
 
       const { data, error } = await supabase
         .from('transactions')
@@ -50,7 +66,7 @@ export default function Categories() {
       const totals: Record<string, number> = {};
       let totalExpense = 0;
 
-      data?.forEach(t => {
+      data?.forEach((t: { amount: number; category_id: string | null; type: string }) => {
         if (t.type === 'expense') {
           const cid = t.category_id || 'unassigned';
           const amt = Math.abs(Number(t.amount));
@@ -80,8 +96,9 @@ export default function Categories() {
       toast.success('Categoria excluída com sucesso');
       fetchCategories();
       setDeletingCategory(null);
-    } catch (err: any) {
-      toast.error(err.message || 'Erro ao excluir categoria');
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      toast.error(error.message || 'Erro ao excluir categoria');
     } finally {
       setIsDeleting(false);
     }
@@ -96,25 +113,23 @@ export default function Categories() {
     <PageTransition className="A-main h-screen overflow-y-auto w-full">
       <div className="A-top">
         <div>
-          <h1 className="text-gray-900 dark:text-white">Categorias</h1>
-          <div className="sub">
-            {categories.length} categorias cadastradas
-          </div>
+          <h1 className="text-gray-900 dark:text-white">Minhas Categorias</h1>
+          <div className="sub">{categories.length} categorias cadastradas</div>
         </div>
         <div className="flex gap-2">
-          <MonthYearPicker 
-            month={filters.month} 
-            year={filters.year} 
-            onChange={(m, y) => setFilters(f => ({ ...f, month: m, year: y }))} 
+          <MonthYearPicker
+            month={filters.month}
+            year={filters.year}
+            onChange={(m, y) => setFilters((f) => ({ ...f, month: m, year: y }))}
           />
-          <button 
+          <button
             onClick={() => {
               setEditingCategory(null);
               setIsFormOpen(true);
-            }} 
+            }}
             className="A-chip primary"
           >
-            <Plus size={14} className="mr-1" /> Nova categoria
+            <Plus size={14} className="mr-1" /> Nova Categoria
           </button>
         </div>
       </div>
@@ -138,7 +153,8 @@ export default function Categories() {
               const spent = categoryTotals[c.id] || 0;
               const hasLimit = (c.monthly_limit || 0) > 0;
               const pctOfLimit = hasLimit ? Math.min((spent / c.monthly_limit) * 100, 100) : 0;
-              const pctOfTotal = totalSpentMonth > 0 ? Math.round((spent / totalSpentMonth) * 100) : 0;
+              const pctOfTotal =
+                totalSpentMonth > 0 ? Math.round((spent / totalSpentMonth) * 100) : 0;
               const isOverLimit = hasLimit && spent > c.monthly_limit;
 
               return (
@@ -148,19 +164,19 @@ export default function Categories() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
                   className={cn(
-                    "A-card flex flex-col gap-3 group hover:border-gray-400 dark:hover:border-gray-500 transition-colors cursor-pointer",
-                    isOverLimit && "!border-red-500/50 bg-red-50/5 dark:bg-red-900/5"
+                    'A-card flex flex-col gap-3 group hover:border-gray-400 dark:hover:border-gray-500 transition-colors cursor-pointer',
+                    isOverLimit && '!border-red-500/50 bg-red-50/5 dark:bg-red-900/5',
                   )}
                   onClick={() => handleEdit(c)}
                 >
                   <div className="flex justify-between items-center">
-                    <div 
+                    <div
                       className="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
                       style={{ backgroundColor: `${c.color}15`, color: c.color }}
                     >
                       {c.icon || '💰'}
                     </div>
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setDeletingCategory(c);
@@ -170,37 +186,45 @@ export default function Categories() {
                       <MoreHorizontal size={18} />
                     </button>
                   </div>
-                  
+
                   <div>
                     <div className="text-base font-semibold text-gray-900 dark:text-white flex items-center justify-between">
                       <span>{c.name}</span>
-                      {isOverLimit && <span className="text-[10px] text-red-500 font-bold uppercase tracking-widest">Limite Excedido</span>}
+                      {isOverLimit && (
+                        <span className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
+                          Limite Excedido
+                        </span>
+                      )}
                     </div>
-                    <div className="text-xs text-gray-500 font-mono mt-1">Transações classificadas</div>
+                    <div className="text-xs text-gray-500 font-mono mt-1">
+                      Transações classificadas
+                    </div>
                   </div>
 
                   <div className="mt-2">
                     <div className="flex items-baseline gap-2">
-                      <div className="text-xl font-bold text-gray-900 dark:text-white">{fmt(spent)}</div>
+                      <div className="text-xl font-bold text-gray-900 dark:text-white">
+                        {fmt(spent)}
+                      </div>
                       {hasLimit && (
                         <div className="text-[11px] text-gray-400">/ {fmt(c.monthly_limit)}</div>
                       )}
                     </div>
-                    
+
                     <div className="flex justify-between text-[10px] font-mono text-gray-500 uppercase tracking-widest mt-3 mb-2">
                       {hasLimit ? (
-                        <span>{Math.round((spent/c.monthly_limit)*100)}% DO LIMITE</span>
+                        <span>{Math.round((spent / c.monthly_limit) * 100)}% DO LIMITE</span>
                       ) : (
                         <span>{pctOfTotal}% DO TOTAL</span>
                       )}
                     </div>
-                    
+
                     <div className="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                      <motion.div 
+                      <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${hasLimit ? pctOfLimit : (pctOfTotal || 0)}%` }}
-                        className={cn("h-full rounded-full", isOverLimit ? "bg-red-500" : "")} 
-                        style={{ backgroundColor: !isOverLimit ? c.color : undefined }} 
+                        animate={{ width: `${hasLimit ? pctOfLimit : pctOfTotal || 0}%` }}
+                        className={cn('h-full rounded-full', isOverLimit ? 'bg-red-500' : '')}
+                        style={{ backgroundColor: !isOverLimit ? c.color : undefined }}
                       />
                     </div>
                   </div>
@@ -209,8 +233,12 @@ export default function Categories() {
             })}
           </AnimatePresence>
         )}
-        
-        <button 
+
+        {!isLoading && categories.length === 0 && (
+          <div className="col-span-full py-12 text-center text-gray-500">Nenhuma categoria</div>
+        )}
+
+        <button
           onClick={() => {
             setEditingCategory(null);
             setIsFormOpen(true);
@@ -218,7 +246,9 @@ export default function Categories() {
           className="border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-2xl p-6 flex flex-col items-center justify-center gap-2 text-gray-500 hover:border-blue-500 hover:text-blue-500 transition-all group min-h-[180px]"
         >
           <Plus size={24} className="group-hover:scale-110 transition-transform" />
-          <span className="text-sm font-medium">Criar categoria personalizada</span>
+          <span className="text-sm font-medium">
+            {categories.length === 0 ? 'Criar Primeira Categoria' : 'Criar categoria personalizada'}
+          </span>
         </button>
       </div>
 

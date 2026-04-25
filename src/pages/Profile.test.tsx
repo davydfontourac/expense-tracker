@@ -29,7 +29,7 @@ vi.mock('@/services/supabase', () => ({
 }));
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...props }: any) => (
+  Link: ({ children, to, ...props }: unknown) => (
     <a href={to} {...props}>
       {children}
     </a>
@@ -53,11 +53,11 @@ vi.mock('@/components/BottomNavigation', () => ({
 }));
 
 vi.mock('@/components/PageTransition', () => ({
-  default: ({ children }: any) => <div>{children}</div>,
+  default: ({ children }: unknown) => <div>{children}</div>,
 }));
 
 vi.mock('@/components/ConfirmModal', () => ({
-  default: ({ isOpen, onConfirm, onClose }: any) =>
+  default: ({ isOpen, onConfirm, onClose }: unknown) =>
     isOpen ? (
       <div data-testid="confirm-modal">
         <button onClick={onConfirm}>Confirmar</button>
@@ -83,7 +83,7 @@ describe('Profile', () => {
     render(<Profile />);
 
     // Clica no botão de excluir conta
-    fireEvent.click(screen.getByText('Excluir Minha Conta'));
+    fireEvent.click(screen.getByText('Excluir minha conta'));
 
     // Modal deve abrir
     expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
@@ -103,7 +103,7 @@ describe('Profile', () => {
 
     render(<Profile />);
 
-    fireEvent.click(screen.getByText('Excluir Minha Conta'));
+    fireEvent.click(screen.getByText('Excluir minha conta'));
     fireEvent.click(screen.getByText('Confirmar'));
 
     await waitFor(() => {

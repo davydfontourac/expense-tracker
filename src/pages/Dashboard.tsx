@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Plus, Search, X } from 'lucide-react';
+import { Plus, Search, X, FileUp, Tag } from 'lucide-react';
 import { useTransactions } from '@/hooks/useTransactions';
+import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Sparkline } from '@/components/Sparkline';
@@ -32,7 +33,7 @@ const fmt = (n: number) =>
   Math.abs(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 interface MonthlyHistory {
-  month: any;
+  month: string | number;
   fullMonth?: number;
   year: number;
   income: number;
@@ -66,9 +67,12 @@ export default function Dashboard() {
   }, [filters, fetchTransactions]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchData();
-    }, filters.search ? 400 : 0);
+    const timer = setTimeout(
+      () => {
+        fetchData();
+      },
+      filters.search ? 400 : 0,
+    );
     return () => clearTimeout(timer);
   }, [fetchData, filters.search]);
 
@@ -86,16 +90,27 @@ export default function Dashboard() {
     const cats: Record<string, { total: number; count: number }> = {};
     let totalVal = 0;
     const targetType = filters.type === 'all' ? 'expense' : filters.type;
-    
-    transactions.filter(t => t.type === targetType).forEach(t => {
-      const catName = t.categories?.name || 'Outros';
-      cats[catName] = cats[catName] || { total: 0, count: 0 };
-      cats[catName].total += Math.abs(t.amount);
-      cats[catName].count += 1;
-      totalVal += Math.abs(t.amount);
-    });
 
-    const colors = ['#6366f1', '#8b5cf6', '#22d3ee', '#0ea5e9', '#f59e0b', '#10b981', '#ef4444', '#a855f7'];
+    transactions
+      .filter((t) => t.type === targetType)
+      .forEach((t) => {
+        const catName = t.categories?.name || 'Outros';
+        cats[catName] = cats[catName] || { total: 0, count: 0 };
+        cats[catName].total += Math.abs(t.amount);
+        cats[catName].count += 1;
+        totalVal += Math.abs(t.amount);
+      });
+
+    const colors = [
+      '#6366f1',
+      '#8b5cf6',
+      '#22d3ee',
+      '#0ea5e9',
+      '#f59e0b',
+      '#10b981',
+      '#ef4444',
+      '#a855f7',
+    ];
 
     return Object.entries(cats)
       .map(([name, data], i) => ({
@@ -103,12 +118,10 @@ export default function Dashboard() {
         total: data.total,
         count: data.count,
         pct: totalVal > 0 ? Math.round((data.total / totalVal) * 100) : 0,
-        color: colors[i % colors.length]
+        color: colors[i % colors.length],
       }))
       .sort((a, b) => b.total - a.total);
   }, [transactions, filters.type]);
-
-
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
@@ -124,33 +137,51 @@ export default function Dashboard() {
       {/* Top Header */}
       <div className="A-top">
         <div>
-          <h1 className="text-gray-900 dark:text-white">{greeting}, {profile?.full_name?.split(' ')[0] || 'usuário'}.</h1>
+          <h1 className="text-gray-900 dark:text-white">
+            {greeting}, {profile?.full_name?.split(' ')[0] || 'usuário'}.
+          </h1>
           <div className="sub">
-            Você gastou <b className="text-gray-900 dark:text-white">{fmt(summary.totalExpense)}</b> em {format(new Date(), 'MMMM', { locale: ptBR })}
+            Você gastou <b className="text-gray-900 dark:text-white">{fmt(summary.totalExpense)}</b>{' '}
+            em {format(new Date(), 'MMMM', { locale: ptBR })}
           </div>
         </div>
         <div className="flex gap-2 items-center flex-wrap">
-          <MonthYearPicker 
-            month={filters.month} 
-            year={filters.year} 
-            onChange={(m, y) => setFilters(f => ({ ...f, month: m, year: y }))} 
+          <MonthYearPicker
+            month={filters.month}
+            year={filters.year}
+            onChange={(m, y) => setFilters((f) => ({ ...f, month: m, year: y }))}
           />
           <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
-            <button 
-              onClick={() => setFilters(f => ({ ...f, type: 'all' }))}
-              className={cn("px-4 py-1.5 rounded-md text-xs font-medium transition-all", filters.type === 'all' ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-500")}
+            <button
+              onClick={() => setFilters((f) => ({ ...f, type: 'all' }))}
+              className={cn(
+                'px-4 py-1.5 rounded-md text-xs font-medium transition-all',
+                filters.type === 'all'
+                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500',
+              )}
             >
               Todos
             </button>
-            <button 
-              onClick={() => setFilters(f => ({ ...f, type: 'income' }))}
-              className={cn("px-4 py-1.5 rounded-md text-xs font-medium transition-all", filters.type === 'income' ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-500")}
+            <button
+              onClick={() => setFilters((f) => ({ ...f, type: 'income' }))}
+              className={cn(
+                'px-4 py-1.5 rounded-md text-xs font-medium transition-all',
+                filters.type === 'income'
+                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500',
+              )}
             >
               Receitas
             </button>
-            <button 
-              onClick={() => setFilters(f => ({ ...f, type: 'expense' }))}
-              className={cn("px-4 py-1.5 rounded-md text-xs font-medium transition-all", filters.type === 'expense' ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-500")}
+            <button
+              onClick={() => setFilters((f) => ({ ...f, type: 'expense' }))}
+              className={cn(
+                'px-4 py-1.5 rounded-md text-xs font-medium transition-all',
+                filters.type === 'expense'
+                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500',
+              )}
             >
               Despesas
             </button>
@@ -158,6 +189,12 @@ export default function Dashboard() {
           <button onClick={() => setIsModalOpen(true)} className="A-chip primary">
             <Plus size={14} className="mr-1" /> Nova transação
           </button>
+          <button onClick={() => setIsImportOpen(true)} className="A-chip">
+            <FileUp size={14} className="mr-1" /> Importar CSV
+          </button>
+          <Link to="/categories" className="A-chip">
+            <Tag size={14} className="mr-1" /> Gerenciar Categorias
+          </Link>
         </div>
       </div>
 
@@ -200,36 +237,48 @@ export default function Dashboard() {
           <div className="A-card-h">
             <div>
               <h3 className="text-gray-900 dark:text-white">Evolução Mensal</h3>
-              <div className="text-xs text-gray-500 mt-1">Receitas vs. Despesas · {filters.year}</div>
+              <div className="text-xs text-gray-500 mt-1">
+                Receitas vs. Despesas · {filters.year}
+              </div>
             </div>
             <div className="meta">JAN → DEZ</div>
           </div>
           <div className="A-bars">
             {typedHistory.map((h, i) => {
-              const max = Math.max(...typedHistory.map(x => Math.max(Number(x.income) || 0, Number(x.expense) || 0)), 1000) || 1000;
+              const max =
+                Math.max(
+                  ...typedHistory.map((x) =>
+                    Math.max(Number(x.income) || 0, Number(x.expense) || 0),
+                  ),
+                  1000,
+                ) || 1000;
               const label = String(h.month).toUpperCase();
-              const isCurrentMonth = Number(h.fullMonth) === new Date().getMonth() + 1 && Number(h.year) === new Date().getFullYear();
-              
+              const isCurrentMonth =
+                Number(h.fullMonth) === new Date().getMonth() + 1 &&
+                Number(h.year) === new Date().getFullYear();
+
               return (
-                <div key={i} className={cn("A-bar-col", isCurrentMonth && "curr group")}>
-                   <div className="A-bar-pair relative group">
-                    <motion.div 
-                      className="inc" 
+                <div key={i} className={cn('A-bar-col', isCurrentMonth && 'curr group')}>
+                  <div className="A-bar-pair relative group">
+                    <motion.div
+                      className="inc"
                       initial={{ height: 0 }}
                       animate={{ height: `${((Number(h.income) || 0) / max) * 100}%` }}
-                      transition={{ duration: 0.8, delay: i * 0.05, ease: "easeOut" }}
+                      transition={{ duration: 0.8, delay: i * 0.05, ease: 'easeOut' }}
                     />
-                    <motion.div 
-                      className="exp" 
+                    <motion.div
+                      className="exp"
                       initial={{ height: 0 }}
                       animate={{ height: `${((Number(h.expense) || 0) / max) * 100}%` }}
-                      transition={{ duration: 0.8, delay: i * 0.05 + 0.1, ease: "easeOut" }}
+                      transition={{ duration: 0.8, delay: i * 0.05 + 0.1, ease: 'easeOut' }}
                     />
-                    
+
                     {/* Tooltip */}
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-[100]">
                       <div className="bg-gray-900 text-white text-[10px] py-2 px-3 rounded-lg shadow-xl whitespace-nowrap pointer-events-none border border-gray-700">
-                        <div className="text-[9px] text-gray-400 mb-1 font-mono uppercase">{h.month} {h.year}</div>
+                        <div className="text-[9px] text-gray-400 mb-1 font-mono uppercase">
+                          {h.month} {h.year}
+                        </div>
                         <div className="flex items-center gap-2 mb-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
                           <span>Receita: {fmt(Number(h.income))}</span>
@@ -266,18 +315,21 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <Donut 
-              segs={categoriesData} 
-              centerLabel={filters.type === 'income' ? 'RECEITA' : 'GASTO'} 
+            <Donut
+              segs={categoriesData}
+              centerLabel={filters.type === 'income' ? 'RECEITA' : 'GASTO'}
               centerValue={
-                filters.type === 'income' 
-                  ? fmt(summary.totalIncome).replace('R$ ', '') 
+                filters.type === 'income'
+                  ? fmt(summary.totalIncome).replace('R$ ', '')
                   : fmt(summary.totalExpense).replace('R$ ', '')
-              } 
+              }
             />
             <div className="flex-1 flex flex-col gap-2">
-              {categoriesData.slice(0, 5).map(c => (
-                <div key={c.name} className="flex justify-between items-center text-[13px] text-gray-600 dark:text-gray-300">
+              {categoriesData.slice(0, 5).map((c) => (
+                <div
+                  key={c.name}
+                  className="flex justify-between items-center text-[13px] text-gray-600 dark:text-gray-300"
+                >
                   <span className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-sm" style={{ background: c.color }} />
                     {c.name}
@@ -295,8 +347,8 @@ export default function Dashboard() {
             <span className="i">✱</span>Insights
           </div>
           <div className="body text-gray-900 dark:text-gray-100">
-            Analise seu comportamento financeiro para gerar insights.
-            As dicas personalizadas aparecerão aqui em breve.
+            Analise seu comportamento financeiro para gerar insights. As dicas personalizadas
+            aparecerão aqui em breve.
           </div>
           <div className="mt-2">
             <div className="flex justify-between text-[11px] font-mono text-gray-500 uppercase tracking-wider mb-2">
@@ -327,16 +379,29 @@ export default function Dashboard() {
           <div className="flex gap-2 items-center">
             <div className="A-search w-64">
               <Search size={14} className="text-gray-400" />
-              <input 
-                placeholder="Buscar por descrição..." 
+              <input
+                placeholder="Buscar por descrição..."
                 value={filters.search}
-                onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
+                onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
                 className="text-gray-900 dark:text-white"
               />
-              {filters.search && <X size={14} className="text-gray-400 cursor-pointer" onClick={() => setFilters(f => ({ ...f, search: '' }))} />}
+              {filters.search && (
+                <X
+                  size={14}
+                  className="text-gray-400 cursor-pointer"
+                  onClick={() => setFilters((f) => ({ ...f, search: '' }))}
+                />
+              )}
             </div>
-            <button 
-              onClick={() => setFilters({ search: '', type: 'all', month: String(new Date().getMonth() + 1), year: String(new Date().getFullYear()) })}
+            <button
+              onClick={() =>
+                setFilters({
+                  search: '',
+                  type: 'all',
+                  month: String(new Date().getMonth() + 1),
+                  year: String(new Date().getFullYear()),
+                })
+              }
               className="A-chip"
             >
               Limpar filtros
@@ -345,16 +410,32 @@ export default function Dashboard() {
         </div>
         <div className="divide-y divide-gray-100 dark:divide-gray-800">
           {transactions.slice(0, 8).map((t) => (
-            <div key={t.id} className="A-txrow hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors cursor-pointer" onClick={() => handleEdit(t)}>
-              <div className="ic text-xl">
-                {CAT_EMOJI[t.categories?.name || ''] || '💰'}
-              </div>
+            <div
+              key={t.id}
+              className="A-txrow hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+              onClick={() => handleEdit(t)}
+            >
+              <div className="ic text-xl">{CAT_EMOJI[t.categories?.name || ''] || '💰'}</div>
               <div className="flex-1 min-w-0">
-                <div className="desc font-medium text-gray-900 dark:text-white" title={t.description}>{t.description}</div>
-                <div className="meta text-xs text-gray-400">{format(new Date(t.date), 'dd/MM/yyyy')}</div>
+                <div
+                  className="desc font-medium text-gray-900 dark:text-white"
+                  title={t.description}
+                >
+                  {t.description}
+                </div>
+                <div className="meta text-xs text-gray-400">
+                  {format(new Date(t.date), 'dd/MM/yyyy')}
+                </div>
               </div>
-              <div className="cat text-[11px] font-mono text-gray-400 uppercase tracking-wider">{t.categories?.name || 'Outros'}</div>
-              <div className={cn("val font-semibold", t.type === 'income' ? "pos text-green-500" : "text-gray-900 dark:text-white")}>
+              <div className="cat text-[11px] font-mono text-gray-400 uppercase tracking-wider">
+                {t.categories?.name || 'Outros'}
+              </div>
+              <div
+                className={cn(
+                  'val font-semibold',
+                  t.type === 'income' ? 'pos text-green-500' : 'text-gray-900 dark:text-white',
+                )}
+              >
                 {t.type === 'income' ? '+' : '−'} {fmt(t.amount)}
               </div>
             </div>
@@ -384,9 +465,9 @@ export default function Dashboard() {
         isOpen={isConfirmClearOpen}
         onClose={() => setIsConfirmClearOpen(false)}
         onConfirm={async () => {
-           await deleteTransactionsByMonth(Number(filters.month), Number(filters.year));
-           setIsConfirmClearOpen(false);
-           fetchData();
+          await deleteTransactionsByMonth(Number(filters.month), Number(filters.year));
+          setIsConfirmClearOpen(false);
+          fetchData();
         }}
         title="Excluir histórico do mês?"
         description={`Isso apagará permanentemente todas as transações deste período. Esta ação não pode ser desfeita.`}

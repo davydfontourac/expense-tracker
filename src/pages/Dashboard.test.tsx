@@ -13,7 +13,7 @@ vi.mock('@/hooks/useTransactions', () => ({
 }));
 
 vi.mock('react-router-dom', () => ({
-  Link: ({ children, to }: any) => <a href={to}>{children}</a>,
+  Link: ({ children, to }: unknown) => <a href={to}>{children}</a>,
   useNavigate: () => vi.fn(),
 }));
 
@@ -22,7 +22,7 @@ vi.mock('@/components/SummaryCards', () => ({
   default: () => <div data-testid="summary-cards" />,
 }));
 vi.mock('@/components/TransactionFilters', () => ({
-  default: ({ onSearchChange, onTypeChange, onMonthChange, onYearChange, onClearMonth }: any) => (
+  default: ({ onSearchChange, onTypeChange, onMonthChange, onYearChange, onClearMonth }: unknown) => (
     <div data-testid="filters">
       <button onClick={() => onSearchChange('test')}>Search</button>
       <button onClick={() => onTypeChange('income')}>Type</button>
@@ -33,7 +33,7 @@ vi.mock('@/components/TransactionFilters', () => ({
   ),
 }));
 vi.mock('@/components/TransactionList', () => ({
-  default: ({ onDelete, onEdit }: any) => (
+  default: ({ onDelete, onEdit }: unknown) => (
     <div data-testid="list">
       <button onClick={() => onDelete('1')}>Delete</button>
       <button onClick={() => onEdit({ id: '1' })}>Edit</button>
@@ -46,10 +46,10 @@ vi.mock('@/components/BottomNavigation', () => ({
   default: () => <div data-testid="bottom-nav" />,
 }));
 vi.mock('@/components/PageTransition', () => ({
-  default: ({ children }: any) => <div>{children}</div>,
+  default: ({ children }: unknown) => <div>{children}</div>,
 }));
 vi.mock('@/components/ImportWizard/ImportWizard', () => ({
-  default: ({ isOpen, onClose, onSuccess }: any) =>
+  default: ({ isOpen, onClose, onSuccess }: unknown) =>
     isOpen ? (
       <div data-testid="import-wizard">
         <button onClick={onClose}>Close Import</button>
@@ -58,7 +58,7 @@ vi.mock('@/components/ImportWizard/ImportWizard', () => ({
     ) : null,
 }));
 vi.mock('@/components/TransactionForm', () => ({
-  default: ({ isOpen, onClose, onSuccess }: any) =>
+  default: ({ isOpen, onClose, onSuccess }: unknown) =>
     isOpen ? (
       <div data-testid="transaction-form">
         <button onClick={onClose}>Close Form</button>
@@ -85,21 +85,9 @@ describe('Dashboard', () => {
     });
   });
 
-  it('deve abrir o menu flutuante (FAB) ao clicar', () => {
+  it('deve exibir os botões de ação no cabeçalho', () => {
     render(<Dashboard />);
-
-    // Procura o botão principal do FAB pelo ícone ou classe
-    const mainFabButton = screen
-      .getAllByRole('button')
-      .find((b) => b.className.includes('bg-blue-600'));
-
-    expect(mainFabButton).toBeInTheDocument();
-
-    // Clica para abrir o menu
-    fireEvent.click(mainFabButton!);
-
-    // Verifica se os botões do menu apareceram (Nova Transação, Importar CSV)
-    expect(screen.getByText('Nova Transação')).toBeInTheDocument();
+    expect(screen.getByText('Nova transação')).toBeInTheDocument();
     expect(screen.getByText('Importar CSV')).toBeInTheDocument();
     expect(screen.getByText('Gerenciar Categorias')).toBeInTheDocument();
   });
@@ -107,44 +95,38 @@ describe('Dashboard', () => {
   it('deve lidar com callbacks dos filtros', async () => {
     render(<Dashboard />);
 
-    fireEvent.click(screen.getByText('Search'));
-    fireEvent.click(screen.getByText('Type'));
-    fireEvent.click(screen.getByText('Month'));
-    fireEvent.click(screen.getByText('Year'));
-    fireEvent.click(screen.getByText('Clear'));
+    // Test search input
+    const searchInput = screen.getByPlaceholderText('Buscar por descrição...');
+    fireEvent.change(searchInput, { target: { value: 'teste' } });
+    expect(searchInput).toHaveValue('teste');
 
-    // Calling Clear will trigger setIsConfirmClearOpen(true), which achieves branch coverage.
-    // We skip asserting the modal's presence because AnimatePresence can block rendering in JSDOM.
+    // Test Limpar filtros
+    fireEvent.click(screen.getByText('Limpar filtros'));
+    expect(searchInput).toHaveValue('');
   });
 
   it('deve lidar com callbacks da lista', () => {
-    const fetchMock = vi.fn();
     (useTransactions as any).mockReturnValue({
-      transactions: [],
+      transactions: [
+        { id: '1', description: 'Mercado', amount: 100, date: '2026-04-01', type: 'expense' },
+      ],
       summary: {},
       history: [],
       isLoading: false,
-      fetchTransactions: fetchMock,
+      fetchTransactions: vi.fn(),
       deleteTransactionsByMonth: vi.fn(),
     });
 
     render(<Dashboard />);
 
-    fireEvent.click(screen.getByText('Delete'));
-    expect(fetchMock).toHaveBeenCalled();
-
-    fireEvent.click(screen.getByText('Edit'));
+    // Clica na transação para editar
+    fireEvent.click(screen.getByText('Mercado'));
     expect(screen.getByTestId('transaction-form')).toBeInTheDocument();
   });
 
-  it('deve lidar com o FAB de nova transação e modal', async () => {
+  it('deve lidar com o botão de nova transação e modal', async () => {
     render(<Dashboard />);
-    const mainFabButton = screen
-      .getAllByRole('button')
-      .find((b) => b.className.includes('bg-blue-600'));
-    fireEvent.click(mainFabButton!);
-
-    fireEvent.click(screen.getByText('Nova Transação'));
+    fireEvent.click(screen.getByText('Nova transação'));
     await waitFor(() => {
       expect(screen.getByTestId('transaction-form')).toBeInTheDocument();
     });
@@ -155,7 +137,7 @@ describe('Dashboard', () => {
     });
   });
 
-  it('deve lidar com o FAB de importar csv e modal', async () => {
+  it('deve lidar com o botão de importar csv e modal', async () => {
     const fetchMock = vi.fn();
     (useTransactions as any).mockReturnValue({
       transactions: [],
@@ -167,11 +149,6 @@ describe('Dashboard', () => {
     });
 
     render(<Dashboard />);
-    const mainFabButton = screen
-      .getAllByRole('button')
-      .find((b) => b.className.includes('bg-blue-600'));
-    fireEvent.click(mainFabButton!);
-
     fireEvent.click(screen.getByText('Importar CSV'));
     await waitFor(() => {
       expect(screen.getByTestId('import-wizard')).toBeInTheDocument();

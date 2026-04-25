@@ -43,7 +43,7 @@ export function Donut({ segs, centerLabel, centerValue, size = 140, stroke = 18 
             strokeWidth={stroke}
             initial={{ strokeDasharray: `0 ${C}`, strokeDashoffset: -acc }}
             animate={{ strokeDasharray: `${len} ${C - len}`, strokeDashoffset: -acc }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            transition={{ duration: 1, ease: 'easeOut' }}
             transform={`rotate(-90 ${size / 2} ${size / 2})`}
           />
         );

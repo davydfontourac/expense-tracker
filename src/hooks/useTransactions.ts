@@ -120,10 +120,7 @@ export function useTransactions() {
   const deleteTransaction = async (id: string) => {
     try {
       setIsLoading(true);
-      const { error } = await supabase
-        .from('transactions')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from('transactions').delete().eq('id', id);
 
       if (error) throw error;
       toast.success('Transação excluída com sucesso');

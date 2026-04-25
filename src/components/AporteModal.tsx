@@ -18,11 +18,11 @@ export default function AporteModal({ isOpen, onClose, onConfirm, goal }: Readon
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!amount || Number(amount) <= 0) return;
-    
+
     setIsSubmitting(true);
     const success = await onConfirm(goal.id, Number(amount));
     setIsSubmitting(false);
-    
+
     if (success) {
       setAmount('');
       onClose();
@@ -34,14 +34,17 @@ export default function AporteModal({ isOpen, onClose, onConfirm, goal }: Readon
       <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-transparent dark:border-gray-800 w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Fazer Aporte</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+          >
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="flex flex-col items-center text-center">
-            <div 
+            <div
               className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-4"
               style={{ backgroundColor: `${goal.color}15` }}
             >
@@ -53,7 +56,9 @@ export default function AporteModal({ isOpen, onClose, onConfirm, goal }: Readon
 
           <div>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">R$</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">
+                R$
+              </span>
               <input
                 type="number"
                 step="0.01"

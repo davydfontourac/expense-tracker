@@ -249,7 +249,16 @@ const COPY: Record<string, any> = {
         subs: 'Assinaturas',
         imported: 'transações importadas',
       },
-      categories: ['Alimentação', 'Transporte', 'Moradia', 'Lazer', 'Saúde', 'Educação', 'Viagem', 'Nova'],
+      categories: [
+        'Alimentação',
+        'Transporte',
+        'Moradia',
+        'Lazer',
+        'Saúde',
+        'Educação',
+        'Viagem',
+        'Nova',
+      ],
     },
   },
   en: {
@@ -441,7 +450,16 @@ const COPY: Record<string, any> = {
         subs: 'Subscriptions',
         imported: 'transactions imported',
       },
-      categories: ['Food', 'Transport', 'Housing', 'Leisure', 'Health', 'Education', 'Travel', 'New'],
+      categories: [
+        'Food',
+        'Transport',
+        'Housing',
+        'Leisure',
+        'Health',
+        'Education',
+        'Travel',
+        'New',
+      ],
     },
   },
 };
@@ -1129,9 +1147,18 @@ function Nav({ lang, setLang, t, scrolled }: any) {
             </button>
           </div>
           <nav>
-            <a href="#features" onClick={() => setMenuOpen(false)}>{t.nav.features}</a>
-            <a href="#how" onClick={() => setMenuOpen(false)}>{t.nav.how}</a>
-            <a href="https://github.com/davydfontourac/expense-tracker" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}>
+            <a href="#features" onClick={() => setMenuOpen(false)}>
+              {t.nav.features}
+            </a>
+            <a href="#how" onClick={() => setMenuOpen(false)}>
+              {t.nav.how}
+            </a>
+            <a
+              href="https://github.com/davydfontourac/expense-tracker"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMenuOpen(false)}
+            >
               {t.nav.github}
             </a>
           </nav>
@@ -1139,7 +1166,10 @@ function Nav({ lang, setLang, t, scrolled }: any) {
             <div className="foot-row">
               <ThemeToggle />
               <div className="lang-toggle" role="tablist" aria-label="Language">
-                <button className={lang === 'pt-BR' ? 'active' : ''} onClick={() => setLang('pt-BR')}>
+                <button
+                  className={lang === 'pt-BR' ? 'active' : ''}
+                  onClick={() => setLang('pt-BR')}
+                >
                   PT
                 </button>
                 <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>
@@ -1287,7 +1317,9 @@ function DashboardMock({ t }: any) {
 
           {/* Main */}
           <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+            <div
+              style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}
+            >
               <div>
                 <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.025em' }}>
                   {t.mock.header.greeting}
@@ -1439,7 +1471,14 @@ function DashboardMock({ t }: any) {
                 <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>
                   {t.mock.charts.distTitle}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flex: 1,
+                  }}
+                >
                   <Donut t={t} />
                 </div>
               </div>
@@ -1450,45 +1489,163 @@ function DashboardMock({ t }: any) {
 
       {/* Mobile Version */}
       <div className="mock mobile-only" style={{ padding: 20 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, position: 'relative', zIndex: 1 }}>
-          <div style={{ fontFamily: '"Geist Mono", monospace', fontSize: 10, color: 'var(--ink-400)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 12,
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: '"Geist Mono", monospace',
+              fontSize: 10,
+              color: 'var(--ink-400)',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+            }}
+          >
             Disponível · Abril
           </div>
           <div style={{ fontSize: 14, color: 'var(--ink-400)' }}>⋯</div>
         </div>
-        <div style={{ fontSize: 38, fontWeight: 600, letterSpacing: '-0.04em', lineHeight: 1, color: 'inherit', position: 'relative', zIndex: 1 }}>
+        <div
+          style={{
+            fontSize: 38,
+            fontWeight: 600,
+            letterSpacing: '-0.04em',
+            lineHeight: 1,
+            color: 'inherit',
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
           R$ 2.014,70
         </div>
-        <div style={{ fontFamily: '"Geist Mono", monospace', fontSize: 11, color: '#10b981', marginTop: 10, position: 'relative', zIndex: 1 }}>
+        <div
+          style={{
+            fontFamily: '"Geist Mono", monospace',
+            fontSize: 11,
+            color: '#10b981',
+            marginTop: 10,
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
           + R$ 412,00 · 4,2% vs. março
         </div>
-        <svg style={{ marginTop: 14, height: 42, width: '100%', position: 'relative', zIndex: 1, overflow: 'visible' }} viewBox="0 0 100 40" preserveAspectRatio="none">
+        <svg
+          style={{
+            marginTop: 14,
+            height: 42,
+            width: '100%',
+            position: 'relative',
+            zIndex: 1,
+            overflow: 'visible',
+          }}
+          viewBox="0 0 100 40"
+          preserveAspectRatio="none"
+        >
           <defs>
             <linearGradient id="sparkGradMobile" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#6366f1" stopOpacity="0.25"/>
-              <stop offset="100%" stopColor="#6366f1" stopOpacity="0"/>
+              <stop offset="0%" stopColor="#6366f1" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
             </linearGradient>
           </defs>
-          <path d={`M 0,${40-(pts[0]/Math.max(...pts))*36} ${pts.map((v,i)=>`L ${(i/(pts.length-1))*100},${40-(v/Math.max(...pts))*36}`).join(' ')} L 100,40 L 0,40 Z`} fill="url(#sparkGradMobile)"/>
-          <polyline fill="none" stroke="#6366f1" strokeWidth="1.5" points={pts.map((v,i)=>`${(i/(pts.length-1))*100},${40-(v/Math.max(...pts))*36}`).join(' ')}/>
+          <path
+            d={`M 0,${40 - (pts[0] / Math.max(...pts)) * 36} ${pts.map((v, i) => `L ${(i / (pts.length - 1)) * 100},${40 - (v / Math.max(...pts)) * 36}`).join(' ')} L 100,40 L 0,40 Z`}
+            fill="url(#sparkGradMobile)"
+          />
+          <polyline
+            fill="none"
+            stroke="#6366f1"
+            strokeWidth="1.5"
+            points={pts
+              .map((v, i) => `${(i / (pts.length - 1)) * 100},${40 - (v / Math.max(...pts)) * 36}`)
+              .join(' ')}
+          />
         </svg>
-        <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 0, position: 'relative', zIndex: 1 }}>
+        <div
+          style={{
+            marginTop: 32,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 0,
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
           {[
             { ic: '🍔', d: 'iFood — Combo', m: '22 ABR · Débito', v: -33.39, pos: false },
-            { ic: '⚡', d: 'Pix recebido', m: '21 ABR · Zamp SA', v: 25.90, pos: true },
+            { ic: '⚡', d: 'Pix recebido', m: '21 ABR · Zamp SA', v: 25.9, pos: true },
             { ic: '🚗', d: 'Uber *Trip', m: '21 ABR · Transporte', v: -17.36, pos: false },
-            { ic: '🛒', d: 'Supermercado', m: '20 ABR · Mercado', v: -142.80, pos: false },
+            { ic: '🛒', d: 'Supermercado', m: '20 ABR · Mercado', v: -142.8, pos: false },
           ].map((r, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 0', borderTop: '1px solid var(--ink-200)', borderTopColor: 'var(--div-color, var(--ink-100))' }}>
-              <div className="ic" style={{ width: 36, height: 36, borderRadius: 10, display: 'grid', placeItems: 'center', fontSize: 16, background: 'var(--ink-100)' }}>
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14,
+                padding: '14px 0',
+                borderTop: '1px solid var(--ink-200)',
+                borderTopColor: 'var(--div-color, var(--ink-100))',
+              }}
+            >
+              <div
+                className="ic"
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 10,
+                  display: 'grid',
+                  placeItems: 'center',
+                  fontSize: 16,
+                  background: 'var(--ink-100)',
+                }}
+              >
                 {r.ic}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.d}</div>
-                <div style={{ fontSize: 11, color: 'var(--ink-400)', fontFamily: '"Geist Mono", monospace', marginTop: 3, letterSpacing: '0.02em' }}>{r.m}</div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 500,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {r.d}
+                </div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: 'var(--ink-400)',
+                    fontFamily: '"Geist Mono", monospace',
+                    marginTop: 3,
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  {r.m}
+                </div>
               </div>
-              <div style={{ fontSize: 14, fontWeight: 500, fontVariantNumeric: 'tabular-nums', color: r.pos ? '#10b981' : 'inherit' }}>
-                {r.pos ? '+' : '−'} R$ {Math.abs(r.v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 500,
+                  fontVariantNumeric: 'tabular-nums',
+                  color: r.pos ? '#10b981' : 'inherit',
+                }}
+              >
+                {r.pos ? '+' : '−'} R${' '}
+                {Math.abs(r.v).toLocaleString('pt-BR', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </div>
             </div>
           ))}
@@ -1728,9 +1885,7 @@ function FeatureVisuals(t: any) {
           <span style={{ color: '#22d3ee' }}>07/10</span> NETFLIX{' '}
           <span style={{ color: '#a78bfa' }}>→ {t.visuals.csv.subs}</span>
         </div>
-        <div style={{ marginTop: 8, color: '#10b981' }}>
-          ✓ 47 {t.visuals.csv.imported}
-        </div>
+        <div style={{ marginTop: 8, color: '#10b981' }}>✓ 47 {t.visuals.csv.imported}</div>
       </div>
     ),
     categories: (

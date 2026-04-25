@@ -100,8 +100,8 @@ export default function Transactions() {
           </div>
         </div>
         <div className="flex gap-2 items-center flex-wrap">
-          <button 
-            onClick={() => setIsConfirmDeleteAllOpen(true)} 
+          <button
+            onClick={() => setIsConfirmDeleteAllOpen(true)}
             className="A-chip text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors border-red-200 dark:border-red-900/30"
             disabled={transactions.length === 0}
           >
@@ -122,11 +122,15 @@ export default function Transactions() {
       {/* Transaction Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <div className="A-card !p-4">
-          <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">Total no período</div>
+          <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+            Total no período
+          </div>
           <div className="text-2xl font-bold mt-2 text-red-500">− {fmt(summary.totalExpense)}</div>
         </div>
         <div className="A-card !p-4">
-          <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">Receitas</div>
+          <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+            Receitas
+          </div>
           <div className="text-2xl font-bold mt-2 text-green-500">+ {fmt(summary.totalIncome)}</div>
         </div>
         <div className="A-card !p-4">
@@ -134,11 +138,22 @@ export default function Transactions() {
             {filters.type === 'income' ? 'Maior receita' : 'Maior gasto'}
           </div>
           <div className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">
-            {fmt(Math.max(...transactions.filter(t => filters.type === 'all' ? t.type === 'expense' : t.type === filters.type).map(t => t.amount), 0))}
+            {fmt(
+              Math.max(
+                ...transactions
+                  .filter((t) =>
+                    filters.type === 'all' ? t.type === 'expense' : t.type === filters.type,
+                  )
+                  .map((t) => t.amount),
+                0,
+              ),
+            )}
           </div>
         </div>
         <div className="A-card !p-4">
-          <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">Média diária</div>
+          <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+            Média diária
+          </div>
           <div className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">
             {fmt((filters.type === 'income' ? summary.totalIncome : summary.totalExpense) / 30)}
           </div>
@@ -149,41 +164,63 @@ export default function Transactions() {
       <div className="flex gap-2 items-center flex-wrap mb-6">
         <div className="A-search flex-1 max-w-md">
           <Search size={14} className="text-gray-400" />
-          <input 
-            placeholder="Buscar por descrição, valor, categoria..." 
+          <input
+            placeholder="Buscar por descrição, valor, categoria..."
             value={filters.search}
-            onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
+            onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
             className="text-gray-900 dark:text-white"
           />
         </div>
-        <MonthYearPicker 
-          month={filters.month} 
-          year={filters.year} 
-          onChange={(m, y) => setFilters(f => ({ ...f, month: m, year: y }))} 
+        <MonthYearPicker
+          month={filters.month}
+          year={filters.year}
+          onChange={(m, y) => setFilters((f) => ({ ...f, month: m, year: y }))}
         />
         <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
-          <button 
-            onClick={() => setFilters(f => ({ ...f, type: 'all' }))}
-            className={cn("px-4 py-1.5 rounded-md text-xs font-medium transition-all", filters.type === 'all' ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-500")}
+          <button
+            onClick={() => setFilters((f) => ({ ...f, type: 'all' }))}
+            className={cn(
+              'px-4 py-1.5 rounded-md text-xs font-medium transition-all',
+              filters.type === 'all'
+                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500',
+            )}
           >
             Todos
           </button>
-          <button 
-            onClick={() => setFilters(f => ({ ...f, type: 'income' }))}
-            className={cn("px-4 py-1.5 rounded-md text-xs font-medium transition-all", filters.type === 'income' ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-500")}
+          <button
+            onClick={() => setFilters((f) => ({ ...f, type: 'income' }))}
+            className={cn(
+              'px-4 py-1.5 rounded-md text-xs font-medium transition-all',
+              filters.type === 'income'
+                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500',
+            )}
           >
             Receitas
           </button>
-          <button 
-            onClick={() => setFilters(f => ({ ...f, type: 'expense' }))}
-            className={cn("px-4 py-1.5 rounded-md text-xs font-medium transition-all", filters.type === 'expense' ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-500")}
+          <button
+            onClick={() => setFilters((f) => ({ ...f, type: 'expense' }))}
+            className={cn(
+              'px-4 py-1.5 rounded-md text-xs font-medium transition-all',
+              filters.type === 'expense'
+                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500',
+            )}
           >
             Despesas
           </button>
         </div>
         <div className="flex-1" />
-        <button 
-          onClick={() => setFilters({ search: '', type: 'all', month: String(new Date().getMonth() + 1), year: String(new Date().getFullYear()) })}
+        <button
+          onClick={() =>
+            setFilters({
+              search: '',
+              type: 'all',
+              month: String(new Date().getMonth() + 1),
+              year: String(new Date().getFullYear()),
+            })
+          }
           className="A-chip"
         >
           Limpar
@@ -202,8 +239,8 @@ export default function Transactions() {
         </div>
         <div className="divide-y divide-gray-100 dark:divide-gray-800">
           {transactions.map((t) => (
-            <div 
-              key={t.id} 
+            <div
+              key={t.id}
               className="grid grid-cols-[48px_1fr_140px_110px_130px_80px] gap-4 px-6 py-4 items-center hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors cursor-pointer group"
               onClick={() => handleEdit(t)}
             >
@@ -211,7 +248,10 @@ export default function Transactions() {
                 {CAT_EMOJI[t.categories?.name || ''] || '💰'}
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-medium text-gray-900 dark:text-white truncate" title={t.description}>
+                <div
+                  className="text-sm font-medium text-gray-900 dark:text-white truncate"
+                  title={t.description}
+                >
                   {t.description}
                 </div>
                 <div className="text-[11px] text-gray-400 mt-0.5">Conta Corrente · Principais</div>
@@ -224,11 +264,16 @@ export default function Transactions() {
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 {format(new Date(t.date), 'dd/MM/yyyy')}
               </div>
-              <div className={cn("text-sm font-semibold text-right", t.type === 'income' ? "text-green-500" : "text-gray-900 dark:text-white")}>
+              <div
+                className={cn(
+                  'text-sm font-semibold text-right',
+                  t.type === 'income' ? 'text-green-500' : 'text-gray-900 dark:text-white',
+                )}
+              >
                 {t.type === 'income' ? '+' : '−'} {fmt(t.amount)}
               </div>
               <div className="flex justify-end gap-2">
-                <button 
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setTransactionToDelete(t.id);
@@ -245,7 +290,9 @@ export default function Transactions() {
             </div>
           ))}
           {transactions.length === 0 && !isLoading && (
-            <div className="py-20 text-center text-gray-500">Nenhuma transação encontrada para este período.</div>
+            <div className="py-20 text-center text-gray-500">
+              Nenhuma transação encontrada para este período.
+            </div>
           )}
           {isLoading && (
             <div className="py-20 text-center text-gray-500 flex flex-col items-center gap-3">
@@ -268,7 +315,7 @@ export default function Transactions() {
         onClose={() => setIsImportOpen(false)}
         onSuccess={fetchData}
       />
-      
+
       <ConfirmModal
         isOpen={isConfirmDeleteOpen}
         onClose={() => {

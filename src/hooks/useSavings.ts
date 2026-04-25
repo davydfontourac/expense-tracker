@@ -36,11 +36,13 @@ export function useSavings() {
 
   const upsertGoal = async (goal: Partial<SavingsGoal>) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
       const payload = { ...goal, user_id: user.id };
-      
+
       let res;
       if (goal.id) {
         res = await supabase.from('savings_goals').update(payload).eq('id', goal.id);
@@ -74,7 +76,7 @@ export function useSavings() {
   const addDeposit = async (goalId: string, amount: number) => {
     try {
       // 1. Update goal balance
-      const goal = goals.find(g => g.id === goalId);
+      const goal = goals.find((g) => g.id === goalId);
       if (!goal) return false;
 
       const newAmount = Number(goal.current_amount) + Number(amount);
@@ -86,8 +88,10 @@ export function useSavings() {
       if (goalErr) throw goalErr;
 
       // 2. Create transaction (optional but consistent with the system)
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       // Find 'Caixinha' category
       const { data: catData } = await supabase
         .from('categories')
@@ -95,15 +99,17 @@ export function useSavings() {
         .ilike('name', '%caixinha%')
         .single();
 
-      await supabase.from('transactions').insert([{
-        user_id: user?.id,
-        amount: amount,
-        type: 'transfer_out',
-        description: `Aporte: ${goal.name}`,
-        category_id: catData?.id,
-        savings_goal_id: goalId,
-        date: new Date().toISOString()
-      }]);
+      await supabase.from('transactions').insert([
+        {
+          user_id: user?.id,
+          amount: amount,
+          type: 'transfer_out',
+          description: `Aporte: ${goal.name}`,
+          category_id: catData?.id,
+          savings_goal_id: goalId,
+          date: new Date().toISOString(),
+        },
+      ]);
 
       toast.success('Aporte realizado com sucesso!');
       fetchGoals();

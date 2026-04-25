@@ -3,7 +3,11 @@ import { useTheme } from '@/context/ThemeContext';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/utils/cn';
 
-export function ThemeToggle({ dropdownPosition = 'bottom' }: { dropdownPosition?: 'top' | 'bottom' }) {
+export function ThemeToggle({
+  dropdownPosition = 'bottom',
+}: {
+  dropdownPosition?: 'top' | 'bottom';
+}) {
   const { theme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -32,10 +36,12 @@ export function ThemeToggle({ dropdownPosition = 'bottom' }: { dropdownPosition?
       </button>
 
       {isOpen && (
-        <div className={cn(
-          "absolute right-0 w-36 py-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 z-50 overflow-hidden",
-          dropdownPosition === 'top' ? "bottom-full mb-2" : "top-full mt-2"
-        )}>
+        <div
+          className={cn(
+            'absolute right-0 w-36 py-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 z-50 overflow-hidden',
+            dropdownPosition === 'top' ? 'bottom-full mb-2' : 'top-full mt-2',
+          )}
+        >
           <button
             onClick={() => {
               setTheme('light');

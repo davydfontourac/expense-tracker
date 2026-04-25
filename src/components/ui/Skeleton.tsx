@@ -1,5 +1,6 @@
 import { cn } from '@/utils/cn';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function Skeleton({ className, ...props }: SkeletonProps) {
