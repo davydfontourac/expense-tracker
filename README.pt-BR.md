@@ -26,13 +26,14 @@
 
 ## ✨ Funcionalidades
 
+- **🏦 Importação Bancária** — Assistente de importação de CSV inteligente com detecção automática de categorias e mapeamento de colunas.
+- **📊 Dashboard Inteligente** — Saldo disponível e "Caixinhas" refletem o valor real acumulado independentemente do filtro mensal, enquanto receitas/despesas respeitam o período selecionado.
+- **📱 UX Mobile Aprimorada** — Botão de Ação Flutuante (FAB) para acesso rápido às funções principais (Nova Transação, Importação CSV, Categorias).
 - **🔐 Autenticação completa** — Login, registro, recuperação de senha e OAuth via Supabase Auth.
-- **💳 Transações** — CRUD completo com categorias, tipo (receita/despesa), data e busca.
-- **📊 Dashboard** — Resumo mensal com saldo total, receitas, despesas e histórico anual.
+- **💳 Transações** — CRUD completo com categorias, tipo (receita/despesa/transferência), data e busca.
 - **🗂️ Categorias** — Categorias nativas + criação de categorias personalizadas com cor e emoji.
 - **👤 Perfil** — Atualização de nome, avatar e senha do usuário.
 - **🌑 Dark Mode** — Alternância entre tema claro e escuro.
-- **📱 Responsivo** — Layout mobile-first com navegação inferior em telas pequenas.
 - **🎭 Animações** — Transições de página e microanimações com Framer Motion.
 
 ---
@@ -57,36 +58,44 @@
 ## 🚀 Como rodar localmente
 
 ### Pré-requisitos
+
 - Node.js 20+
 - Conta no [Supabase](https://supabase.com)
 
 ### 1. Clone o repositório
+
 ```bash
 git clone https://github.com/davydfontourac/expense-tracker.git
 cd expense-tracker
 ```
 
 ### 2. Instale as dependências
+
 ```bash
 npm install
 ```
 
 ### 3. Variáveis de Ambiente
+
 Crie um arquivo `.env` na raiz do projeto:
+
 ```bash
 cp .env.example .env
 ```
 
 Preencha com suas credenciais do Supabase:
+
 ```env
 VITE_SUPABASE_URL=https://SEU_PROJETO.supabase.co
 VITE_SUPABASE_ANON_KEY=sua_anon_key_aqui
 ```
 
 ### 4. Configuração do Banco de Dados
+
 O projeto utiliza funções PostgreSQL (RPCs) para cálculos otimizados no dashboard. Execute os scripts SQL encontrados em `supabase/migrations` diretamente no **SQL Editor do Supabase**.
 
 ### 5. Inicie o projeto
+
 ```bash
 npm run dev
 ```

@@ -107,7 +107,9 @@ describe('Profile', () => {
     fireEvent.click(screen.getByText('Confirmar'));
 
     await waitFor(() => {
-      expect(toast.toast.error).toHaveBeenCalledWith('Erro ao excluir conta. Tente novamente mais tarde.');
+      expect(toast.toast.error).toHaveBeenCalledWith(
+        'Erro ao excluir conta. Tente novamente mais tarde.',
+      );
     });
   });
 });
