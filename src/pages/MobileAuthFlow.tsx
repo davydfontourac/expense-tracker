@@ -1,124 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Github, Chrome, Eye, EyeOff, CheckCircle2, Menu, X, LogOut } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, CheckCircle2, X, LogOut } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuthActions } from '@/hooks/useAuthActions';
+import { AuthHeader, SocialAuth, AuthFooter, Input } from '@/components/AuthUI';
 
 // --- SCHEMAS ---
 import { loginSchema, registerSchema, forgotPasswordSchema } from '@/utils/auth-schemas';
 import { AUTH_TRANSLATIONS } from '@/utils/auth-translations';
 
-const COPY: any = {
-  'pt-BR': {
-    splash: { subtitle: 'Seu dinheiro, sob controle.' },
-    onboarding: {
-      step1: { title: 'Rastreie tudo em um só lugar.', desc: 'Despesas, receitas e caixinhas. Sem planilhas, sem fricção.' },
-      step2: { title: 'Importe extratos em 2 cliques.', desc: 'Suporte a CSV de qualquer banco. Nós mapeamos as colunas para você.' },
-      step3: { title: 'Insights que fazem sentido.', desc: 'Categorização automática e relatórios visuais para você economizar.' },
-      skip: 'Pular',
-      next: 'Próximo',
-      finish: 'Começar agora'
-    },
-    register: {
-      ...AUTH_TRANSLATIONS['pt-BR'].register,
-      title: 'Crie sua conta.',
-      subtitle: 'É grátis. Seus dados são seus. Criptografia em repouso por padrão.',
-      name: 'Nome',
-      namePlaceholder: 'Digite seu nome',
-      emailPlaceholder: 'Digite seu email',
-      passwordPlaceholder: 'Digite sua senha',
-      confirmPassword: 'Confirmar Senha',
-      confirmPasswordPlaceholder: 'Confirme sua senha',
-      termsLink: 'Termos',
-      hasAccount: 'Já tem conta? Entrar',
-      hasAccountLink: 'Entrar',
-      termsError: 'Você deve aceitar os termos',
-    },
-    login: {
-      ...AUTH_TRANSLATIONS['pt-BR'].login,
-      title: 'Bem-vindo de volta.',
-      subtitle: 'Entre para continuar acompanhando suas finanças.',
-      noAccount: 'Ainda não tem conta? Criar conta',
-      noAccountLink: 'Criar conta'
-    },
-    forgot: {
-      title: 'Esqueceu a senha?',
-      subtitle: 'Digite seu e-mail e mandaremos um link para você redefinir.',
-      button: 'Enviar link',
-      buttonLoading: 'Enviando...',
-      cancel: 'Cancelar',
-      footer: 'Verifique seu inbox · Spam'
-    },
-    menu: {
-      home: 'Página Inicial',
-      theme: 'Tema',
-      language: 'Idioma'
-    },
-    mock: {
-      balance: 'Saldo',
-      lunch: 'iFood - Almoço',
-      today: 'Hoje',
-      transactions: 'transações',
-      apr: 'Abr'
-    }
-  },
-  'en': {
-    splash: { subtitle: 'Your money, under control.' },
-    onboarding: {
-      step1: { title: 'Track everything in one place.', desc: 'Expenses, income and goals. No spreadsheets, no friction.' },
-      step2: { title: 'Import statements in 2 clicks.', desc: 'CSV support for any bank. We map the columns for you.' },
-      step3: { title: 'Insights that make sense.', desc: 'Automatic categorization and visual reports to help you save.' },
-      skip: 'Skip',
-      next: 'Next',
-      finish: 'Get started'
-    },
-    register: {
-      ...AUTH_TRANSLATIONS['en'].register,
-      title: 'Create your account.',
-      subtitle: "It's free. Your data is yours. Encryption at rest by default.",
-      name: 'Name',
-      namePlaceholder: 'Enter your name',
-      emailPlaceholder: 'Enter your email',
-      passwordPlaceholder: 'Enter your password',
-      confirmPassword: 'Confirm Password',
-      confirmPasswordPlaceholder: 'Confirm your password',
-      termsLink: 'Terms',
-      hasAccount: 'Already have an account? Sign in',
-      hasAccountLink: 'Sign in',
-      termsError: 'You must accept the terms',
-    },
-    login: {
-      ...AUTH_TRANSLATIONS['en'].login,
-      title: 'Welcome back.',
-      subtitle: 'Sign in to continue tracking your finances.',
-      noAccount: "Don't have an account? Create one",
-      noAccountLink: 'Create one'
-    },
-    forgot: {
-      title: 'Forgot password?',
-      subtitle: "Enter your email and we'll send you a link to reset.",
-      button: 'Send link',
-      buttonLoading: 'Sending...',
-      cancel: 'Cancel',
-      footer: 'Check your inbox · Spam'
-    },
-    menu: {
-      home: 'Home Page',
-      theme: 'Theme',
-      language: 'Language'
-    },
-    mock: {
-      balance: 'Balance',
-      lunch: 'iFood - Lunch',
-      today: 'Today',
-      transactions: 'transactions',
-      apr: 'Apr'
-    }
-  }
-};
+const COPY: any = AUTH_TRANSLATIONS;
 
 type Step = 'splash' | 'onboarding1' | 'onboarding2' | 'onboarding3' | 'register' | 'login' | 'forgot_password';
 
@@ -323,71 +217,6 @@ export default function MobileAuthFlow() {
 }
 
 // --- SHARED COMPONENTS ---
-
-function AuthHeader({ onBack, onOpenMenu, title, subtitle }: { onBack?: () => void, onOpenMenu: () => void, title: string, subtitle: string }) {
-  return (
-    <>
-      <header className="flex items-center justify-between mb-8">
-        {onBack ? (
-          <button onClick={onBack} className="p-2 -mr-2 text-gray-900 dark:text-white">
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-        ) : (
-          <div className="flex items-center gap-2">
-            <img src="/logo-expense-tracker.png" alt="Logo" className="w-6 h-6" />
-            <span className="text-sm font-bold dark:text-white">Expense Tracker</span>
-          </div>
-        )}
-        <button onClick={onOpenMenu} className="p-2 -mr-2 text-gray-900 dark:text-white">
-          <Menu className="w-6 h-6" />
-        </button>
-      </header>
-
-      <div className="mb-8">
-        <h1 className="text-[32px] font-bold leading-tight text-gray-900 dark:text-white mb-2">{title}</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">{subtitle}</p>
-      </div>
-    </>
-  );
-}
-
-function SocialAuth({ t, onSocialLogin }: { t: any, onSocialLogin: (provider: 'google' | 'github') => void }) {
-  return (
-    <div className="mt-8 flex flex-col items-center gap-6 w-full">
-      <div className="relative w-full">
-        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100 dark:border-white/5"></div></div>
-        <div className="relative flex justify-center text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-600 bg-white dark:bg-[#0c0c1d] px-4">{t.register.or}</div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 w-full">
-        <SocialButton 
-          icon={<Chrome className="w-5 h-5 text-gray-500" />} 
-          label="Google" 
-          onClick={() => onSocialLogin('google')}
-        />
-        <SocialButton 
-          icon={<Github className="w-5 h-5 text-gray-500" />} 
-          label="GitHub" 
-          onClick={() => onSocialLogin('github')}
-        />
-      </div>
-    </div>
-  );
-}
-
-function AuthFooter({ text, linkText, onClick }: { text: string, linkText: string, onClick: () => void }) {
-  return (
-    <button onClick={onClick} className="text-sm font-medium text-gray-500 mt-8">
-      {text.split(linkText).map((part: string, i: number) => (
-        <React.Fragment key={i}>
-          {part}
-          {i === 0 && <span className="text-gray-900 dark:text-white font-bold">{linkText}</span>}
-        </React.Fragment>
-      ))}
-    </button>
-  );
-}
-
 // --- SUB-COMPONENTS ---
 
 function SplashStep({ t }: { t: any }) {
@@ -740,25 +569,3 @@ function ForgotPasswordStep({ onBack, t, lang }: { onBack: () => void, t: any, l
   );
 }
 
-// --- SHARED UI ---
-
-const Input = React.forwardRef<HTMLInputElement, any>(({ label, error, ...props }, ref) => (
-  <div className="space-y-2">
-    <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest font-mono">{label}</label>
-    <input
-      ref={ref}
-      className={`w-full px-5 py-4 bg-gray-50 dark:bg-white/5 border ${error ? 'border-red-500' : 'border-gray-100 dark:border-white/10'} rounded-2xl text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-700`}
-      {...props}
-    />
-    {error && <p className="text-[10px] font-bold text-red-500 uppercase tracking-wide">{error}</p>}
-  </div>
-));
-
-function SocialButton({ icon, label, onClick }: { icon: React.ReactNode, label: string, onClick?: () => void }) {
-  return (
-    <button onClick={onClick} className="flex items-center justify-center gap-3 px-4 py-4 bg-white dark:bg-[#161629] border border-gray-100 dark:border-white/10 rounded-2xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors shadow-sm active:scale-[0.98]">
-      {icon}
-      <span className="text-sm font-bold text-gray-700 dark:text-gray-200">{label}</span>
-    </button>
-  );
-}

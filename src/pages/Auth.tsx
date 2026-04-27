@@ -14,53 +14,7 @@ import PageTransition from '@/components/PageTransition';
 import { loginSchema, registerSchema, type LoginFormValues as LoginForm, type RegisterFormValues as RegisterForm } from '@/utils/auth-schemas';
 import { AUTH_TRANSLATIONS } from '@/utils/auth-translations';
 
-const COPY: any = {
-  'pt-BR': {
-    login: {
-      ...AUTH_TRANSLATIONS['pt-BR'].login,
-      title: 'Bem-vindo de volta',
-      subtitle: 'Entre para gerenciar suas finanças de forma inteligente.',
-      create: 'Crie uma agora',
-    },
-    register: {
-      ...AUTH_TRANSLATIONS['pt-BR'].register,
-      title: 'Crie sua conta',
-      subtitle: 'Comece a rastrear seus gastos em menos de 1 minuto.',
-      confirm: 'Confirmar senha',
-      termsLink: 'Termos',
-      termsError: 'Você deve aceitar os termos',
-    },
-    success: {
-      title: 'Verifique seu e-mail',
-      subtitle: 'Enviamos um link de confirmação especial para o seu e-mail. Acesse sua caixa de entrada para ativar sua conta e começar sua jornada.',
-      button: 'Ir para o Login',
-      noEmail: 'Não recebeu?',
-      resend: 'Reenviar link'
-    }
-  },
-  'en': {
-    login: {
-      ...AUTH_TRANSLATIONS['en'].login,
-      title: 'Welcome back',
-      subtitle: 'Sign in to manage your finances intelligently.',
-      create: 'Create one now',
-    },
-    register: {
-      ...AUTH_TRANSLATIONS['en'].register,
-      title: 'Create your account',
-      subtitle: 'Start tracking your expenses in less than 1 minute.',
-      termsLink: 'Terms',
-      termsError: 'You must accept the terms',
-    },
-    success: {
-      title: 'Check your email',
-      subtitle: "We've sent a special confirmation link to your email. Check your inbox to activate your account and start your journey.",
-      button: 'Go to Login',
-      noEmail: "Didn't receive it?",
-      resend: 'Resend link'
-    }
-  }
-};
+const COPY: any = AUTH_TRANSLATIONS;
 
 // ── COMPONENT ────────────────────────────────────────────────────────────────
 
