@@ -56,6 +56,7 @@ export default function Dashboard() {
     deleteTransactionsByMonth,
   } = useTransactions();
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [modalInitialType, setModalInitialType] = useState<'income' | 'expense' | 'transfer_in' | 'transfer_out' | undefined>(undefined);
 
   const [filters, setFilters] = useState({
     search: '',
@@ -86,6 +87,12 @@ export default function Dashboard() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingTransaction(null);
+    setModalInitialType(undefined);
+  };
+
+  const openModalWithType = (type: any) => {
+    setModalInitialType(type);
+    setIsModalOpen(true);
   };
 
   const categoriesData = useMemo(() => {
@@ -178,29 +185,29 @@ export default function Dashboard() {
               </div>
               <div className="text-3xl font-bold text-white mb-2">{fmt(summary.availableBalance)}</div>
               <div className="flex items-center gap-1.5 text-xs font-medium text-white/90">
-                <TrendingUp size={14} className="text-green-300" />
-                <span>+ {fmt(89.12)} (+4.2%) este mês</span>
+                <TrendingUp size={14} className="text-white/60" />
+                <span>{fmt(0)} (0%) este mês</span>
               </div>
 
               {/* Action Buttons Inside Card */}
               <div className="grid grid-cols-4 gap-2 mt-8">
-                <button onClick={() => setIsModalOpen(true)} className="flex flex-col items-center gap-2">
+                <button onClick={() => openModalWithType('income')} className="flex flex-col items-center gap-2">
                   <div className="w-11 h-11 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl flex items-center justify-center text-white transition-all active:scale-90">
                     <ArrowUpRight size={20} />
                   </div>
-                  <span className="text-[9px] font-bold text-white uppercase tracking-tighter">Enviar</span>
+                  <span className="text-[9px] font-bold text-white uppercase tracking-tighter">Receitas</span>
                 </button>
-                <button onClick={() => setIsModalOpen(true)} className="flex flex-col items-center gap-2">
+                <button onClick={() => openModalWithType('expense')} className="flex flex-col items-center gap-2">
                   <div className="w-11 h-11 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl flex items-center justify-center text-white transition-all active:scale-90">
                     <ArrowDownLeft size={20} />
                   </div>
-                  <span className="text-[9px] font-bold text-white uppercase tracking-tighter">Receber</span>
+                  <span className="text-[9px] font-bold text-white uppercase tracking-tighter">Despesas</span>
                 </button>
-                <button onClick={() => setIsModalOpen(true)} className="flex flex-col items-center gap-2">
+                <button onClick={() => openModalWithType('transfer_out')} className="flex flex-col items-center gap-2">
                   <div className="w-11 h-11 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl flex items-center justify-center text-white transition-all active:scale-90">
                     <Plus size={20} />
                   </div>
-                  <span className="text-[9px] font-bold text-white uppercase tracking-tighter">Gasto</span>
+                  <span className="text-[9px] font-bold text-white uppercase tracking-tighter">Transf.</span>
                 </button>
                 <Link to="/goals" className="flex flex-col items-center gap-2">
                   <div className="w-11 h-11 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl flex items-center justify-center text-white transition-all active:scale-90">
@@ -218,32 +225,32 @@ export default function Dashboard() {
           <div className="bg-white dark:bg-[#161629] p-5 rounded-[24px] border border-gray-100 dark:border-white/5 shadow-sm">
             <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Receitas</div>
             <div className="text-lg font-bold text-gray-900 dark:text-white">{fmt(summary.totalIncome)}</div>
-            <div className="mt-2 text-[10px] font-bold text-green-500 flex items-center gap-1">
+            <div className="mt-2 text-[10px] font-bold text-gray-400 flex items-center gap-1">
                <ArrowUpRight size={12} />
-               +12%
+               0%
             </div>
           </div>
           <div className="bg-white dark:bg-[#161629] p-5 rounded-[24px] border border-gray-100 dark:border-white/5 shadow-sm">
             <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Despesas</div>
             <div className="text-lg font-bold text-gray-900 dark:text-white">{fmt(summary.totalExpense)}</div>
-            <div className="mt-2 text-[10px] font-bold text-red-500 flex items-center gap-1">
+            <div className="mt-2 text-[10px] font-bold text-gray-400 flex items-center gap-1">
                <ArrowDownLeft size={12} />
-               -3.1%
+               0%
             </div>
           </div>
           <div className="bg-white dark:bg-[#161629] p-5 rounded-[24px] border border-gray-100 dark:border-white/5 shadow-sm">
             <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Caixinhas</div>
-            <div className="text-lg font-bold text-gray-900 dark:text-white">R$ {Math.round(summary.caixinhaBalance / 1000)}k</div>
-            <div className="mt-2 text-[10px] font-bold text-green-500 flex items-center gap-1">
+            <div className="text-lg font-bold text-gray-900 dark:text-white">{fmt(summary.caixinhaBalance)}</div>
+            <div className="mt-2 text-[10px] font-bold text-gray-400 flex items-center gap-1">
                <Plus size={12} />
-               +0.3%
+               0%
             </div>
           </div>
           <div className="bg-white dark:bg-[#161629] p-5 rounded-[24px] border border-gray-100 dark:border-white/5 shadow-sm">
             <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Metas</div>
             <div className="text-lg font-bold text-gray-900 dark:text-white">3/5</div>
-            <div className="mt-2 text-[10px] font-bold text-blue-500 flex items-center gap-1 uppercase">
-               no ritmo
+            <div className="mt-2 text-[10px] font-bold text-gray-400 flex items-center gap-1 uppercase">
+               0%
             </div>
           </div>
         </div>
@@ -272,6 +279,52 @@ export default function Dashboard() {
                     <span className="text-[10px] font-bold text-gray-400">{c.pct}%</span>
                   </div>
                 ))}
+             </div>
+          </div>
+        </div>
+
+        {/* Monthly Evolution Section */}
+        <div className="px-6 mb-10">
+          <div className="flex items-center justify-between mb-4">
+             <h3 className="text-lg font-bold text-gray-900 dark:text-white">Evolução Mensal</h3>
+             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{filters.year}</span>
+          </div>
+          <div className="bg-white dark:bg-[#161629] p-6 rounded-[32px] border border-gray-100 dark:border-white/5 shadow-sm">
+             <div className="overflow-x-auto no-scrollbar">
+                <div className="flex items-end gap-3 h-40 min-w-[500px] pb-2">
+                   {typedHistory.map((h, i) => {
+                      const max = Math.max(...typedHistory.map(x => Math.max(Number(x.income) || 0, Number(x.expense) || 0)), 1000) || 1000;
+                      const isCurrentMonth = Number(h.fullMonth) === new Date().getMonth() + 1 && Number(h.year) === new Date().getFullYear();
+                      
+                      return (
+                        <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full">
+                           <div className="flex-1 w-full flex items-end gap-1 px-1">
+                              <motion.div 
+                                className={cn("flex-1 rounded-t-sm", isCurrentMonth ? "bg-indigo-500" : "bg-gray-900 dark:bg-gray-100")}
+                                initial={{ height: 0 }}
+                                animate={{ height: `${((Number(h.income) || 0) / max) * 100}%` }}
+                                transition={{ duration: 0.8, delay: i * 0.05 }}
+                              />
+                              <motion.div 
+                                className={cn("flex-1 rounded-t-sm", isCurrentMonth ? "bg-indigo-200 dark:bg-indigo-900/50" : "bg-gray-200 dark:bg-gray-700")}
+                                initial={{ height: 0 }}
+                                animate={{ height: `${((Number(h.expense) || 0) / max) * 100}%` }}
+                                transition={{ duration: 0.8, delay: i * 0.05 + 0.1 }}
+                              />
+                           </div>
+                           <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{String(h.month).substring(0, 3)}</span>
+                        </div>
+                      );
+                   })}
+                </div>
+             </div>
+             <div className="flex gap-4 mt-4 text-[10px] font-bold uppercase tracking-tighter text-gray-400">
+               <span className="flex items-center gap-1.5">
+                 <span className="w-2 h-2 rounded-full bg-gray-900 dark:bg-gray-100" /> Receitas
+               </span>
+               <span className="flex items-center gap-1.5">
+                 <span className="w-2 h-2 rounded-full bg-gray-200 dark:bg-gray-700" /> Despesas
+               </span>
              </div>
           </div>
         </div>
@@ -309,6 +362,7 @@ export default function Dashboard() {
           onClose={handleCloseModal}
           onSuccess={fetchData}
           transaction={editingTransaction}
+          initialType={modalInitialType}
         />
       </PageTransition>
     );

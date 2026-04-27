@@ -37,6 +37,7 @@ interface Props {
   onClose: () => void;
   onSuccess: () => void;
   transaction?: any;
+  initialType?: 'income' | 'expense' | 'transfer_in' | 'transfer_out';
 }
 
 const CAT_EMOJI: Record<string, string> = {
@@ -56,6 +57,7 @@ export default function TransactionForm({
   onClose,
   onSuccess,
   transaction,
+  initialType,
 }: Readonly<Props>) {
   const [categories, setCategories] = useState<Category[]>([]);
   const isMobile = useMobile();
@@ -113,7 +115,7 @@ export default function TransactionForm({
           description: '',
           amount: '',
           date: new Date().toISOString().split('T')[0],
-          type: 'expense',
+          type: initialType || 'expense',
           category_id: null,
           is_recurrent: false,
           frequency: 'monthly',
@@ -121,7 +123,7 @@ export default function TransactionForm({
         });
       }
     }
-  }, [transaction, isOpen, reset]);
+  }, [transaction, isOpen, reset, initialType]);
 
   if (!isOpen) return null;
 
