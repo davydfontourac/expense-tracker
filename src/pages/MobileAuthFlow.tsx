@@ -5,8 +5,7 @@ import { ArrowLeft, Github, Chrome, Eye, EyeOff, CheckCircle2, Menu, X, LogOut }
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { supabase } from '@/services/supabase';
-import { toast } from 'sonner';
+import { useAuthActions } from '@/hooks/useAuthActions';
 
 // --- SCHEMAS ---
 import { loginSchema, registerSchema, forgotPasswordSchema } from '@/utils/auth-schemas';
@@ -323,6 +322,72 @@ export default function MobileAuthFlow() {
   );
 }
 
+// --- SHARED COMPONENTS ---
+
+function AuthHeader({ onBack, onOpenMenu, title, subtitle }: { onBack?: () => void, onOpenMenu: () => void, title: string, subtitle: string }) {
+  return (
+    <>
+      <header className="flex items-center justify-between mb-8">
+        {onBack ? (
+          <button onClick={onBack} className="p-2 -mr-2 text-gray-900 dark:text-white">
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+        ) : (
+          <div className="flex items-center gap-2">
+            <img src="/logo-expense-tracker.png" alt="Logo" className="w-6 h-6" />
+            <span className="text-sm font-bold dark:text-white">Expense Tracker</span>
+          </div>
+        )}
+        <button onClick={onOpenMenu} className="p-2 -mr-2 text-gray-900 dark:text-white">
+          <Menu className="w-6 h-6" />
+        </button>
+      </header>
+
+      <div className="mb-8">
+        <h1 className="text-[32px] font-bold leading-tight text-gray-900 dark:text-white mb-2">{title}</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">{subtitle}</p>
+      </div>
+    </>
+  );
+}
+
+function SocialAuth({ t, onSocialLogin }: { t: any, onSocialLogin: (provider: 'google' | 'github') => void }) {
+  return (
+    <div className="mt-8 flex flex-col items-center gap-6 w-full">
+      <div className="relative w-full">
+        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100 dark:border-white/5"></div></div>
+        <div className="relative flex justify-center text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-600 bg-white dark:bg-[#0c0c1d] px-4">{t.register.or}</div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 w-full">
+        <SocialButton 
+          icon={<Chrome className="w-5 h-5 text-gray-500" />} 
+          label="Google" 
+          onClick={() => onSocialLogin('google')}
+        />
+        <SocialButton 
+          icon={<Github className="w-5 h-5 text-gray-500" />} 
+          label="GitHub" 
+          onClick={() => onSocialLogin('github')}
+        />
+      </div>
+    </div>
+  );
+}
+
+function AuthFooter({ text, linkText, onClick }: { text: string, linkText: string, onClick: () => void }) {
+  return (
+    <button onClick={onClick} className="text-sm font-medium text-gray-500 mt-8">
+      {text.split(linkText).map((part: string, i: number) => (
+        <React.Fragment key={i}>
+          {part}
+          {i === 0 && <span className="text-gray-900 dark:text-white font-bold">{linkText}</span>}
+        </React.Fragment>
+      ))}
+    </button>
+  );
+}
+
 // --- SUB-COMPONENTS ---
 
 function SplashStep({ t }: { t: any }) {
@@ -471,59 +536,23 @@ function InsightsIllustration({ t }: { t: any }) {
 // --- FORMS ---
 
 function RegisterStep({ onLogin, onOpenMenu, t }: { onLogin: () => void, onOpenMenu: () => void, t: any }) {
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { isLoading, handleSocialLogin, handleRegister } = useAuthActions();
   
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(registerSchema)
   });
 
-  const onSubmit = async (data: any) => {
-    try {
-      setIsLoading(true);
-      const { error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: { data: { full_name: data.fullName } }
-      });
-      if (error) throw error;
-      toast.success('Cadastro realizado! Verifique seu e-mail.');
-    } catch (err: any) {
-      toast.error(err.message || 'Erro ao realizar cadastro');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSocialLogin = async (provider: 'google' | 'github') => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: { redirectTo: globalThis.location.origin },
-      });
-      if (error) throw error;
-    } catch (err: any) {
-      toast.error(err.message || `Erro ao conectar com ${provider}`);
-    }
-  };
+  const onSubmit = (data: any) => handleRegister(data);
 
   return (
     <div className="flex-1 flex flex-col bg-white dark:bg-[#0c0c1d] p-8 overflow-y-auto">
-      <header className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-2">
-          <img src="/logo-expense-tracker.png" alt="Logo" className="w-6 h-6" />
-          <span className="text-sm font-bold dark:text-white">Expense Tracker</span>
-        </div>
-        <button onClick={onOpenMenu} className="p-2 -mr-2 text-gray-900 dark:text-white">
-          <Menu className="w-6 h-6" />
-        </button>
-      </header>
-
-      <div className="mb-8">
-        <h1 className="text-[32px] font-bold leading-tight text-gray-900 dark:text-white mb-2">{t.register.title}</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">{t.register.subtitle}</p>
-      </div>
+      <AuthHeader 
+        onOpenMenu={onOpenMenu}
+        title={t.register.title}
+        subtitle={t.register.subtitle}
+      />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input label={t.register.name} placeholder={t.register.namePlaceholder} {...register('fullName')} error={errors.fullName?.message as string} />
@@ -575,23 +604,7 @@ function RegisterStep({ onLogin, onOpenMenu, t }: { onLogin: () => void, onOpenM
       </form>
 
       <div className="mt-8 flex flex-col items-center gap-6">
-        <div className="relative w-full">
-          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100 dark:border-white/5"></div></div>
-          <div className="relative flex justify-center text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-600 bg-white dark:bg-[#0c0c1d] px-4">{t.register.or}</div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 w-full">
-          <SocialButton 
-            icon={<Chrome className="w-5 h-5 text-gray-500" />} 
-            label="Google" 
-            onClick={() => handleSocialLogin('google')}
-          />
-          <SocialButton 
-            icon={<Github className="w-5 h-5 text-gray-500" />} 
-            label="GitHub" 
-            onClick={() => handleSocialLogin('github')}
-          />
-        </div>
+        <SocialAuth t={t} onSocialLogin={handleSocialLogin} />
 
         <p className="text-[10px] text-gray-400 dark:text-gray-500 text-center px-4 leading-relaxed">
           {t.register.termsText}{' '}
@@ -600,73 +613,32 @@ function RegisterStep({ onLogin, onOpenMenu, t }: { onLogin: () => void, onOpenM
           </Link>
         </p>
 
-        <button onClick={onLogin} className="text-sm font-medium text-gray-500">
-          {t.register.hasAccount.split(t.register.hasAccountLink).map((part: string, i: number) => (
-            <React.Fragment key={i}>
-              {part}
-              {i === 0 && <span className="text-gray-900 dark:text-white font-bold">{t.register.hasAccountLink}</span>}
-            </React.Fragment>
-          ))}
-        </button>
+        <AuthFooter 
+          text={t.register.hasAccount}
+          linkText={t.register.hasAccountLink}
+          onClick={onLogin}
+        />
       </div>
     </div>
   );
 }
 
 function LoginStep({ onBack, onRegister, onForgotPassword, onOpenMenu, t }: { onBack: () => void, onRegister: () => void, onForgotPassword: () => void, onOpenMenu: () => void, t: any }) {
-  const [isLoading, setIsLoading] = useState(false);
+  const { isLoading, handleSocialLogin, handleLogin } = useAuthActions();
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(loginSchema)
   });
 
-  const onSubmit = async (data: any) => {
-    try {
-      setIsLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password
-      });
-      if (error) throw error;
-      toast.success('Bem-vindo de volta!');
-      window.location.href = '/dashboard';
-    } catch (err: any) {
-      toast.error(err.message || 'Erro ao realizar login');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSocialLogin = async (provider: 'google' | 'github') => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: { redirectTo: globalThis.location.origin },
-      });
-      if (error) throw error;
-    } catch (err: any) {
-      toast.error(err.message || `Erro ao conectar com ${provider}`);
-    }
-  };
+  const onSubmit = (data: any) => handleLogin(data);
 
   return (
     <div className="flex-1 flex flex-col bg-white dark:bg-[#0c0c1d] p-8 overflow-y-auto">
-      <header className="flex items-center justify-between mb-8">
-        <button onClick={onBack} className="p-2 -ml-2 text-gray-900 dark:text-white">
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <div className="flex items-center gap-2">
-          <img src="/logo-expense-tracker.png" alt="Logo" className="w-6 h-6" />
-          <span className="text-sm font-bold dark:text-white">Expense Tracker</span>
-        </div>
-        <button onClick={onOpenMenu} className="p-2 -mr-2 text-gray-900 dark:text-white">
-          <Menu className="w-6 h-6" />
-        </button>
-      </header>
-
-      <div className="mb-8">
-        <h1 className="text-[32px] font-bold leading-tight text-gray-900 dark:text-white mb-2">{t.login.title}</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">{t.login.subtitle}</p>
-      </div>
+      <AuthHeader 
+        onBack={onBack}
+        onOpenMenu={onOpenMenu}
+        title={t.login.title}
+        subtitle={t.login.subtitle}
+      />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <Input label={t.register.email} placeholder={t.register.emailPlaceholder} type="email" {...register('email')} error={errors.email?.message as string} />
@@ -689,58 +661,26 @@ function LoginStep({ onBack, onRegister, onForgotPassword, onOpenMenu, t }: { on
       </form>
 
       <div className="mt-8 flex flex-col items-center gap-6">
-        <div className="relative w-full">
-          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100 dark:border-white/5"></div></div>
-          <div className="relative flex justify-center text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-600 bg-white dark:bg-[#0c0c1d] px-4">{t.login.or}</div>
-        </div>
+        <SocialAuth t={t} onSocialLogin={handleSocialLogin} />
 
-        <div className="grid grid-cols-2 gap-4 w-full">
-          <SocialButton 
-            icon={<Chrome className="w-5 h-5 text-gray-500" />} 
-            label="Google" 
-            onClick={() => handleSocialLogin('google')}
-          />
-          <SocialButton 
-            icon={<Github className="w-5 h-5 text-gray-500" />} 
-            label="GitHub" 
-            onClick={() => handleSocialLogin('github')}
-          />
-        </div>
-
-        <button onClick={onRegister} className="text-sm font-medium text-gray-500">
-          {t.login.noAccount.split(t.login.noAccountLink).map((part: string, i: number) => (
-            <React.Fragment key={i}>
-              {part}
-              {i === 0 && <span className="text-gray-900 dark:text-white font-bold">{t.login.noAccountLink}</span>}
-            </React.Fragment>
-          ))}
-        </button>
+        <AuthFooter 
+          text={t.login.noAccount}
+          linkText={t.login.noAccountLink}
+          onClick={onRegister}
+        />
       </div>
     </div>
   );
 }
 
 function ForgotPasswordStep({ onBack, t, lang }: { onBack: () => void, t: any, lang: string }) {
-  const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const { isLoading, handleForgotPassword } = useAuthActions();
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(forgotPasswordSchema)
   });
 
-  const onSubmit = async (data: any) => {
-    try {
-      setIsLoading(true);
-      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${globalThis.location.origin}/reset-password`
-      });
-      if (error) throw error;
-      setIsSuccess(true);
-    } catch (err: any) {
-      toast.error(err.message || 'Erro ao solicitar recuperação');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const onSubmit = (data: any) => handleForgotPassword(data.email, () => setIsSuccess(true));
 
   if (isSuccess) {
     return (

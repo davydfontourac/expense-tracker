@@ -10,10 +10,11 @@ export function Sparkline({ data, color = 'var(--accent)', className }: Sparklin
   const mx = Math.max(...data);
   const mn = Math.min(...data);
   const range = mx - mn || 1;
+  const lenAdjust = data.length > 1 ? data.length - 1 : 1;
 
   const points = data
     .map((v, j) => {
-      const x = (j / (data.length - 1)) * 100;
+      const x = (j / lenAdjust) * 100;
       const y = 24 - ((v - mn) / range) * 20 - 2; // Keep it within 24px height with some padding
       return `${x},${y}`;
     })

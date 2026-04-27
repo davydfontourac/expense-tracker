@@ -32,7 +32,10 @@ export function Donut({ segs, centerLabel, centerValue, size = 140, stroke = 18 
       />
       {segs.map((s) => {
         const len = (s.pct / 100) * C;
-        const el = (
+        const currentOffset = acc;
+        acc += len;
+        
+        return (
           <motion.circle
             key={s.name}
             cx={size / 2}
@@ -41,14 +44,12 @@ export function Donut({ segs, centerLabel, centerValue, size = 140, stroke = 18 
             fill="none"
             stroke={s.color}
             strokeWidth={stroke}
-            initial={{ strokeDasharray: `0 ${C}`, strokeDashoffset: -acc }}
-            animate={{ strokeDasharray: `${len} ${C - len}`, strokeDashoffset: -acc }}
+            initial={{ strokeDasharray: `0 ${C}`, strokeDashoffset: -currentOffset }}
+            animate={{ strokeDasharray: `${len} ${C - len}`, strokeDashoffset: -currentOffset }}
             transition={{ duration: 1, ease: 'easeOut' }}
             transform={`rotate(-90 ${size / 2} ${size / 2})`}
           />
         );
-        acc += len;
-        return el;
       })}
       <text
         x={size / 2}
