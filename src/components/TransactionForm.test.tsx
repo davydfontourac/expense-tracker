@@ -274,7 +274,7 @@ describe('TransactionForm', () => {
   it('deve lidar com erro na submissão sem mensagem do servidor', async () => {
     const toast = await import('sonner');
     mockQuery.then.mockImplementationOnce((cb) => cb({ data: [], error: null })); // get categories
-    mockQuery.then.mockImplementationOnce((cb) => cb({ error: new Error('Generic Error') })); // insert error
+    mockQuery.then.mockImplementationOnce((cb) => cb({ error: new Error('') })); // insert error
 
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
 

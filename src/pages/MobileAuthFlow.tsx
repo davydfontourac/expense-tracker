@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Github, Chrome, Mail, Eye, EyeOff, CheckCircle2, Menu, X, Globe, LogOut } from 'lucide-react';
+import { ArrowLeft, Github, Chrome, Eye, EyeOff, CheckCircle2, Menu, X, LogOut } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -268,8 +268,7 @@ export default function MobileAuthFlow() {
           />}
           {step === 'register' && <RegisterStep
             t={t}
-            onBack={() => prevStep('onboarding3')}
-            onLogin={() => nextStep('login')}
+            onLogin={() => setStep('login')}
             onOpenMenu={() => setIsMenuOpen(true)}
           />}
           {step === 'login' && <LoginStep
@@ -509,7 +508,7 @@ function InsightsIllustration({ t }: { t: any }) {
 
 // --- FORMS ---
 
-function RegisterStep({ onBack, onLogin, onOpenMenu, t }: { onBack: () => void, onLogin: () => void, onOpenMenu: () => void, t: any }) {
+function RegisterStep({ onLogin, onOpenMenu, t }: { onLogin: () => void, onOpenMenu: () => void, t: any }) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);

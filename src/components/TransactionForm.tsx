@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/services/supabase';
 import { cn } from '@/utils/cn';
-import { X, ArrowUpCircle, ArrowDownCircle, Loader2, Tag, ChevronLeft, Check, Plus } from 'lucide-react';
+import { X, ArrowUpCircle, ArrowDownCircle, Loader2, Tag, ChevronLeft, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
@@ -82,7 +82,6 @@ export default function TransactionForm({
   const selectedType = watch('type');
   const isRecurrent = watch('is_recurrent');
   const selectedCategoryId = watch('category_id');
-  const currentAmount = watch('amount');
 
   useEffect(() => {
     if (isOpen) {

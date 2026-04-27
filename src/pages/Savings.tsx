@@ -8,8 +8,7 @@ import {
   MoreHorizontal,
   Trash2,
   Edit2,
-  ChevronLeft,
-  Loader2
+  ChevronLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSavings, type SavingsGoal } from '@/hooks/useSavings';
@@ -19,7 +18,6 @@ import { Link } from 'react-router-dom';
 import SavingsForm from '@/components/SavingsForm';
 import AporteModal from '@/components/AporteModal';
 import ConfirmModal from '@/components/ConfirmModal';
-import { cn } from '@/utils/cn';
 
 const fmt = (n: number) =>
   'R$ ' + Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

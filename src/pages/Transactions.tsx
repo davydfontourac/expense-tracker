@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Download, Upload, Trash2, MoreHorizontal, Bell, ChevronLeft, Filter, ArrowUpRight, ArrowDownLeft, Loader2, Receipt } from 'lucide-react';
+import { Plus, Search, Download, Upload, Trash2, MoreHorizontal, ChevronLeft, Filter, Loader2, Receipt } from 'lucide-react';
 import { useTransactions } from '@/hooks/useTransactions';
-import { useCategories } from '@/hooks/useCategories';
 import { useMobile } from '@/hooks/useMobile';
-import { format, isToday, isYesterday, isThisYear } from 'date-fns';
+import { format, isToday, isYesterday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import TransactionForm from '@/components/TransactionForm';
 import ImportWizard from '@/components/ImportWizard/ImportWizard';
@@ -46,7 +45,6 @@ export default function Transactions() {
     deleteTransaction,
     deleteTransactionsByMonth,
   } = useTransactions();
-  const { categories } = useCategories();
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
   const [filters, setFilters] = useState({

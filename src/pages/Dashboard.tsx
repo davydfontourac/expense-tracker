@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Plus, Search, X, FileUp, Tag, ArrowUpRight, ArrowDownLeft, MinusCircle, LayoutGrid, Bell, ChevronRight, TrendingUp, Loader2, Receipt, Crosshair } from 'lucide-react';
+import { Plus, Search, X, FileUp, Tag, ArrowUpRight, ArrowDownLeft, Bell, TrendingUp, Loader2, Crosshair } from 'lucide-react';
 import { useMobile } from '@/hooks/useMobile';
 import PageTransition from '@/components/PageTransition';
 import { useTransactions } from '@/hooks/useTransactions';

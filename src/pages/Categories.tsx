@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/services/supabase';
-import { Plus, MoreHorizontal, ChevronLeft, LayoutGrid, Bell, Loader2 } from 'lucide-react';
+import { Plus, MoreHorizontal, ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import ConfirmModal from '@/components/ConfirmModal';
 import CategoryForm from '@/components/CategoryForm';
