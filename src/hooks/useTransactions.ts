@@ -32,7 +32,7 @@ export function useTransactions() {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchTransactions = useCallback(
-    async (filters: { type: string; month: string; year: string; search: string }) => {
+    async (filters: { type: string; month: string; year: string; search: string; category?: string }) => {
       try {
         setIsLoading(true);
 
@@ -42,7 +42,7 @@ export function useTransactions() {
         // 1. Fetch Transactions with Category details
         let query = supabase
           .from('transactions')
-          .select('*, categories(name, icon, color)')
+          .select('*, categories!inner(name, icon, color)')
           .order('date', { ascending: false });
 
         if (filters.type !== 'all') {
@@ -51,6 +51,10 @@ export function useTransactions() {
 
         if (filters.search) {
           query = query.ilike('description', `%${filters.search}%`);
+        }
+
+        if (filters.category) {
+          query = query.eq('categories.name', filters.category);
         }
 
         if (monthNum && yearNum) {

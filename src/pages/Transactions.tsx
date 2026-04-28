@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Download, Upload, Trash2, MoreHorizontal, ChevronLeft, Filter, Loader2, Receipt } from 'lucide-react';
+import { Plus, Search, Download, Upload, Trash2, MoreHorizontal, ChevronLeft, Filter, Loader2, Receipt, X } from 'lucide-react';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useMobile } from '@/hooks/useMobile';
 import { format, isToday, isYesterday } from 'date-fns';
@@ -52,7 +53,10 @@ export default function Transactions() {
     type: 'all',
     month: String(new Date().getMonth() + 1),
     year: String(new Date().getFullYear()),
+    category: undefined as string | undefined,
   });
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
 
   const fetchData = useCallback(async () => {
     await fetchTransactions(filters);
@@ -120,28 +124,71 @@ export default function Transactions() {
               <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Transações</h1>
            </div>
            <div className="flex items-center gap-2">
-              <button className="p-2.5 bg-white dark:bg-[#161629] rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
-                 <Search size={20} className="text-gray-600 dark:text-gray-400" />
+              <button 
+                onClick={() => setIsSearchVisible(!isSearchVisible)}
+                className={cn("p-2.5 rounded-xl border transition-all", isSearchVisible ? "bg-indigo-50 border-indigo-200 text-indigo-600" : "bg-white dark:bg-[#161629] border-gray-100 dark:border-white/5 text-gray-600 dark:text-gray-400")}
+              >
+                 <Search size={20} />
               </button>
-              <button className="p-2.5 bg-white dark:bg-[#161629] rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
+              <button 
+                onClick={() => setIsFilterPanelOpen(true)}
+                className="p-2.5 bg-white dark:bg-[#161629] rounded-xl border border-gray-100 dark:border-white/5 shadow-sm"
+              >
                  <Filter size={20} className="text-gray-600 dark:text-gray-400" />
               </button>
            </div>
         </header>
 
+        {/* Mobile Search Bar */}
+        <AnimatePresence>
+          {isSearchVisible && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="px-6 mb-4 overflow-hidden"
+            >
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <input 
+                  autoFocus
+                  placeholder="Buscar transação..."
+                  value={filters.search}
+                  onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
+                  className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-[#161629] rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm text-sm focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all dark:text-white"
+                />
+                {filters.search && (
+                  <button 
+                    onClick={() => setFilters(f => ({ ...f, search: '' }))}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  >
+                    <X size={18} />
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Filter Chips */}
         <div className="px-6 mb-6 flex gap-2 overflow-x-auto no-scrollbar py-2">
           {['Todas', 'Entradas', 'Saídas', 'Pix', 'Débito', 'Crédito'].map((tag) => {
-             const isActive = (tag === 'Todas' && filters.type === 'all') || 
+             const isActive = (tag === 'Todas' && filters.type === 'all' && !filters.category) || 
                             (tag === 'Entradas' && filters.type === 'income') ||
-                            (tag === 'Saídas' && filters.type === 'expense');
+                            (tag === 'Saídas' && filters.type === 'expense') ||
+                            (tag === 'Pix' && filters.category === 'Pix') ||
+                            (tag === 'Débito' && filters.category === 'Débito') ||
+                            (tag === 'Crédito' && filters.category === 'Crédito');
              return (
                <button
                  key={tag}
                  onClick={() => {
-                    if (tag === 'Todas') setFilters(f => ({...f, type: 'all'}));
-                    if (tag === 'Entradas') setFilters(f => ({...f, type: 'income'}));
-                    if (tag === 'Saídas') setFilters(f => ({...f, type: 'expense'}));
+                    if (tag === 'Todas') setFilters(f => ({...f, type: 'all', category: undefined}));
+                    if (tag === 'Entradas') setFilters(f => ({...f, type: 'income', category: undefined}));
+                    if (tag === 'Saídas') setFilters(f => ({...f, type: 'expense', category: undefined}));
+                    if (tag === 'Pix') setFilters(f => ({...f, type: 'all', category: 'Pix'}));
+                    if (tag === 'Débito') setFilters(f => ({...f, type: 'all', category: 'Débito'}));
+                    if (tag === 'Crédito') setFilters(f => ({...f, type: 'all', category: 'Crédito'}));
                  }}
                  className={cn(
                    "px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-sm border",
@@ -212,6 +259,95 @@ export default function Transactions() {
           onSuccess={fetchData}
           transaction={editingTransaction}
         />
+
+        {/* Mobile Filter Panel */}
+        <AnimatePresence>
+          {isFilterPanelOpen && (
+            <>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsFilterPanelOpen(false)}
+                className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100]"
+              />
+              <motion.div 
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="fixed bottom-0 left-0 right-0 bg-[#f8f9fc] dark:bg-[#0f0f1e] rounded-t-[32px] p-8 z-[101] shadow-2xl max-h-[80vh] overflow-y-auto"
+              >
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">Filtros</h2>
+                  <button onClick={() => setIsFilterPanelOpen(false)} className="p-2 bg-white dark:bg-white/5 rounded-full shadow-sm border border-gray-100 dark:border-white/5">
+                    <X size={20} className="text-gray-400" />
+                  </button>
+                </div>
+
+                <div className="space-y-8">
+                  <div>
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-4">Período</label>
+                    <MonthYearPicker
+                      month={filters.month}
+                      year={filters.year}
+                      onChange={(m, y) => setFilters(f => ({ ...f, month: m, year: y }))}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-4">Tipo</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { id: 'all', label: 'Todos' },
+                        { id: 'income', label: 'Receitas' },
+                        { id: 'expense', label: 'Despesas' }
+                      ].map((t) => (
+                        <button
+                          key={t.id}
+                          onClick={() => setFilters(f => ({ ...f, type: t.id, category: undefined }))}
+                          className={cn(
+                            "py-3 rounded-2xl text-xs font-bold border transition-all",
+                            filters.type === t.id && !filters.category
+                              ? "bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900 shadow-lg shadow-gray-900/20"
+                              : "bg-white dark:bg-white/5 border-gray-100 dark:border-white/5 text-gray-500 shadow-sm"
+                          )}
+                        >
+                          {t.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <button 
+                      onClick={() => {
+                        setFilters({
+                          search: '',
+                          type: 'all',
+                          month: String(new Date().getMonth() + 1),
+                          year: String(new Date().getFullYear()),
+                          category: undefined,
+                        });
+                        setIsFilterPanelOpen(false);
+                      }}
+                      className="flex-1 py-4 rounded-2xl border border-gray-100 dark:border-white/5 text-sm font-bold text-gray-500 bg-white dark:bg-white/5 active:scale-[0.98] transition-all"
+                    >
+                      Limpar
+                    </button>
+
+                    <button 
+                      onClick={() => setIsFilterPanelOpen(false)}
+                      className="flex-[2] py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-2xl text-sm font-bold shadow-lg shadow-gray-900/20 active:scale-[0.98] transition-all"
+                    >
+                      Aplicar
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </PageTransition>
     );
   }
@@ -346,6 +482,7 @@ export default function Transactions() {
               type: 'all',
               month: String(new Date().getMonth() + 1),
               year: String(new Date().getFullYear()),
+              category: undefined,
             })
           }
           className="A-chip"

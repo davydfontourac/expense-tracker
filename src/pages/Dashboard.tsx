@@ -5,7 +5,7 @@ import { useMobile } from '@/hooks/useMobile';
 import PageTransition from '@/components/PageTransition';
 import { useTransactions } from '@/hooks/useTransactions';
 import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
+import { format, isToday, isYesterday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Sparkline } from '@/components/Sparkline';
 import { Donut } from '@/components/Donut';
@@ -139,6 +139,11 @@ export default function Dashboard() {
     return 'Boa noite';
   }, []);
 
+  const currentMonthName = useMemo(() => {
+    const date = new Date(Number(filters.year), Number(filters.month) - 1);
+    return format(date, 'MMM yyyy', { locale: ptBR }).toUpperCase();
+  }, [filters.month, filters.year]);
+
   const typedHistory = history as MonthlyHistory[];
   const isMobile = useMobile();
 
@@ -163,8 +168,12 @@ export default function Dashboard() {
              <button className="p-2.5 bg-white dark:bg-[#161629] rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
                 <Bell size={20} className="text-gray-600 dark:text-gray-400" />
              </button>
-             <Link to="/profile" className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/20">
-                {profile?.full_name?.charAt(0).toUpperCase() || 'U'}
+             <Link to="/profile" className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/20 overflow-hidden">
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  profile?.full_name?.charAt(0).toUpperCase() || 'U'
+                )}
              </Link>
           </div>
         </header>
@@ -181,7 +190,7 @@ export default function Dashboard() {
 
             <div className="relative z-10">
               <div className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-1 flex items-center gap-2">
-                Saldo · {format(new Date(), 'MMM yyyy', { locale: ptBR }).toUpperCase()}
+                Saldo · {currentMonthName}
               </div>
               <div className="text-3xl font-bold text-white mb-2">{fmt(summary.availableBalance)}</div>
               <div className="flex items-center gap-1.5 text-xs font-medium text-white/90">
@@ -218,6 +227,18 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Period Selector */}
+        <div className="px-6 mb-8">
+           <div className="bg-white dark:bg-[#161629] p-3 rounded-[24px] border border-gray-100 dark:border-white/5 shadow-sm">
+              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">Período de análise</div>
+              <MonthYearPicker
+                month={filters.month}
+                year={filters.year}
+                onChange={(m, y) => setFilters((f) => ({ ...f, month: m, year: y }))}
+              />
+           </div>
         </div>
 
         {/* Summary Grid */}
@@ -347,7 +368,14 @@ export default function Dashboard() {
                 </div>
                 <div className="flex-1">
                    <div className="text-sm font-bold text-gray-900 dark:text-white truncate max-w-[120px]">{t.description}</div>
-                   <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{t.categories?.name} · HOJE</div>
+                   <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+                     {t.categories?.name} · {(() => {
+                       const d = new Date(t.date);
+                       if (isToday(d)) return 'HOJE';
+                       if (isYesterday(d)) return 'ONTEM';
+                       return format(d, "dd 'de' MMM", { locale: ptBR });
+                     })()}
+                   </div>
                 </div>
                 <div className={cn("text-sm font-bold", t.type === 'income' ? 'text-green-500' : 'text-gray-900 dark:text-white')}>
                    {t.type === 'income' ? '+' : '−'} {fmt(t.amount)}

@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/services/supabase';
 import { Plus, MoreHorizontal, ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
@@ -35,6 +37,11 @@ export default function Categories() {
 
   const [categoryTotals, setCategoryTotals] = useState<Record<string, number>>({});
   const [totalSpentMonth, setTotalSpentMonth] = useState(0);
+
+  const currentMonthShort = useMemo(() => {
+    const date = new Date(Number(filters.year), Number(filters.month) - 1);
+    return format(date, 'MMM', { locale: ptBR }).toUpperCase();
+  }, [filters.month, filters.year]);
 
   const fetchTotals = useCallback(async () => {
     try {
@@ -128,6 +135,18 @@ export default function Categories() {
            </button>
         </header>
 
+        {/* Period Selector */}
+        <div className="px-6 mb-8">
+           <div className="bg-white dark:bg-[#161629] p-3 rounded-[24px] border border-gray-100 dark:border-white/5 shadow-sm">
+              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">Período de análise</div>
+              <MonthYearPicker
+                month={filters.month}
+                year={filters.year}
+                onChange={(m, y) => setFilters((f) => ({ ...f, month: m, year: y }))}
+              />
+           </div>
+        </div>
+
         {/* Donut Summary Card */}
         <div className="px-6 mb-8">
            <div className="bg-white dark:bg-[#161629] p-6 rounded-[32px] border border-gray-100 dark:border-white/5 shadow-sm">
@@ -135,16 +154,15 @@ export default function Categories() {
                  <div className="w-32 h-32 shrink-0">
                     <Donut 
                       segs={donutData} 
-                      centerLabel="TOTAL" 
+                      centerLabel={currentMonthShort} 
                       centerValue={fmt(totalSpentMonth).replace('R$ ', '').split(',')[0] + 'k'} 
                     />
                  </div>
                  <div>
                     <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">TOTAL NO MÊS</div>
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">{fmt(totalSpentMonth)}</div>
-                    <div className="mt-2 text-[10px] font-bold text-red-500 flex items-center gap-1">
-                       <Plus size={12} className="rotate-45" />
-                       -3.1% vs março
+                    <div className="mt-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                       0% este mês
                     </div>
                  </div>
               </div>
@@ -158,8 +176,10 @@ export default function Categories() {
               {categories.map((c) => {
                 const spent = categoryTotals[c.id] || 0;
                 const hasLimit = (c.monthly_limit || 0) > 0;
-                const pctOfLimit = hasLimit ? Math.min((spent / c.monthly_limit) * 100, 100) : 0;
+                const pctOfLimit = hasLimit ? (spent / c.monthly_limit) * 100 : 0;
                 const pctOfTotal = totalSpentMonth > 0 ? (spent / totalSpentMonth) * 100 : 0;
+                const barWidth = Math.min(pctOfLimit, 100);
+                const isOverLimit = hasLimit && spent > c.monthly_limit;
 
                 return (
                   <div 
@@ -184,7 +204,13 @@ export default function Categories() {
                     </div>
                     {/* Progress Bar */}
                     <div className="h-1.5 w-full bg-gray-50 dark:bg-white/5 rounded-full overflow-hidden">
-                       <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${hasLimit ? pctOfLimit : pctOfTotal}%`, backgroundColor: c.color }} />
+                       <div 
+                         className="h-full rounded-full transition-all duration-1000" 
+                         style={{ 
+                            width: `${barWidth}%`, 
+                            backgroundColor: isOverLimit ? '#ef4444' : c.color 
+                         }} 
+                       />
                     </div>
                   </div>
                 );

@@ -80,10 +80,14 @@ export function Sidebar() {
         </div>
 
         <div className="A-sb-user">
-          <div className="av">
-            {profile?.full_name?.charAt(0).toUpperCase() ||
+          <div className="av overflow-hidden">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              profile?.full_name?.charAt(0).toUpperCase() ||
               user?.email?.charAt(0).toUpperCase() ||
-              'U'}
+              'U'
+            )}
           </div>
           <div className="info">
             <div className="n text-gray-900 dark:text-white truncate">
