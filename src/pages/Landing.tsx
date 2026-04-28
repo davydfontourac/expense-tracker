@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useTheme } from '@/context/ThemeContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -165,14 +166,15 @@ function Nav({ lang, setLang, t, scrolled, isMobile }: any) {
 // Dashboard mockup (clean, data-driven, not slop)
 // ─────────────────────────────────────────────────────────────────────────────
 function DashboardMock({ t }: any) {
-  const bars = [42, 58, 71, 49, 83, 92, 76, 64, 88, 72, 95, 81];
-  const months = t.mock.months;
-  const sparks = [
-    [20, 28, 24, 36, 30, 42, 38, 50],
-    [60, 52, 58, 44, 50, 38, 30, 24],
-    [12, 18, 16, 22, 20, 28, 26, 34],
-  ];
-  const pts = [28, 34, 30, 42, 38, 50, 46, 58, 52, 64];
+  const [activeTab, setActiveTab] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveTab((prev) => (prev + 1) % 4);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   const mkSpark = (pts: number[], color: string) => {
     const mx = Math.max(...pts);
     return (
@@ -251,23 +253,26 @@ function DashboardMock({ t }: any) {
               {t.mock.sidebar.general}
             </div>
             {[
-              ['▦', t.mock.sidebar.dashboard, true],
-              ['≡', t.mock.sidebar.transactions, false],
-              ['◫', t.mock.sidebar.categories, false],
-              ['⎘', t.mock.sidebar.savings, false],
-            ].map(([ic, label, active]) => (
+              ['▦', t.mock.sidebar.dashboard, 0],
+              ['≡', t.mock.sidebar.transactions, 1],
+              ['◫', t.mock.sidebar.categories, 2],
+              ['⎘', t.mock.sidebar.savings, 3],
+            ].map(([ic, label, index]) => (
               <div
                 key={label.toString()}
+                onClick={() => setActiveTab(index as number)}
                 style={{
                   padding: '7px 10px',
                   borderRadius: 7,
                   fontSize: 13,
-                  color: active ? 'var(--ink-900)' : 'var(--ink-500)',
-                  background: active ? 'var(--ink-100)' : 'transparent',
-                  fontWeight: active ? 500 : 400,
+                  color: activeTab === index ? 'var(--ink-900)' : 'var(--ink-500)',
+                  background: activeTab === index ? 'var(--ink-100)' : 'transparent',
+                  fontWeight: activeTab === index ? 500 : 400,
                   display: 'flex',
                   alignItems: 'center',
                   gap: 10,
+                  cursor: 'pointer',
+                  transition: 'all 200ms ease',
                 }}
               >
                 <span
@@ -275,7 +280,7 @@ function DashboardMock({ t }: any) {
                     width: 14,
                     fontFamily: 'Geist Mono, monospace',
                     fontSize: 11,
-                    color: active ? 'var(--brand-500)' : 'var(--ink-400)',
+                    color: activeTab === index ? 'var(--brand-500)' : 'var(--ink-400)',
                     textAlign: 'center',
                   }}
                 >
@@ -296,7 +301,7 @@ function DashboardMock({ t }: any) {
                   {t.mock.header.greeting}
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--ink-500)', marginTop: 4 }}>
-                  {t.mock.header.spent} <b style={{ color: 'var(--ink-900)' }}>R$ 1.292,83</b>{' '}
+                  {t.mock.header.spent} <b style={{ color: 'var(--ink-900)' }}>R$ 3.420,00</b>{' '}
                   {t.mock.header.inApril} · 41% {t.mock.header.ofRevenue}
                 </div>
               </div>
@@ -320,305 +325,179 @@ function DashboardMock({ t }: any) {
               </div>
             </div>
 
-            {/* KPI cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-              {[
-                {
-                  label: t.mock.kpis.available,
-                  sub: t.mock.kpis.balance,
-                  v: 'R$ 2.014,70',
-                  delta: '+4.2%',
-                  color: 'var(--brand-500)',
-                  pts: sparks[0],
-                },
-                {
-                  label: t.mock.kpis.income,
-                  sub: t.mock.kpis.thisMonth,
-                  v: 'R$ 3.179,00',
-                  delta: '+12%',
-                  color: '#10b981',
-                  pts: sparks[0],
-                },
-                {
-                  label: t.mock.kpis.expenses,
-                  sub: t.mock.kpis.thisMonth,
-                  v: 'R$ 1.292,83',
-                  delta: '-3.1%',
-                  color: '#ef4444',
-                  pts: sparks[1],
-                },
-              ].map((k) => (
-                <div
-                  key={k.label}
-                  style={{
-                    padding: 14,
-                    borderRadius: 12,
-                    border: '1px solid var(--ink-200)',
-                    background: 'white',
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 10,
-                      color: 'var(--ink-400)',
-                      fontFamily: 'Geist Mono, monospace',
-                      letterSpacing: '0.08em',
-                    }}
-                  >
-                    {k.label}
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20 }}
+            >
+              {activeTab === 0 && (
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                    {[
+                      { label: t.mock.kpis.available, v: 'R$ 12.450,00', color: '#6366f1' },
+                      { label: t.mock.kpis.income, v: 'R$ 8.200,00', color: '#10b981' },
+                      { label: t.mock.kpis.expenses, v: 'R$ 3.420,00', color: '#ef4444' },
+                    ].map((k, i) => (
+                      <div key={i} style={{ padding: 14, borderRadius: 12, border: '1px solid var(--ink-200)', background: 'white' }}>
+                        <div style={{ fontSize: 10, color: 'var(--ink-400)', fontFamily: 'Geist Mono', letterSpacing: '0.08em' }}>{k.label}</div>
+                        <div style={{ fontSize: 22, fontWeight: 600, marginTop: 8 }}>{k.v}</div>
+                        {mkSpark(i === 2 ? [60, 52, 58, 44, 50, 38, 30, 24] : [20, 28, 24, 36, 30, 42, 38, 50], k.color)}
+                      </div>
+                    ))}
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--ink-500)', marginTop: 2 }}>{k.sub}</div>
-                  <div
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 600,
-                      letterSpacing: '-0.025em',
-                      marginTop: 10,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {k.v}
-                  </div>
-                  {mkSpark(k.pts, k.color)}
-                </div>
-              ))}
-            </div>
 
-            {/* Chart */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 10, flex: 1 }}>
-              <div
-                style={{
-                  padding: 14,
-                  borderRadius: 12,
-                  border: '1px solid var(--ink-200)',
-                  background: 'white',
-                }}
-              >
-                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>
-                  {t.mock.charts.monthlyTitle}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 10, flex: 1 }}>
+                    <div style={{ padding: 14, borderRadius: 12, border: '1px solid var(--ink-200)', background: 'white' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>{t.mock.charts.monthlyTitle}</div>
+                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 5, height: 110 }}>
+                        {[42, 48, 52, 58, 65, 72, 68, 75, 82, 88, 92, 85].map((h, i) => (
+                          <div key={i} style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 4 }}>
+                            <div style={{ width: '100%', height: h + '%', borderRadius: '3px 3px 0 0', background: i === 3 ? '#6366f1' : '#c7d2fe' }} />
+                            <div style={{ fontSize: 8, color: 'var(--ink-400)', fontFamily: 'Geist Mono' }}>{t.mock.months[i]}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div style={{ padding: 14, borderRadius: 12, border: '1px solid var(--ink-200)', background: 'white' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>{t.mock.charts.distTitle}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}><Donut t={t} /></div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {activeTab === 1 && (
+                <div style={{ background: 'white', borderRadius: 12, border: '1px solid var(--ink-200)', padding: 16, flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 16 }}>{t.mock.sidebar.transactions}</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {t.mock.tabs.transactions.map((tx: any, i: number) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < 4 ? '1px solid var(--ink-100)' : 'none' }}>
+                        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--ink-50)', display: 'grid', placeItems: 'center', fontSize: 14 }}>{tx.icon}</div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 12, fontWeight: 500 }}>{tx.title}</div>
+                          <div style={{ fontSize: 10, color: 'var(--ink-400)', fontFamily: 'Geist Mono' }}>{tx.cat}</div>
+                        </div>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: tx.pos ? '#10b981' : 'var(--ink-900)' }}>{tx.val}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 5, height: 130 }}>
-                  {bars.map((h, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        flex: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 4,
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: '100%',
-                          height: h + '%',
-                          borderRadius: '3px 3px 0 0',
-                          background: i === 3 ? 'var(--brand-500)' : 'var(--ink-100)',
-                        }}
-                      />
-                      <div
-                        style={{
-                          fontSize: 9,
-                          color: 'var(--ink-400)',
-                          fontFamily: 'Geist Mono, monospace',
-                        }}
-                      >
-                        {months[i]}
+              )}
+
+              {activeTab === 2 && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, flex: 1 }}>
+                  {t.mock.tabs.categories.map((cat: any, i: number) => (
+                    <div key={i} style={{ background: 'white', borderRadius: 12, border: '1px solid var(--ink-200)', padding: 14 }}>
+                      <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 8 }}>{cat.name}</div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 6 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700 }}>{cat.val}</div>
+                        <div style={{ fontSize: 9, color: 'var(--ink-400)' }}>{t.mock.header.target}: {cat.limit}</div>
+                      </div>
+                      <div style={{ height: 6, background: 'var(--ink-100)', borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{ width: cat.pct + '%', height: '100%', background: cat.color }} />
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
+              )}
 
-              <div
-                style={{
-                  padding: 14,
-                  borderRadius: 12,
-                  border: '1px solid var(--ink-200)',
-                  background: 'white',
-                }}
-              >
-                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>
-                  {t.mock.charts.distTitle}
+              {activeTab === 3 && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 10, flex: 1 }}>
+                  {t.mock.tabs.savings.map((sav: any, i: number) => (
+                    <div key={i} style={{ background: 'white', borderRadius: 12, border: '1px solid var(--ink-200)', padding: 16 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>{sav.name}</div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 8 }}>
+                        <div style={{ fontSize: 18, fontWeight: 700 }}>{sav.curr}</div>
+                        <div style={{ fontSize: 11, color: 'var(--ink-400)' }}>{t.mock.sidebar.goals}: {sav.target}</div>
+                      </div>
+                      <div style={{ height: 8, background: 'var(--ink-100)', borderRadius: 4, overflow: 'hidden', marginBottom: 4 }}>
+                        <div style={{ width: sav.pct + '%', height: '100%', background: '#10B981' }} />
+                      </div>
+                      <div style={{ fontSize: 10, color: 'var(--ink-400)', textAlign: 'right' }}>{sav.pct}% {t.mock.header.completed}</div>
+                    </div>
+                  ))}
                 </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flex: 1,
-                  }}
-                >
-                  <Donut t={t} />
-                </div>
-              </div>
-            </div>
+              )}
+            </motion.div>
           </div>
         </div>
       </div>
 
       {/* Mobile Version */}
       <div className="mock mobile-only" style={{ padding: 20 }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 12,
-            position: 'relative',
-            zIndex: 1,
-          }}
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          style={{ minHeight: 180 }}
         >
-          <div
-            style={{
-              fontFamily: '"Geist Mono", monospace',
-              fontSize: 10,
-              color: 'var(--ink-400)',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-            }}
-          >
-            Disponível · Abril
-          </div>
-          <div style={{ fontSize: 14, color: 'var(--ink-400)' }}>⋯</div>
-        </div>
-        <div
-          style={{
-            fontSize: 38,
-            fontWeight: 600,
-            letterSpacing: '-0.04em',
-            lineHeight: 1,
-            color: 'inherit',
-            position: 'relative',
-            zIndex: 1,
-          }}
-        >
-          R$ 2.014,70
-        </div>
-        <div
-          style={{
-            fontFamily: '"Geist Mono", monospace',
-            fontSize: 11,
-            color: '#10b981',
-            marginTop: 10,
-            position: 'relative',
-            zIndex: 1,
-          }}
-        >
-          + R$ 412,00 · 4,2% vs. março
-        </div>
-        <svg
-          style={{
-            marginTop: 14,
-            height: 42,
-            width: '100%',
-            position: 'relative',
-            zIndex: 1,
-            overflow: 'visible',
-          }}
-          viewBox="0 0 100 40"
-          preserveAspectRatio="none"
-        >
-          <defs>
-            <linearGradient id="sparkGradMobile" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#6366f1" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <path
-            d={`M 0,${40 - (pts[0] / Math.max(...pts)) * 36} ${pts.map((v, i) => `L ${(i / (pts.length - 1)) * 100},${40 - (v / Math.max(...pts)) * 36}`).join(' ')} L 100,40 L 0,40 Z`}
-            fill="url(#sparkGradMobile)"
-          />
-          <polyline
-            fill="none"
-            stroke="#6366f1"
-            strokeWidth="1.5"
-            points={pts
-              .map((v, i) => `${(i / (pts.length - 1)) * 100},${40 - (v / Math.max(...pts)) * 36}`)
-              .join(' ')}
-          />
-        </svg>
-        <div
-          style={{
-            marginTop: 32,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 0,
-            position: 'relative',
-            zIndex: 1,
-          }}
-        >
-          {[
-            { ic: '🍔', d: 'iFood — Combo', m: '22 ABR · Débito', v: -33.39, pos: false },
-            { ic: '⚡', d: 'Pix recebido', m: '21 ABR · Zamp SA', v: 25.9, pos: true },
-            { ic: '🚗', d: 'Uber *Trip', m: '21 ABR · Transporte', v: -17.36, pos: false },
-            { ic: '🛒', d: 'Supermercado', m: '20 ABR · Mercado', v: -142.8, pos: false },
-          ].map((r, i) => (
-            <div
-              key={i}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 14,
-                padding: '14px 0',
-                borderTop: '1px solid var(--ink-200)',
-                borderTopColor: 'var(--div-color, var(--ink-100))',
-              }}
-            >
-              <div
-                className="ic"
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
-                  display: 'grid',
-                  placeItems: 'center',
-                  fontSize: 16,
-                  background: 'var(--ink-100)',
-                }}
-              >
-                {r.ic}
+          {activeTab === 0 && (
+            <>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <div style={{ fontSize: 10, color: 'var(--ink-400)', textTransform: 'uppercase', fontFamily: 'Geist Mono' }}>Disponível · Abril</div>
+                <div style={{ fontSize: 14 }}>⋯</div>
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 500,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {r.d}
+              <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: '-0.04em' }}>R$ 12.450,00</div>
+              <div style={{ fontSize: 11, color: '#10b981', marginTop: 8, fontFamily: 'Geist Mono' }}>+ R$ 1.200,00 (10,2%)</div>
+              <div style={{ marginTop: 20, height: 60, background: 'var(--ink-50)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ transform: 'scale(0.7)' }}><Donut t={t} /></div>
+              </div>
+            </>
+          )}
+
+          {activeTab === 1 && (
+            <>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 16 }}>{t.mock.sidebar.transactions}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {t.mock.tabs.transactions.slice(0, 3).map((tx: any, i: number) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: 12 }}>{tx.title}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: tx.pos ? '#10b981' : 'inherit' }}>{tx.val}</div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {activeTab === 2 && (
+            <>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 16 }}>{t.mock.sidebar.categories}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {t.mock.tabs.categories.slice(0, 2).map((cat: any, i: number) => (
+                  <div key={i}>
+                    <div style={{ fontSize: 11, marginBottom: 4 }}>{cat.name}</div>
+                    <div style={{ height: 6, background: 'var(--ink-100)', borderRadius: 3, overflow: 'hidden' }}>
+                      <div style={{ width: cat.pct + '%', height: '100%', background: cat.color }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {activeTab === 3 && (
+            <>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 16 }}>{t.mock.sidebar.savings}</div>
+              {t.mock.tabs.savings.slice(0, 1).map((sav: any, i: number) => (
+                <div key={i} style={{ padding: 12, border: '1px solid var(--ink-200)', borderRadius: 12 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600 }}>{sav.name}</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, margin: '8px 0' }}>{sav.curr}</div>
+                  <div style={{ height: 6, background: 'var(--ink-100)', borderRadius: 3, overflow: 'hidden' }}>
+                    <div style={{ width: sav.pct + '%', height: '100%', background: '#10b981' }} />
+                  </div>
                 </div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: 'var(--ink-400)',
-                    fontFamily: '"Geist Mono", monospace',
-                    marginTop: 3,
-                    letterSpacing: '0.02em',
-                  }}
-                >
-                  {r.m}
-                </div>
-              </div>
-              <div
-                style={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  fontVariantNumeric: 'tabular-nums',
-                  color: r.pos ? '#10b981' : 'inherit',
-                }}
-              >
-                {r.pos ? '+' : '−'} R${' '}
-                {Math.abs(r.v).toLocaleString('pt-BR', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </div>
-            </div>
+              ))}
+            </>
+          )}
+        </motion.div>
+        
+        {/* Mobile Tab Bar */}
+        <div style={{ display: 'flex', justifyContent: 'space-around', borderTop: '1px solid var(--ink-100)', marginTop: 24, paddingTop: 12 }}>
+          {['▦', '≡', '◫', '⎘'].map((ic, i) => (
+            <div key={i} onClick={() => setActiveTab(i)} style={{ fontSize: 18, color: activeTab === i ? 'var(--brand-500)' : 'var(--ink-300)', cursor: 'pointer' }}>{ic}</div>
           ))}
         </div>
       </div>

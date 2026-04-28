@@ -118,7 +118,7 @@ export const LANDING_COPY: Record<string, any> = {
         company: [
           ['GitHub', 'https://github.com/davydfontourac/expense-tracker'],
           ['Issues', 'https://github.com/davydfontourac/expense-tracker/issues'],
-          ['Licença MIT', '#'],
+          ['Licença MIT', '/LICENSE-PT.md'],
         ],
         resources: [
           ['Documentação', '#'],
@@ -144,13 +144,15 @@ export const LANDING_COPY: Record<string, any> = {
         october: 'OUTUBRO 2026',
       },
       header: {
-        greeting: 'Boa tarde, davyd.',
+        greeting: 'Boa tarde, usuário.',
         spent: 'Você gastou',
         ofRevenue: 'da sua receita',
         inApril: 'em abril',
         april2026: 'Abril 2026',
         all: 'Todos',
         new: 'Nova',
+        target: 'Meta',
+        completed: 'concluído',
       },
       kpis: {
         available: 'DISPONÍVEL',
@@ -175,6 +177,25 @@ export const LANDING_COPY: Record<string, any> = {
         food: 'Alimentação',
         transport: 'Transporte',
         others: 'Outros',
+      },
+      tabs: {
+        transactions: [
+          { icon: '🍔', title: 'iFood — Combo Burguer', cat: 'Alimentação', val: '- R$ 82,90' },
+          { icon: '⚡', title: 'Pix Recebido', cat: 'Rendimentos', val: '+ R$ 1.200,00', pos: true },
+          { icon: '🚗', title: 'Uber *Trip', cat: 'Transporte', val: '- R$ 24,50' },
+          { icon: '🛒', title: 'Supermercado Online', cat: 'Mantimentos', val: '- R$ 412,80' },
+          { icon: '🎬', title: 'Netflix', cat: 'Assinaturas', val: '- R$ 55,90' },
+        ],
+        categories: [
+          { name: 'Alimentação', val: 'R$ 840,00', limit: 'R$ 1.200', pct: 70, color: '#6366f1' },
+          { name: 'Transporte', val: 'R$ 320,00', limit: 'R$ 500', pct: 64, color: '#0ea5e9' },
+          { name: 'Lazer', val: 'R$ 410,00', limit: 'R$ 450', pct: 91, color: '#8b5cf6' },
+          { name: 'Educação', val: 'R$ 1.200,00', limit: 'R$ 1.500', pct: 80, color: '#10b981' },
+        ],
+        savings: [
+          { name: 'Reserva de Emergência', curr: 'R$ 8.240,00', target: 'R$ 12.000,00', pct: 68 },
+          { name: 'Viagem Japão 2027', curr: 'R$ 3.100,00', target: 'R$ 15.000,00', pct: 20 },
+        ],
       },
     },
     visuals: {
@@ -319,7 +340,7 @@ export const LANDING_COPY: Record<string, any> = {
         company: [
           ['GitHub', 'https://github.com/davydfontourac/expense-tracker'],
           ['Issues', 'https://github.com/davydfontourac/expense-tracker/issues'],
-          ['MIT License', '#'],
+          ['MIT License', '/LICENSE'],
         ],
         resources: [
           ['Docs', '#'],
@@ -345,13 +366,15 @@ export const LANDING_COPY: Record<string, any> = {
         october: 'OCTOBER 2026',
       },
       header: {
-        greeting: 'Good afternoon, davyd.',
+        greeting: 'Good afternoon, user.',
         spent: 'You spent',
         ofRevenue: 'of your revenue',
         inApril: 'in April',
         april2026: 'April 2026',
         all: 'All',
         new: 'New',
+        target: 'Goal',
+        completed: 'completed',
       },
       kpis: {
         available: 'AVAILABLE',
@@ -374,8 +397,27 @@ export const LANDING_COPY: Record<string, any> = {
         debit: 'Debit',
         pix: 'Pix',
         food: 'Food',
-        transport: 'Transport',
+        transport: 'Transporte',
         others: 'Others',
+      },
+      tabs: {
+        transactions: [
+          { icon: '🍔', title: 'iFood — Combo Burguer', cat: 'Food', val: '- $ 82.90' },
+          { icon: '⚡', title: 'Pix Received', cat: 'Income', val: '+ $ 1,200.00', pos: true },
+          { icon: '🚗', title: 'Uber *Trip', cat: 'Transport', val: '- $ 24.50' },
+          { icon: '🛒', title: 'Online Grocery', cat: 'Groceries', val: '- $ 412.80' },
+          { icon: '🎬', title: 'Netflix', cat: 'Subscriptions', val: '- $ 55.90' },
+        ],
+        categories: [
+          { name: 'Food', val: '$ 840.00', limit: '$ 1,200', pct: 70, color: '#6366f1' },
+          { name: 'Transport', val: '$ 320.00', limit: '$ 500', pct: 64, color: '#0ea5e9' },
+          { name: 'Leisure', val: '$ 410.00', limit: '$ 450', pct: 91, color: '#8b5cf6' },
+          { name: 'Education', val: '$ 1,200.00', limit: '$ 1,500', pct: 80, color: '#10b981' },
+        ],
+        savings: [
+          { name: 'Emergency Fund', curr: '$ 8,240.00', target: '$ 12,000.00', pct: 68 },
+          { name: 'Japan Trip 2027', curr: '$ 3,100.00', target: '$ 15,000.00', pct: 20 },
+        ],
       },
     },
     visuals: {
