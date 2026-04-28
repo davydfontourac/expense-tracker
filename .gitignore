@@ -29,3 +29,8 @@ dist-ssr
 .env
 .vercel
 .env*.local
+
+# Design assets
+Landing page expense tracker/
+Landing page expense tracker2/
+Landing page expense tracker2.zip
