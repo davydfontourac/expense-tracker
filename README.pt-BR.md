@@ -10,7 +10,7 @@
   <p>Um companheiro financeiro sofisticado, focado em mobile, construído com React 19, Supabase e Tailwind CSS 4.</p>
 
   <div align="center">
-    <img src="./demo.gif" alt="Preview Expense Tracker" width="800" style="border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);"/>
+    <img src="./expense-tracker-pt-br.gif" alt="Preview Expense Tracker" width="800" style="border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);"/>
   </div>
 
   <br />
