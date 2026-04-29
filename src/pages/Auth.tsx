@@ -144,7 +144,13 @@ export default function Auth() {
       <motion.div
         className="hidden lg:flex absolute top-0 bottom-0 w-1/2 bg-[#0c0c1d] dark:bg-[#161629] z-20 items-center justify-center p-16 overflow-hidden"
         initial={false}
-        animate={{ x: isLogin ? '0%' : '100%', borderRadius: isLogin ? '0 40px 40px 0' : '40px 0 0 40px' }}
+        animate={{ 
+          x: isLogin ? '0%' : '100%', 
+          borderTopRightRadius: isLogin ? '40px' : '0px',
+          borderBottomRightRadius: isLogin ? '40px' : '0px',
+          borderTopLeftRadius: isLogin ? '0px' : '40px',
+          borderBottomLeftRadius: isLogin ? '0px' : '40px'
+        }}
         transition={{ type: 'spring', stiffness: 100, damping: 20 }}
       >
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full -mr-48 -mt-48"></div>
@@ -175,17 +181,31 @@ export default function Auth() {
               </div>
 
               {/* Desktop Toggle */}
-              <div className="flex bg-gray-100 dark:bg-white/5 rounded-2xl p-1 shadow-inner">
+              <div className="flex bg-gray-100 dark:bg-white/5 rounded-2xl p-1 shadow-inner relative">
                 <button 
                   onClick={() => toggleMode('register')}
-                  className={`px-6 py-2 text-xs font-bold rounded-xl transition-all ${!isLogin ? 'bg-white dark:bg-white/10 shadow-sm text-gray-900 dark:text-white' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                  className={`relative px-6 py-2 text-xs font-bold rounded-xl transition-colors z-10 ${!isLogin ? 'text-gray-900 dark:text-white' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
                 >
+                  {!isLogin && (
+                    <motion.div
+                      layoutId="auth-tab-indicator"
+                      className="absolute inset-0 bg-white dark:bg-white/10 shadow-sm rounded-xl -z-10"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
                   {t.register.signup}
                 </button>
                 <button 
                   onClick={() => toggleMode('login')}
-                  className={`px-6 py-2 text-xs font-bold rounded-xl transition-all ${isLogin ? 'bg-white dark:bg-white/10 shadow-sm text-gray-900 dark:text-white' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                  className={`relative px-6 py-2 text-xs font-bold rounded-xl transition-colors z-10 ${isLogin ? 'text-gray-900 dark:text-white' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
                 >
+                  {isLogin && (
+                    <motion.div
+                      layoutId="auth-tab-indicator"
+                      className="absolute inset-0 bg-white dark:bg-white/10 shadow-sm rounded-xl -z-10"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
                   {t.register.signin}
                 </button>
               </div>
