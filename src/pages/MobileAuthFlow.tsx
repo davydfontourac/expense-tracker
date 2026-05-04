@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Eye, EyeOff, CheckCircle2, X, LogOut } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, CheckCircle2, X, LogOut, Loader2, Mail } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,7 +14,7 @@ import { AUTH_TRANSLATIONS } from '@/utils/auth-translations';
 
 const COPY: any = AUTH_TRANSLATIONS;
 
-type Step = 'splash' | 'onboarding1' | 'onboarding2' | 'onboarding3' | 'register' | 'login' | 'forgot_password';
+type Step = 'splash' | 'onboarding1' | 'onboarding2' | 'onboarding3' | 'register' | 'login' | 'forgot_password' | 'register_success';
 
 export default function MobileAuthFlow() {
   const [step, setStep] = useState<Step>('splash');
@@ -25,6 +25,7 @@ export default function MobileAuthFlow() {
     return 'pt-BR';
   });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialMode = searchParams.get('mode');
@@ -123,7 +124,10 @@ export default function MobileAuthFlow() {
           />}
           {step === 'register' && <RegisterStep
             t={t}
-
+            onSuccess={(email) => {
+              setRegisteredEmail(email);
+              nextStep('register_success');
+            }}
             onLogin={() => setStep('login')}
             onOpenMenu={() => setIsMenuOpen(true)}
           />}
@@ -138,6 +142,12 @@ export default function MobileAuthFlow() {
             t={t}
             lang={lang}
             onBack={() => prevStep('login')}
+          />}
+          {step === 'register_success' && <RegisterSuccessStep
+            t={t}
+            email={registeredEmail}
+            onLogin={() => setStep('login')}
+            onOpenMenu={() => setIsMenuOpen(true)}
           />}
         </motion.div>
       </AnimatePresence>
@@ -365,11 +375,15 @@ function InsightsIllustration({ t }: { t: any }) {
 
 // --- FORMS ---
 
-function RegisterStep({ onLogin, onOpenMenu, t }: { onLogin: () => void, onOpenMenu: () => void, t: any }) {
+function RegisterStep({ onLogin, onOpenMenu, t, onSuccess }: { onLogin: () => void, onOpenMenu: () => void, t: any, onSuccess: (email: string) => void }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { isLoading, handleSocialLogin, handleRegister } = useAuthActions();
   
+  const onRegisterSuccess = (data: any) => {
+    onSuccess(data.email);
+  };
+
   const { register, handleSubmit, watch, formState: { errors } } = useForm({
     resolver: zodResolver(getRegisterSchema(t))
   });
@@ -408,7 +422,7 @@ function RegisterStep({ onLogin, onOpenMenu, t }: { onLogin: () => void, onOpenM
   const passwordScore = getPasswordScore(passwordValue);
   const matchScore = getMatchScore(passwordValue, confirmPasswordValue);
 
-  const onSubmit = (data: any) => handleRegister(data);
+  const onSubmit = (data: any) => handleRegister(data, () => onRegisterSuccess(data));
 
   return (
     <div className="flex-1 flex flex-col bg-white dark:bg-[#0c0c1d] p-8 overflow-y-auto">
@@ -508,9 +522,13 @@ function RegisterStep({ onLogin, onOpenMenu, t }: { onLogin: () => void, onOpenM
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-bold py-5 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 active:scale-[0.98] mt-4"
+          className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-bold py-5 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 active:scale-[0.98] mt-4 flex items-center justify-center"
         >
-          {isLoading ? t.register.buttonLoading : t.register.button}
+          {isLoading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            t.register.button
+          )}
         </button>
       </form>
 
@@ -571,9 +589,13 @@ function LoginStep({ onBack, onRegister, onForgotPassword, onOpenMenu, t }: { on
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-[#0c0c1d] dark:bg-white text-white dark:text-[#0c0c1d] font-bold py-5 rounded-2xl transition-all shadow-xl active:scale-[0.98] mt-4"
+          className="w-full bg-[#0c0c1d] dark:bg-white text-white dark:text-[#0c0c1d] font-bold py-5 rounded-2xl transition-all shadow-xl active:scale-[0.98] mt-4 flex items-center justify-center"
         >
-          {isLoading ? t.login.buttonLoading : t.login.button}
+          {isLoading ? (
+            <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+          ) : (
+            t.login.button
+          )}
         </button>
       </form>
 
@@ -640,9 +662,13 @@ function ForgotPasswordStep({ onBack, t, lang }: { onBack: () => void, t: any, l
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#0c0c1d] dark:bg-white text-white dark:text-[#0c0c1d] font-bold py-5 rounded-2xl transition-all shadow-xl active:scale-[0.98]"
+            className="w-full bg-[#0c0c1d] dark:bg-white text-white dark:text-[#0c0c1d] font-bold py-5 rounded-2xl transition-all shadow-xl active:scale-[0.98] flex items-center justify-center"
           >
-            {isLoading ? t.forgot.buttonLoading : t.forgot.button}
+            {isLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+            ) : (
+              t.forgot.button
+            )}
           </button>
           <button type="button" onClick={onBack} className="w-full py-5 text-gray-500 font-bold text-sm">
             {t.forgot.cancel}
@@ -657,3 +683,53 @@ function ForgotPasswordStep({ onBack, t, lang }: { onBack: () => void, t: any, l
   );
 }
 
+function RegisterSuccessStep({ t, email, onLogin, onOpenMenu }: { t: any, email: string, onLogin: () => void, onOpenMenu: () => void }) {
+  const { isLoading, handleResendConfirmation } = useAuthActions();
+
+  return (
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#0c0c1d] p-8 overflow-y-auto">
+      <AuthHeader 
+        onOpenMenu={onOpenMenu}
+        title={t.success.title}
+        subtitle={t.success.subtitle}
+      />
+
+      <div className="flex-1 flex flex-col items-center justify-center py-12">
+        <div className="relative mb-12">
+          <div className="w-24 h-24 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 rounded-full flex items-center justify-center shadow-inner">
+            <Mail className="w-10 h-10" />
+          </div>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.3, type: 'spring' }}
+            className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 border-4 border-white dark:border-[#0c0c1d] rounded-full flex items-center justify-center text-white"
+          >
+            <CheckCircle2 className="w-4 h-4" />
+          </motion.div>
+        </div>
+
+        <div className="w-full space-y-6 text-center">
+          <button
+            onClick={onLogin}
+            className="w-full bg-[#0c0c1d] dark:bg-white text-white dark:text-[#0c0c1d] font-bold py-5 rounded-2xl transition-all shadow-xl active:scale-[0.98]"
+          >
+            {t.success.button} →
+          </button>
+
+          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+            {t.success.noEmail}{' '}
+            <button 
+              onClick={() => handleResendConfirmation(email)}
+              disabled={isLoading}
+              className="text-indigo-500 font-bold hover:underline disabled:opacity-50"
+            >
+              {isLoading ? <Loader2 className="w-3 h-3 animate-spin inline mr-1" /> : null}
+              {t.success.resend}
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

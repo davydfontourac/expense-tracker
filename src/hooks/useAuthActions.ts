@@ -46,7 +46,6 @@ export function useAuthActions() {
         options: { data: { full_name: data.fullName } }
       });
       if (error) throw error;
-      toast.success('Cadastro realizado! Verifique seu e-mail.');
       if (onSuccess) onSuccess();
     } catch (err: any) {
       toast.error(err.message || 'Erro ao realizar cadastro');
