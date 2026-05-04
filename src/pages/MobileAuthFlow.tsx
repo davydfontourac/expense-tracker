@@ -9,7 +9,7 @@ import { useAuthActions } from '@/hooks/useAuthActions';
 import { AuthHeader, SocialAuth, AuthFooter, Input, StrengthMeter } from '@/components/AuthUI';
 
 // --- SCHEMAS ---
-import { loginSchema, registerSchema, forgotPasswordSchema } from '@/utils/auth-schemas';
+import { getLoginSchema, getRegisterSchema, getForgotPasswordSchema } from '@/utils/auth-schemas';
 import { AUTH_TRANSLATIONS } from '@/utils/auth-translations';
 
 const COPY: any = AUTH_TRANSLATIONS;
@@ -371,7 +371,7 @@ function RegisterStep({ onLogin, onOpenMenu, t }: { onLogin: () => void, onOpenM
   const { isLoading, handleSocialLogin, handleRegister } = useAuthActions();
   
   const { register, handleSubmit, watch, formState: { errors } } = useForm({
-    resolver: zodResolver(registerSchema)
+    resolver: zodResolver(getRegisterSchema(t))
   });
 
   const passwordValue = watch('password', '');
@@ -538,7 +538,7 @@ function LoginStep({ onBack, onRegister, onForgotPassword, onOpenMenu, t }: { on
   const [showPassword, setShowPassword] = useState(false);
   const { isLoading, handleSocialLogin, handleLogin } = useAuthActions();
   const { register, handleSubmit, formState: { errors } } = useForm({
-    resolver: zodResolver(loginSchema)
+    resolver: zodResolver(getLoginSchema(t))
   });
 
   const onSubmit = (data: any) => handleLogin(data);
@@ -594,7 +594,7 @@ function ForgotPasswordStep({ onBack, t, lang }: { onBack: () => void, t: any, l
   const [isSuccess, setIsSuccess] = useState(false);
   const { isLoading, handleForgotPassword } = useAuthActions();
   const { register, handleSubmit, formState: { errors } } = useForm({
-    resolver: zodResolver(forgotPasswordSchema)
+    resolver: zodResolver(getForgotPasswordSchema(t))
   });
 
   const onSubmit = (data: any) => handleForgotPassword(data.email, () => setIsSuccess(true));

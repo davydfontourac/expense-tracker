@@ -70,11 +70,31 @@ export function useAuthActions() {
     }
   };
 
+  const handleResendConfirmation = async (email: string) => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: `${globalThis.location.origin}/login`
+        }
+      });
+      if (error) throw error;
+      toast.success('Link reenviado! Verifique seu e-mail.');
+    } catch (err: any) {
+      toast.error(err.message || 'Erro ao reenviar link');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     isLoading,
     handleSocialLogin,
     handleLogin,
     handleRegister,
-    handleForgotPassword
+    handleForgotPassword,
+    handleResendConfirmation
   };
 }

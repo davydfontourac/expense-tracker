@@ -1,17 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Github } from 'lucide-react';
+import { Github, Loader2 } from 'lucide-react';
 import { PasswordInput } from '@/components/PasswordInput';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuthActions } from '@/hooks/useAuthActions';
 import PageTransition from '@/components/PageTransition';
+import { StrengthMeter } from '@/components/AuthUI';
 
 // ── SCHEMAS ──────────────────────────────────────────────────────────────────
 
-import { loginSchema, registerSchema, type LoginFormValues as LoginForm, type RegisterFormValues as RegisterForm } from '@/utils/auth-schemas';
+import { getLoginSchema, getRegisterSchema, type LoginFormValues as LoginForm, type RegisterFormValues as RegisterForm } from '@/utils/auth-schemas';
 import { AUTH_TRANSLATIONS } from '@/utils/auth-translations';
 
 const COPY: any = AUTH_TRANSLATIONS;
@@ -23,15 +24,19 @@ export default function Auth() {
   const location = useLocation();
   const [isLogin, setIsLogin] = useState(location.pathname === '/login');
   const [isRegistered, setIsRegistered] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
   const [lang, setLang] = useState(() => localStorage.getItem('language') || 'pt-BR');
   
-  const { isLoading, handleLogin, handleRegister, handleSocialLogin } = useAuthActions();
+  const { isLoading, handleLogin, handleRegister, handleSocialLogin, handleResendConfirmation } = useAuthActions();
   
   useEffect(() => {
     localStorage.setItem('language', lang);
   }, [lang]);
   
-  const t = COPY[lang];
+  const t = COPY[lang] || COPY['pt-BR'];
+
+  const loginSchema = useMemo(() => getLoginSchema(t), [t]);
+  const registerSchema = useMemo(() => getRegisterSchema(t), [t]);
 
   useEffect(() => {
     setIsLogin(location.pathname === '/login');
@@ -45,11 +50,53 @@ export default function Auth() {
     window.history.pushState({}, '', mode === 'login' ? '/login' : '/register');
   };
 
-  const loginForm = useForm<LoginForm>({ resolver: zodResolver(loginSchema) });
-  const registerForm = useForm<RegisterForm>({ resolver: zodResolver(registerSchema) });
+  const loginForm = useForm<LoginForm>({ 
+    resolver: zodResolver(loginSchema),
+    mode: 'onChange' 
+  });
+  const registerForm = useForm<RegisterForm>({ 
+    resolver: zodResolver(registerSchema),
+    mode: 'onChange'
+  });
 
   const onLoginSubmit = (data: LoginForm) => handleLogin(data);
-  const onRegisterSubmit = (data: RegisterForm) => handleRegister(data, () => setIsRegistered(true));
+  const onRegisterSubmit = (data: RegisterForm) => handleRegister(data, () => {
+    setRegisteredEmail(data.email);
+    setIsRegistered(true);
+  });
+
+  const passwordValue = registerForm.watch('password', '');
+  const confirmPasswordValue = registerForm.watch('confirmPassword', '');
+
+  const getPasswordScore = (pass: string) => {
+    if (!pass) return 0;
+    let score = 0;
+    if (pass.length >= 8) score++;
+    if (/[A-Z]/.test(pass)) score++;
+    if (/[0-9]/.test(pass)) score++;
+    if (/[^A-Za-z0-9]/.test(pass)) score++;
+    return score;
+  };
+
+  const getMatchScore = (pass: string, confirm: string) => {
+    if (!pass || !confirm) return 0;
+    if (confirm === pass) return 4;
+    
+    let matchCount = 0;
+    const minLen = Math.min(pass.length, confirm.length);
+    for (let i = 0; i < minLen; i++) {
+      if (confirm[i] === pass[i]) matchCount++;
+      else return 1; // Red bar on mismatch
+    }
+    
+    if (confirm.length > pass.length) return 1; // Mismatch if longer
+    
+    const score = Math.floor((matchCount / pass.length) * 4);
+    return Math.max(1, score);
+  };
+
+  const passwordScore = getPasswordScore(passwordValue);
+  const matchScore = getMatchScore(passwordValue, confirmPasswordValue);
 
   if (isRegistered) {
     return (
@@ -123,7 +170,13 @@ export default function Auth() {
 
             <p className="mt-8 text-xs text-gray-400 dark:text-gray-500 font-medium">
               {t.success.noEmail}{' '}
-              <button className="text-blue-600 dark:text-blue-400 font-bold hover:underline">{t.success.resend}</button>
+              <button 
+                onClick={() => handleResendConfirmation(registeredEmail)}
+                disabled={isLoading}
+                className="text-blue-600 dark:text-blue-400 font-bold hover:underline disabled:opacity-50"
+              >
+                {t.success.resend}
+              </button>
             </p>
           </div>
         </motion.div>
@@ -241,8 +294,12 @@ export default function Auth() {
                     <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 font-mono">{t.login.password}</label>
                     <PasswordInput {...loginForm.register('password')} placeholder={t.login.passwordPlaceholder} error={loginForm.formState.errors.password?.message} className="!bg-gray-50 dark:!bg-[#161629] !border-gray-200 dark:!border-gray-800 !rounded-xl !py-3.5" />
                   </div>
-                  <button type="submit" disabled={isLoading} className="w-full bg-[#0c0c1d] dark:bg-white hover:bg-[#1a1a33] dark:hover:bg-gray-100 text-white dark:text-[#0c0c1d] font-bold py-4 rounded-xl transition-all shadow-lg active:scale-[0.98]">
-                    {isLoading ? '...' : `${t.login.button} →`}
+                  <button type="submit" disabled={isLoading} className="w-full bg-[#0c0c1d] dark:bg-white hover:bg-[#1a1a33] dark:hover:bg-gray-100 text-white dark:text-[#0c0c1d] font-bold py-4 rounded-xl transition-all shadow-lg active:scale-[0.98] flex items-center justify-center gap-2">
+                    {isLoading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>{t.login.button} →</>
+                    )}
                   </button>
                 </motion.form>
               ) : (
@@ -257,16 +314,56 @@ export default function Auth() {
                     <input type="email" {...registerForm.register('email')} className="w-full px-4 py-3.5 border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-[#161629] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all" placeholder={t.register.emailPlaceholder} />
                     {registerForm.formState.errors.email && <p className="mt-1 text-xs text-red-600">{registerForm.formState.errors.email.message}</p>}
                   </div>
-                  <div>
+                  <div className="relative">
                     <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 font-mono">{t.register.password}</label>
                     <PasswordInput {...registerForm.register('password')} placeholder={t.register.passwordPlaceholder} error={registerForm.formState.errors.password?.message} className="!bg-gray-50 dark:!bg-[#161629] !border-gray-200 dark:!border-gray-800 !rounded-xl !py-3.5" />
+                    <StrengthMeter score={passwordScore} />
+                    <div className="mt-2 flex flex-wrap gap-2">
+                       {[
+                         { label: t.register.reqLen, met: passwordValue.length >= 8 },
+                         { label: t.register.reqUpper, met: /[A-Z]/.test(passwordValue) },
+                         { label: t.register.reqNum, met: /[0-9]/.test(passwordValue) },
+                         { label: t.register.reqSymbol, met: /[^A-Za-z0-9]/.test(passwordValue) },
+                       ].map((req, i) => (
+                         <span key={i} className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border transition-colors ${req.met ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-gray-100 dark:bg-white/5 text-gray-400 border-transparent'}`}>
+                           {req.label}
+                         </span>
+                       ))}
+                    </div>
                   </div>
-                  <div>
+                  <div className="relative">
                     <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 font-mono">{t.register.confirm}</label>
                     <PasswordInput {...registerForm.register('confirmPassword')} placeholder={t.register.confirmPasswordPlaceholder} error={registerForm.formState.errors.confirmPassword?.message} className="!bg-gray-50 dark:!bg-[#161629] !border-gray-200 dark:!border-gray-800 !rounded-xl !py-3.5" />
+                    <StrengthMeter score={matchScore} mode="match" />
                   </div>
-                  <button type="submit" disabled={isLoading} className="w-full bg-[#0c0c1d] dark:bg-white hover:bg-[#1a1a33] dark:hover:bg-gray-100 text-white dark:text-[#0c0c1d] font-bold py-4 rounded-xl transition-all shadow-lg active:scale-[0.98] mt-4">
-                    {isLoading ? '...' : `${t.register.button} →`}
+                  <div className="flex flex-col gap-1 py-2">
+                    <label className="flex items-center gap-3 cursor-pointer group">
+                      <div className="relative flex items-center">
+                        <input 
+                          type="checkbox" 
+                          {...registerForm.register('acceptTerms')}
+                          className="w-5 h-5 rounded-md border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#161629] text-blue-600 focus:ring-blue-600/20 transition-all cursor-pointer" 
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                        {t.register.termsText}{' '}
+                        <button type="button" onClick={() => navigate('/terms')} className="text-blue-600 dark:text-blue-400 font-bold hover:underline">
+                          {t.register.termsLink}
+                        </button>
+                      </p>
+                    </label>
+                    {registerForm.formState.errors.acceptTerms && (
+                      <p className="text-[10px] text-red-600 font-bold uppercase tracking-wide">
+                        {registerForm.formState.errors.acceptTerms.message}
+                      </p>
+                    )}
+                  </div>
+                  <button type="submit" disabled={isLoading} className="w-full bg-[#0c0c1d] dark:bg-white hover:bg-[#1a1a33] dark:hover:bg-gray-100 text-white dark:text-[#0c0c1d] font-bold py-4 rounded-xl transition-all shadow-lg active:scale-[0.98] mt-4 flex items-center justify-center gap-2">
+                    {isLoading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>{t.register.button} →</>
+                    )}
                   </button>
                 </motion.form>
               )}
