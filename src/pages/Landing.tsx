@@ -1046,7 +1046,11 @@ function Footer({ t }: any) {
             <ul>
               {t.footer.links.resources.map(([l, h]: any) => (
                 <li key={l}>
-                  <a href={h}>{l}</a>
+                  {h.startsWith('/') ? (
+                    <Link to={h}>{l}</Link>
+                  ) : (
+                    <a href={h}>{l}</a>
+                  )}
                 </li>
               ))}
             </ul>

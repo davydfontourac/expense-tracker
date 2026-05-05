@@ -112,8 +112,6 @@ export const LANDING_COPY: Record<string, any> = {
         product: [
           ['Recursos', '#features'],
           ['Como funciona', '#how'],
-          ['Demo', '#'],
-          ['Dark mode', '#'],
         ],
         company: [
           ['GitHub', 'https://github.com/davydfontourac/expense-tracker'],
@@ -121,9 +119,9 @@ export const LANDING_COPY: Record<string, any> = {
           ['Licença MIT', 'https://github.com/davydfontourac/expense-tracker/blob/develop/LICENSE-PT.md'],
         ],
         resources: [
-          ['Documentação', '#'],
-          ['Changelog', '#'],
-          ['Privacidade', '#'],
+          ['Documentação', '/docs'],
+          ['Changelog', '/changelog'],
+          ['Privacidade', '/terms'],
         ],
       },
       rights: '© 2026 Expense Tracker · Open source sob licença MIT',
@@ -334,8 +332,6 @@ export const LANDING_COPY: Record<string, any> = {
         product: [
           ['Features', '#features'],
           ['How it works', '#how'],
-          ['Demo', '#'],
-          ['Dark mode', '#'],
         ],
         company: [
           ['GitHub', 'https://github.com/davydfontourac/expense-tracker'],
@@ -343,9 +339,9 @@ export const LANDING_COPY: Record<string, any> = {
           ['MIT License', 'https://github.com/davydfontourac/expense-tracker/blob/develop/LICENSE'],
         ],
         resources: [
-          ['Docs', '#'],
-          ['Changelog', '#'],
-          ['Privacy', '#'],
+          ['Docs', '/docs'],
+          ['Changelog', '/changelog'],
+          ['Privacy', '/terms'],
         ],
       },
       rights: '© 2026 Expense Tracker · Open source under MIT license',
