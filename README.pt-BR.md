@@ -25,7 +25,7 @@
 
   <br />
 
-  [🌐 Ver Demo](https://expensetracker.app) · [🐞 Reportar Bug](https://github.com/davydfontourac/expense-tracker/issues) · [💡 Sugerir Funcionalidade](https://github.com/davydfontourac/expense-tracker/issues)
+  [🌐 Ver Demo](https://myexpenseetracker.vercel.app) · [🐞 Reportar Bug](https://github.com/davydfontourac/expense-tracker/issues) · [💡 Sugerir Funcionalidade](https://github.com/davydfontourac/expense-tracker/issues)
 </div>
 
 ---

@@ -14,7 +14,7 @@ Contato / Contact: privacyexpensetracker@gmail.com
 
 ### 1. Aceitação dos Termos
 
-Ao acessar ou utilizar o Expense Tracker ("Serviço"), disponível em https://expensetracker.app, você ("Usuário") concorda expressamente com estes Termos de Uso. Caso não concorde com qualquer disposição aqui prevista, você não deve utilizar o Serviço.
+Ao acessar ou utilizar o Expense Tracker ("Serviço"), disponível em https://myexpenseetracker.vercel.app, você ("Usuário") concorda expressamente com estes Termos de Uso. Caso não concorde com qualquer disposição aqui prevista, você não deve utilizar o Serviço.
 
 Estes Termos constituem um acordo juridicamente vinculante entre você e o responsável pelo Serviço. O uso continuado do Serviço após a publicação de alterações implica aceitação dos novos termos.
 
@@ -120,7 +120,7 @@ Para dúvidas, solicitações ou reclamações relacionadas a estes Termos de Us
 
 ### 1. Acceptance of Terms
 
-By accessing or using Expense Tracker (the "Service"), available at https://expensetracker.app, you ("User") expressly agree to these Terms of Use. If you do not agree with any provision set forth herein, you must not use the Service.
+By accessing or using Expense Tracker (the "Service"), available at https://myexpenseetracker.vercel.app, you ("User") expressly agree to these Terms of Use. If you do not agree with any provision set forth herein, you must not use the Service.
 
 These Terms constitute a legally binding agreement between you and the party responsible for the Service. Continued use of the Service after any updates are published constitutes acceptance of the revised terms.
 

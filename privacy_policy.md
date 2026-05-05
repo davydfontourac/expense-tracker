@@ -21,7 +21,7 @@ Esta Política de Privacidade descreve como o Expense Tracker ("Serviço") colet
 | Responsável pelo Serviço (Controlador) | Expense Tracker |
 | Natureza | Projeto de código aberto de pessoa física |
 | Canal de privacidade | privacyexpensetracker@gmail.com |
-| URL do Serviço | https://expensetracker.app |
+| URL do Serviço | https://myexpenseetracker.vercel.app |
 
 ### 2. Dados Pessoais Coletados
 
@@ -166,7 +166,7 @@ This Privacy Policy describes how Expense Tracker (the "Service") collects, uses
 | Service Responsible (Controller) | Expense Tracker |
 | Nature | Open-source project by an individual developer |
 | Privacy contact | privacyexpensetracker@gmail.com |
-| Service URL | https://expensetracker.app |
+| Service URL | https://myexpenseetracker.vercel.app |
 
 ### 2. Personal Data Collected
 
