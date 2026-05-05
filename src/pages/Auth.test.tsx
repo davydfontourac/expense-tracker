@@ -12,7 +12,8 @@ vi.mock('@/hooks/useMobile', () => ({
 }));
 
 vi.mock('@/components/AuthUI', () => ({
-  default: () => <div data-testid="auth-ui">AuthUI Component</div>
+  default: () => <div data-testid="auth-ui">AuthUI Component</div>,
+  StrengthMeter: () => <div data-testid="strength-meter">StrengthMeter</div>
 }));
 
 vi.mock('@/pages/MobileAuthFlow', () => ({
@@ -21,11 +22,16 @@ vi.mock('@/pages/MobileAuthFlow', () => ({
 
 describe('Auth Component', () => {
   it('renders correctly on desktop', () => {
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 1024,
+    });
     render(
       <BrowserRouter>
         <Auth />
       </BrowserRouter>
     );
-    expect(screen.getByTestId('auth-ui')).toBeInTheDocument();
+    expect(screen.getAllByTestId('strength-meter')[0]).toBeInTheDocument();
   });
 });

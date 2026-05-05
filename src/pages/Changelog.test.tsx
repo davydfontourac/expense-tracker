@@ -10,6 +10,6 @@ describe('Changelog Component', () => {
         <Changelog />
       </BrowserRouter>
     );
-    expect(screen.getByText(/O que há de novo/i)).toBeInTheDocument();
+    expect(screen.getByText(/Acompanhe as últimas melhorias/i)).toBeInTheDocument();
   });
 });

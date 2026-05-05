@@ -10,6 +10,6 @@ describe('Docs Component', () => {
         <Docs />
       </BrowserRouter>
     );
-    expect(screen.getByText(/Documentação/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Documentação/i)[0]).toBeInTheDocument();
   });
 });

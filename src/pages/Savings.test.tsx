@@ -5,13 +5,19 @@ import Savings from './Savings';
 
 vi.mock('@/hooks/useSavings', () => ({
   useSavings: () => ({
-    savings: [],
+    goals: [],
     isLoading: false,
-    summary: { total: 0, monthlyContribution: 0, projectedYearly: 0 },
-    fetchSavings: vi.fn(),
-    addSaving: vi.fn(),
-    updateSaving: vi.fn(),
-    deleteSaving: vi.fn()
+    fetchGoals: vi.fn(),
+    upsertGoal: vi.fn(),
+    deleteGoal: vi.fn(),
+    addDeposit: vi.fn()
+  })
+}));
+
+vi.mock('@/hooks/useTransactions', () => ({
+  useTransactions: () => ({
+    summary: { caixinhaBalance: 0 },
+    fetchTransactions: vi.fn()
   })
 }));
 
@@ -34,6 +40,6 @@ describe('Savings Component', () => {
         <Savings />
       </BrowserRouter>
     );
-    expect(screen.getByText('Minhas Economias')).toBeInTheDocument();
+    expect(screen.getByText('Caixinhas')).toBeInTheDocument();
   });
 });

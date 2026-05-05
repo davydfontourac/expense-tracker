@@ -38,15 +38,19 @@ describe('Terms', () => {
       click: mockClick,
     } as any;
 
-    vi.spyOn(document, 'createElement').mockReturnValue(mockAnchor);
-    const spyAppend = vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node);
-    const spyRemove = vi.spyOn(document.body, 'removeChild').mockImplementation((node) => node);
-
     render(
       <BrowserRouter>
         <Terms />
       </BrowserRouter>
     );
+
+    const originalCreate = document.createElement.bind(document);
+    vi.spyOn(document, 'createElement').mockImplementation((tagName, options) => {
+      if (tagName === 'a') return mockAnchor;
+      return originalCreate(tagName, options);
+    });
+    const spyAppend = vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node);
+    const spyRemove = vi.spyOn(document.body, 'removeChild').mockImplementation((node) => node);
 
     const downloadBtn = screen.getByText('Download MD').closest('button');
     if (downloadBtn) fireEvent.click(downloadBtn);

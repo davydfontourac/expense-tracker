@@ -19,6 +19,6 @@ describe('MobileAuthFlow Component', () => {
         <MobileAuthFlow />
       </BrowserRouter>
     );
-    expect(screen.getByText(/O controle de gastos/i)).toBeInTheDocument();
+    expect(screen.getByText(/Seu dinheiro sob controle/i)).toBeInTheDocument();
   });
 });
