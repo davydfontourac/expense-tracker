@@ -50,8 +50,9 @@ export function Sidebar() {
   return (
     <aside className="A-sb hidden lg:flex">
       <div className="A-sb-brand !justify-start !pt-2 !pb-6">
-        <div className="flex items-center gap-2">
-           <img src="/logo-expense-tracker.webp" alt="Logo" className="w-11 h-11 object-contain" />
+        <div className="flex items-center gap-3">
+           <img src="/logo-expense-tracker.webp" alt="Logo" className="w-14 h-14 object-contain" />
+           <span className="font-bold text-gray-900 dark:text-white">Expense Tracker</span>
         </div>
       </div>
 

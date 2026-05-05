@@ -171,8 +171,9 @@ export default function Dashboard() {
       <PageTransition className="min-h-screen bg-[#f8f9fc] dark:bg-[#0c0c1d] pb-32">
         {/* Header */}
         <header className="px-6 pt-12 pb-6 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-             <img src="/logo-expense-tracker.webp" alt="Logo" className="w-11 h-11 object-contain" />
+          <div className="flex items-center gap-3">
+             <img src="/logo-expense-tracker.webp" alt="Logo" className="w-14 h-14 object-contain" />
+             <span className="font-bold text-gray-900 dark:text-white">Expense Tracker</span>
           </div>
           <div className="flex items-center gap-3">
              <button className="p-2.5 bg-white dark:bg-[#161629] rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
