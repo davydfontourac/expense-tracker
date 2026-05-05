@@ -9,7 +9,7 @@ vi.mock('@/hooks/useAuthActions', () => ({
 }));
 
 const mockHandleLogin = vi.fn();
-const mockHandleRegister = vi.fn((data, callback) => callback && callback());
+const mockHandleRegister = vi.fn((_data, callback) => callback && callback());
 const mockHandleSocialLogin = vi.fn();
 const mockHandleResendConfirmation = vi.fn();
 const mockNavigate = vi.fn();
