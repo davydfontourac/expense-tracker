@@ -4,7 +4,7 @@
 </p>
 
 <div align="center">
-  <img src="public/logo-expense-tracker.png" alt="Logo Expense Tracker" width="120" />
+  <img src="public/logo-expense-tracker.webp" alt="Logo Expense Tracker" width="120" />
   <h1>💰 Expense Tracker</h1>
   <p><strong>Gestão de Finanças Pessoais de Alto Nível</strong></p>
   <p>Um companheiro financeiro sofisticado, focado em mobile, construído com React 19, Supabase e Tailwind CSS 4.</p>
@@ -37,7 +37,9 @@ A versão mais recente introduz ferramentas poderosas para um controle financeir
 - **📱 PWA & Mobile-First** — Otimizado para uso móvel com suporte offline e capacidade de instalação na tela inicial.
 - **🕵️ Modo Privacidade** — Oculte dados financeiros sensíveis com um único clique, ideal para ambientes públicos.
 - **🏦 Importação Bancária Imersiva** — Assistente de três etapas para importação de CSV com mapeamento automático de categorias e pré-visualização em tempo real.
+- **📤 Portabilidade de Dados** — Exportação completa de transações para CSV, permitindo que você gerencie seus dados fora da plataforma.
 - **🎯 Metas de Economia** — Defina, acompanhe e alcance seus marcos financeiros com indicadores visuais de progresso.
+- **🌍 Multi-idioma & Legal** — Suporte total para Inglês e Português, incluindo páginas dedicadas de Termos de Uso e Políticas de Privacidade.
 - **📊 Dashboard Otimizado** — Análises em tempo real alimentadas por RPCs no PostgreSQL, garantindo atualizações instantâneas e saldo sempre preciso.
 - **🔐 Segurança Reforçada** — Fluxo de autenticação robusto, incluindo recuperação de senha e telas de login otimizadas para mobile.
 - **🌓 Tema Adaptativo** — Suporte completo para modos Claro e Escuro com transições fluidas via Framer Motion.
