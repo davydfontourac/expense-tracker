@@ -14,7 +14,7 @@ import { Reveal } from '@/components/Reveal';
 // Copy (PT-BR + EN)
 // ─────────────────────────────────────────────────────────────────────────────
 import { LANDING_COPY } from '@/components/Landing/LandingTranslations';
-import { LandingCopy } from '@/types/landing';
+import type { LandingCopy } from '@/types/landing';
 
 const COPY = LANDING_COPY;
 
