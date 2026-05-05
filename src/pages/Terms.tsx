@@ -72,7 +72,22 @@ export default function Terms() {
             prose-strong:text-gray-900 dark:prose-strong:text-white
             prose-blockquote:italic prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300
           ">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              components={{
+                table: ({node, ...props}) => (
+                  <div className="w-full overflow-x-auto my-6 border border-gray-100 dark:border-white/5 rounded-2xl">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-white/5" {...props} />
+                  </div>
+                ),
+                th: ({node, ...props}) => (
+                  <th className="px-4 py-3 bg-gray-50 dark:bg-white/5 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider" {...props} />
+                ),
+                td: ({node, ...props}) => (
+                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-100 dark:border-white/5" {...props} />
+                )
+              }}
+            >
               {termsMarkdown}
             </ReactMarkdown>
           </div>

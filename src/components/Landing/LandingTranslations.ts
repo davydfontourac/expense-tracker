@@ -14,7 +14,7 @@ export const LANDING_COPY: Record<string, any> = {
       h1b: 'sob controle.',
       sub: 'Rastreie despesas, receitas e investimentos em um só lugar. Importe extratos do seu banco, categorize automaticamente e entenda para onde vai cada real.',
       cta: 'Começar grátis',
-      cta2: 'Ver demo',
+      cta2: 'Acessar',
       trust: 'Sem cartão de crédito · Dados criptografados · Código aberto',
     },
     problems: {
@@ -235,7 +235,7 @@ export const LANDING_COPY: Record<string, any> = {
       h1b: 'under control.',
       sub: 'Track expenses, income and investments in one place. Import bank statements, auto-categorize, and understand where every dollar goes.',
       cta: 'Start free',
-      cta2: 'See demo',
+      cta2: 'Access',
       trust: 'No credit card · Encrypted data · Open source',
     },
     problems: {

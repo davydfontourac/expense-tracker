@@ -590,14 +590,12 @@ function Hero({ t, isMobile }: { t: LandingCopy, isMobile: boolean }) {
           <Link to={isMobile ? "/welcome" : "/register"} className="btn btn-primary">
             {t.hero.cta} <Icon.arrow />
           </Link>
-          <a
-            href="https://myexpenseetracker.vercel.app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to="/login"
             className="btn btn-ghost"
           >
             <Icon.play /> {t.hero.cta2}
-          </a>
+          </Link>
         </div>
         <div className="hero-trust">{t.hero.trust}</div>
 
