@@ -520,7 +520,7 @@ function RegisterStep({ onLogin, onOpenMenu, t, onSuccess }: { onLogin: () => vo
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-bold py-5 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 active:scale-[0.98] mt-4 flex items-center justify-center"
+          className="w-full bg-[#0c0c1d] dark:bg-white text-white dark:text-[#0c0c1d] font-bold py-5 rounded-2xl transition-all shadow-xl active:scale-[0.98] mt-4 flex items-center justify-center"
         >
           {isLoading ? (
             <Loader2 className="w-5 h-5 animate-spin" />
