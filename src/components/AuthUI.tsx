@@ -59,7 +59,7 @@ export function AuthFooter({ text, linkText, onClick }: { text: string, linkText
       {text.split(linkText).map((part: string, i: number) => (
         <React.Fragment key={i}>
           {part}
-          {i === 0 && <span className="text-gray-900 dark:text-white font-bold">{linkText}</span>}
+          {i === 0 && <span className="text-gray-900 dark:text-white font-bold">{' '}{linkText}</span>}
         </React.Fragment>
       ))}
     </button>
