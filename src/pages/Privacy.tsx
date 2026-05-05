@@ -61,15 +61,12 @@ export default function Privacy() {
             </div>
           </div>
 
-          <div className="prose prose-slate dark:prose-invert max-w-none 
-            prose-headings:font-bold prose-headings:tracking-tight 
-            prose-h1:text-4xl prose-h2:text-2xl prose-h3:text-xl
-            prose-p:text-gray-600 dark:prose-p:text-gray-400 prose-p:leading-relaxed
-            prose-strong:text-gray-900 dark:prose-strong:text-white
-            prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
-            prose-hr:border-gray-200 dark:prose-hr:border-white/10
-            prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-500/5 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-xl
+          <div className="prose prose-blue dark:prose-invert max-w-none 
+            prose-headings:text-gray-900 dark:prose-headings:text-white
+            prose-p:text-gray-600 dark:prose-p:text-gray-400
             prose-li:text-gray-600 dark:prose-li:text-gray-400
+            prose-strong:text-gray-900 dark:prose-strong:text-white
+            prose-blockquote:italic prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300
           ">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {privacyMarkdown}
