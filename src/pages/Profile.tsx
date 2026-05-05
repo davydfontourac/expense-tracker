@@ -556,7 +556,7 @@ export default function Profile() {
           <div className="flex flex-col">
             <MobileHeader title="Sobre" onBack={() => setView('main')} />
             <div className="px-6 flex flex-col items-center">
-              <img src="/logo-expense-tracker.png" alt="Logo" className="w-20 h-20 mb-6 rounded-3xl" />
+              <img src="/logo-expense-tracker.webp" alt="Logo" className="w-24 h-24 mb-6 rounded-3xl" />
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Expense Tracker</h2>
               <p className="text-sm text-gray-400 font-mono mt-1 mb-6">VERSÃO 1.2.0 · BUILD 204</p>
               

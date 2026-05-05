@@ -178,7 +178,7 @@ export default function MobileAuthFlow() {
 
               <div className="flex items-center gap-3 mb-12">
                 <div className="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center">
-                  <img src="/logo-expense-tracker.png" alt="Logo" className="w-6 h-6 brightness-0 invert rounded-md" />
+                  <img src="/logo-expense-tracker.webp" alt="Logo" className="w-8 h-8 brightness-0 invert rounded-md" />
                 </div>
                 <span className="text-xl font-bold dark:text-white">Expense Tracker</span>
               </div>
@@ -243,7 +243,7 @@ function SplashStep({ t }: { t: any }) {
         className="relative z-10 flex flex-col items-center"
       >
         <div className="w-20 h-20 bg-indigo-500 rounded-[28px] shadow-2xl shadow-indigo-500/20 flex items-center justify-center mb-8">
-           <img src="/logo-expense-tracker.png" alt="Logo" className="w-12 h-12 brightness-0 invert rounded-xl" />
+           <img src="/logo-expense-tracker.webp" alt="Logo" className="w-16 h-16 brightness-0 invert rounded-xl" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">Expense Tracker</h1>
         <p className="text-gray-500 dark:text-gray-400 font-medium mb-12">{t.splash.subtitle}</p>

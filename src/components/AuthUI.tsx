@@ -11,7 +11,7 @@ export function AuthHeader({ onBack, onOpenMenu, title, subtitle }: { onBack?: (
           </button>
         ) : (
           <div className="flex items-center gap-2">
-            <img src="/logo-expense-tracker.png" alt="Logo" className="w-6 h-6 rounded-lg" />
+            <img src="/logo-expense-tracker.webp" alt="Logo" className="w-8 h-8 rounded-lg" />
             <span className="text-sm font-bold dark:text-white">Expense Tracker</span>
           </div>
         )}

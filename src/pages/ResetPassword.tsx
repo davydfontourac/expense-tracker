@@ -63,7 +63,7 @@ export default function ResetPassword() {
       <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800 transition-colors">
         <div className="flex flex-col items-center mb-8">
             <img
-              src="/logo-expense-tracker.png"
+              src="/logo-expense-tracker.webp"
               alt="Expense Tracker Logo"
               className="object-contain rounded-xl"
             />

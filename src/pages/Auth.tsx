@@ -229,7 +229,7 @@ export default function Auth() {
           <div className="max-w-md w-full mx-auto">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
-                <img src="/logo-expense-tracker.png" alt="Logo" className="w-8 h-8 rounded-xl" />
+                <img src="/logo-expense-tracker.webp" alt="Logo" className="w-10 h-10 rounded-xl" />
                 <span className="font-semibold text-gray-900 dark:text-white text-lg">Expense Tracker</span>
               </div>
 
