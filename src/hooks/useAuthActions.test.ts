@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { Mock } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAuthActions } from './useAuthActions';
 import { supabase } from '@/services/supabase';

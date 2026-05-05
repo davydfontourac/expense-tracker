@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import type { Mock } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { usePWA } from './usePWA';
 
@@ -27,7 +28,7 @@ describe('usePWA', () => {
     const { result } = renderHook(() => usePWA());
     
     // Get the registered handler
-    const addEventListenerMock = window.addEventListener as vi.Mock;
+    const addEventListenerMock = window.addEventListener as Mock;
     const eventName = addEventListenerMock.mock.calls[0][0];
     const handler = addEventListenerMock.mock.calls[0][1];
 
@@ -51,7 +52,7 @@ describe('usePWA', () => {
   it('should call prompt and handle accepted user choice', async () => {
     const { result } = renderHook(() => usePWA());
     
-    const handler = (window.addEventListener as vi.Mock).mock.calls[0][1];
+    const handler = (window.addEventListener as Mock).mock.calls[0][1];
 
     const mockEvent = {
       preventDefault: vi.fn(),
@@ -74,7 +75,7 @@ describe('usePWA', () => {
   it('should call prompt and handle dismissed user choice', async () => {
     const { result } = renderHook(() => usePWA());
     
-    const handler = (window.addEventListener as vi.Mock).mock.calls[0][1];
+    const handler = (window.addEventListener as Mock).mock.calls[0][1];
 
     const mockEvent = {
       preventDefault: vi.fn(),
@@ -97,7 +98,7 @@ describe('usePWA', () => {
   it('should remove event listener on unmount', () => {
     const { unmount } = renderHook(() => usePWA());
     
-    const handler = (window.addEventListener as jest.Mock).mock.calls[0][1];
+    const handler = (window.addEventListener as Mock).mock.calls[0][1];
     
     unmount();
     

@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Privacy from './Privacy';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 
 vi.mock('react-markdown', () => ({
   default: () => <div data-testid="markdown-content">Markdown Content</div>
@@ -10,6 +10,10 @@ vi.mock('react-markdown', () => ({
 vi.mock('@/components/PageTransition', () => ({
   default: ({ children }: any) => <div data-testid="page-transition">{children}</div>
 }));
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe('Privacy', () => {
   it('renders the privacy policy page correctly', () => {
@@ -26,8 +30,6 @@ describe('Privacy', () => {
   it('has a download button and handles download', () => {
     // Mock URL.createObjectURL
     global.URL.createObjectURL = vi.fn();
-    const mockAppendChild = vi.fn();
-    const mockRemoveChild = vi.fn();
     const mockClick = vi.fn();
 
     const mockAnchor = {

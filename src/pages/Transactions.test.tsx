@@ -83,7 +83,7 @@ describe('Transactions Component', () => {
     
     vi.spyOn(PrivacyContextModule, 'usePrivacy').mockReturnValue({
       hideBalance: false,
-      toggleHideBalance: vi.fn(),
+      setHideBalance: vi.fn(),
     });
   });
 

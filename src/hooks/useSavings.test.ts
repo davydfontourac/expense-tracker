@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { Mock } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSavings } from './useSavings';
 import { supabase } from '@/services/supabase';
@@ -50,7 +51,7 @@ describe('useSavings', () => {
     mockEq.mockResolvedValue({ error: null });
     mockInsert.mockResolvedValue({ error: null });
     
-    (supabase.auth.getUser as vi.Mock).mockResolvedValue({
+    (supabase.auth.getUser as Mock).mockResolvedValue({
       data: { user: { id: 'user-1' } },
     });
   });
@@ -121,7 +122,7 @@ describe('useSavings', () => {
     });
 
     it('should handle unauthenticated user', async () => {
-      (supabase.auth.getUser as vi.Mock).mockResolvedValueOnce({ data: { user: null } });
+      (supabase.auth.getUser as Mock).mockResolvedValueOnce({ data: { user: null } });
       const { result } = renderHook(() => useSavings());
       
       let success = true;

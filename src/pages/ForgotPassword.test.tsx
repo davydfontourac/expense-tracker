@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import ForgotPassword from './ForgotPassword';
 import { supabase } from '@/services/supabase';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { Mock } from 'vitest';
 
 vi.mock('@/services/supabase', () => ({
   supabase: {
@@ -45,7 +46,7 @@ describe('ForgotPassword', () => {
   });
 
   it('submits the form successfully and shows success message', async () => {
-    (supabase.auth.resetPasswordForEmail as vi.Mock).mockResolvedValueOnce({ error: null });
+    (supabase.auth.resetPasswordForEmail as Mock).mockResolvedValueOnce({ error: null });
     
     render(
       <BrowserRouter>
@@ -68,7 +69,7 @@ describe('ForgotPassword', () => {
   });
 
   it('shows an error message when submission fails', async () => {
-    (supabase.auth.resetPasswordForEmail as vi.Mock).mockResolvedValueOnce({ 
+    (supabase.auth.resetPasswordForEmail as Mock).mockResolvedValueOnce({ 
       error: new Error('Usuário não encontrado') 
     });
     
