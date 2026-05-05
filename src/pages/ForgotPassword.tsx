@@ -141,7 +141,7 @@ export default function ForgotPassword() {
         <div className="max-w-md w-full">
           {/* Header */}
           <div className="flex flex-col items-center mb-16">
-            <img src="/logo-expense-tracker.webp" alt="Logo" style={{ width: 110, height: 80, objectFit: 'contain' }} />
+            <img src="/logo-expense-tracker.webp" alt="Logo" style={{ width: 180, height: 130, objectFit: 'contain' }} />
           </div>
 
           <AnimatePresence mode="wait">

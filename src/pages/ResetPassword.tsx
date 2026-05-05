@@ -65,7 +65,7 @@ export default function ResetPassword() {
             <img
               src="/logo-expense-tracker.webp"
               alt="Expense Tracker Logo"
-              style={{ width: 110, height: 80, objectFit: 'contain' }}
+              style={{ width: 180, height: 130, objectFit: 'contain' }}
             />
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-4">Nova Senha</h1>
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 text-center">

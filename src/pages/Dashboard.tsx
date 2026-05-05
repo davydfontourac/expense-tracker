@@ -172,7 +172,7 @@ export default function Dashboard() {
         {/* Header */}
         <header className="px-6 pt-12 pb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-             <img src="/logo-expense-tracker.webp" alt="Logo" style={{ width: 110, height: 80, objectFit: 'contain' }} />
+             <img src="/logo-expense-tracker.webp" alt="Logo" className="w-11 h-11 object-contain" />
           </div>
           <div className="flex items-center gap-3">
              <button className="p-2.5 bg-white dark:bg-[#161629] rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">

@@ -177,7 +177,7 @@ export default function MobileAuthFlow() {
               </div>
 
               <div className="flex flex-col items-center w-full mb-12">
-                <img src="/logo-expense-tracker.webp" alt="Logo" style={{ width: 110, height: 80, objectFit: 'contain' }} />
+                <img src="/logo-expense-tracker.webp" alt="Logo" style={{ width: 180, height: 130, objectFit: 'contain' }} />
               </div>
 
               <div className="space-y-6 flex-1">
@@ -240,7 +240,7 @@ function SplashStep({ t }: { t: any }) {
         className="relative z-10 flex flex-col items-center"
       >
         <div className="flex flex-col items-center mb-16">
-          <img src="/logo-expense-tracker.webp" alt="Logo" style={{ width: 110, height: 80, objectFit: 'contain' }} />
+          <img src="/logo-expense-tracker.webp" alt="Logo" style={{ width: 180, height: 130, objectFit: 'contain' }} />
         </div>
         <p className="text-gray-500 dark:text-gray-400 font-medium mb-12">{t.splash.subtitle}</p>
         

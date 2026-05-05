@@ -228,8 +228,8 @@ export default function Auth() {
         >
           <div className="max-w-md w-full mx-auto">
             <div className="flex items-center justify-between mb-8">
-              <div className="flex flex-col items-center w-full mb-12">
-                <img src="/logo-expense-tracker.webp" alt="Logo" style={{ width: 110, height: 80, objectFit: 'contain' }} />
+              <div className="flex flex-col items-center mb-16">
+                <img src="/logo-expense-tracker.webp" alt="Logo" style={{ width: 180, height: 130, objectFit: 'contain' }} />
               </div>
 
               {/* Desktop Toggle */}
