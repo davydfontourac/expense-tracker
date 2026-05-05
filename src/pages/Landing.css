@@ -1,6 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
 
 /* ── Variables injected for Landing ─────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --maxw: 1200px;
   --radius: 12px;
