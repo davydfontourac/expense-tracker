@@ -12,6 +12,8 @@ Contato / Contact: privacyexpensetracker@gmail.com
 
 ## Português — Termos de Uso
 
+> **Licença de código aberto:** O código-fonte do Expense Tracker é distribuído sob a [Licença MIT](https://github.com/davydfontourac/expense-tracker/blob/develop/LICENSE). Estes Termos de Uso regem o **uso do Serviço hospedado** (a aplicação disponível em https://myexpenseetracker.vercel.app), e não substituem nem conflitam com a licença MIT aplicável ao código-fonte.
+
 ### 1. Aceitação dos Termos
 
 Ao acessar ou utilizar o Expense Tracker ("Serviço"), disponível em https://myexpenseetracker.vercel.app, você ("Usuário") concorda expressamente com estes Termos de Uso. Caso não concorde com qualquer disposição aqui prevista, você não deve utilizar o Serviço.
@@ -71,15 +73,31 @@ O Serviço destina-se exclusivamente ao uso pessoal e não comercial de controle
 - Introduzir vírus, malware ou qualquer código malicioso no Serviço;
 - Reproduzir, distribuir ou explorar comercialmente o Serviço sem autorização expressa.
 
-### 6. Propriedade Intelectual
+### 6. Licença, Código Aberto e Propriedade Intelectual
 
-O código-fonte do Expense Tracker é disponibilizado como projeto de código aberto. Exceto onde expressamente indicado, o design, a marca, os logotipos e demais elementos visuais do Serviço são de propriedade do responsável. A licença de código aberto não implica cessão de direitos sobre a marca ou identidade visual do Serviço.
+#### 6.1 Código-fonte (Licença MIT)
 
-Os dados inseridos pelo Usuário pertencem exclusivamente a ele. O responsável pelo Serviço não reivindica qualquer direito de propriedade sobre os dados financeiros do Usuário.
+O código-fonte do Expense Tracker é distribuído sob a **Licença MIT**, cujo texto completo está disponível no repositório do projeto no GitHub. Nos termos da licença MIT, qualquer pessoa pode usar, copiar, modificar, fundir, publicar, distribuir, sublicenciar e/ou vender cópias do software, sujeito às condições da própria licença.
+
+A Licença MIT inclui expressamente a seguinte isenção de garantia, que se aplica ao código-fonte:
+
+> *O SOFTWARE É FORNECIDO "COMO ESTÁ", SEM GARANTIA DE QUALQUER TIPO, EXPRESSA OU IMPLÍCITA, INCLUINDO, MAS NÃO SE LIMITANDO ÀS GARANTIAS DE COMERCIALIZAÇÃO, ADEQUAÇÃO A UM DETERMINADO FIM E NÃO VIOLAÇÃO.*
+
+#### 6.2 Serviço hospedado
+
+Estes Termos de Uso regulam exclusivamente o **uso do Serviço hospedado** — a instância da aplicação disponível em https://myexpenseetracker.vercel.app. A liberdade concedida pela Licença MIT sobre o código-fonte não se estende ao direito de uso irrestrito do Serviço hospedado, que permanece sujeito a estas regras.
+
+#### 6.3 Marca e identidade visual
+
+O design, a marca, os logotipos e os elementos visuais do Serviço são de propriedade do responsável e não estão cobertos pela Licença MIT. O uso da marca "Expense Tracker" em produtos derivados exige autorização expressa.
+
+#### 6.4 Dados do Usuário
+
+Os dados financeiros inseridos pelo Usuário pertencem exclusivamente a ele. O responsável pelo Serviço não reivindica qualquer direito de propriedade sobre esses dados.
 
 ### 7. Limitação de Responsabilidade
 
-O Expense Tracker é uma ferramenta de auxílio à organização financeira pessoal. O responsável pelo Serviço:
+O Expense Tracker é uma ferramenta de auxílio à organização financeira pessoal. Conforme também estabelecido pela Licença MIT aplicável ao código-fonte, o Serviço é fornecido **sem qualquer garantia**. Especificamente, o responsável pelo Serviço:
 
 - Não presta serviços de consultoria financeira, investimento ou planejamento patrimonial;
 - Não se responsabiliza por decisões financeiras tomadas com base nos dados apresentados pelo Serviço;
@@ -87,7 +105,7 @@ O Expense Tracker é uma ferramenta de auxílio à organização financeira pess
 - Não se responsabiliza por perdas de dados decorrentes de falhas nos serviços de infraestrutura de terceiros;
 - Não garante que o Serviço estará livre de erros ou vulnerabilidades de segurança.
 
-Em nenhuma hipótese o responsável pelo Serviço será responsável por danos indiretos, incidentais, especiais ou consequentes decorrentes do uso ou impossibilidade de uso do Serviço.
+Em nenhuma hipótese o responsável pelo Serviço será responsável por danos indiretos, incidentais, especiais ou consequentes decorrentes do uso ou impossibilidade de uso do Serviço — limitação esta consistente com a isenção de responsabilidade prevista na Licença MIT.
 
 ### 8. Disponibilidade e Modificações do Serviço
 
@@ -117,6 +135,8 @@ Para dúvidas, solicitações ou reclamações relacionadas a estes Termos de Us
 ---
 
 ## English — Terms of Use
+
+> **Open-source license:** The Expense Tracker source code is distributed under the [MIT License](https://github.com/davydfontourac/expense-tracker/blob/develop/LICENSE). These Terms of Use govern the **use of the hosted Service** (the application available at https://myexpenseetracker.vercel.app) and do not replace or conflict with the MIT License applicable to the source code.
 
 ### 1. Acceptance of Terms
 
@@ -177,15 +197,31 @@ The following are expressly prohibited:
 - Introducing viruses, malware, or any malicious code into the Service;
 - Reproducing, distributing, or commercially exploiting the Service without express authorization.
 
-### 6. Intellectual Property
+### 6. License, Open Source, and Intellectual Property
 
-The source code of Expense Tracker is made available as an open-source project. Except where expressly stated otherwise, the design, brand, logos, and other visual elements of the Service are the property of the responsible party. The open-source license does not imply any assignment of rights over the brand or visual identity of the Service.
+#### 6.1 Source code (MIT License)
 
-Data entered by the User belongs exclusively to them. The party responsible for the Service makes no claim of ownership over the User's financial data.
+The Expense Tracker source code is distributed under the **MIT License**, the full text of which is available in the project's GitHub repository. Under the MIT License, anyone may use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to the conditions of the license itself.
+
+The MIT License explicitly includes the following warranty disclaimer, which applies to the source code:
+
+> *THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.*
+
+#### 6.2 Hosted Service
+
+These Terms of Use govern exclusively the **use of the hosted Service** — the application instance available at https://myexpenseetracker.vercel.app. The freedoms granted by the MIT License over the source code do not extend to unrestricted use of the hosted Service, which remains subject to these Terms.
+
+#### 6.3 Brand and visual identity
+
+The design, brand, logos, and visual elements of the Service are the property of the responsible party and are not covered by the MIT License. Use of the "Expense Tracker" brand in derivative products requires express authorization.
+
+#### 6.4 User data
+
+Financial data entered by the User belongs exclusively to them. The party responsible for the Service makes no claim of ownership over such data.
 
 ### 7. Limitation of Liability
 
-Expense Tracker is a personal financial management assistance tool. The party responsible for the Service:
+Expense Tracker is a personal financial management assistance tool. As also established by the MIT License applicable to the source code, the Service is provided **without any warranty**. Specifically, the party responsible for the Service:
 
 - Does not provide financial advisory, investment, or wealth planning services;
 - Is not responsible for financial decisions made based on data presented by the Service;
@@ -193,7 +229,7 @@ Expense Tracker is a personal financial management assistance tool. The party re
 - Is not responsible for data loss resulting from failures in third-party infrastructure services;
 - Does not guarantee that the Service will be free of errors or security vulnerabilities.
 
-Under no circumstances shall the party responsible for the Service be liable for indirect, incidental, special, or consequential damages arising from the use or inability to use the Service.
+Under no circumstances shall the party responsible for the Service be liable for indirect, incidental, special, or consequential damages arising from the use or inability to use the Service — a limitation consistent with the disclaimer of liability set forth in the MIT License.
 
 ### 8. Availability and Modifications
 
