@@ -205,7 +205,7 @@ function DashboardMock({ t }: any) {
             <span></span>
             <span></span>
           </div>
-          <div className="url">controle-de-gastos.vercel.app/dashboard</div>
+          <div className="url">expensetracker.app/dashboard</div>
           <div style={{ width: 52 }}></div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', minHeight: 500 }}>
@@ -578,7 +578,7 @@ function Hero({ t, isMobile }: any) {
             {t.hero.cta} <Icon.arrow />
           </Link>
           <a
-            href="https://controle-de-gastos-tan-six.vercel.app"
+            href="https://expensetracker.app"
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-ghost"

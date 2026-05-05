@@ -25,7 +25,7 @@
 
   <br />
 
-  [🌐 Live Demo](https://controle-de-gastos-tan-six.vercel.app) · [🐞 Report Bug](https://github.com/davydfontourac/expense-tracker/issues) · [💡 Request Feature](https://github.com/davydfontourac/expense-tracker/issues)
+  [🌐 Live Demo](https://expensetracker.app) · [🐞 Report Bug](https://github.com/davydfontourac/expense-tracker/issues) · [💡 Request Feature](https://github.com/davydfontourac/expense-tracker/issues)
 </div>
 
 ---
