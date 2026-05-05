@@ -12,11 +12,14 @@ vi.mock('@/services/supabase', () => {
         })),
         signOut: vi.fn(),
       },
-      from: vi.fn(() => ({
-        select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        maybeSingle: vi.fn(),
-      })),
+      from: vi.fn(() => {
+        const mockQueryBuilder = {
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          maybeSingle: vi.fn(),
+        };
+        return mockQueryBuilder;
+      }),
     },
   };
 });
@@ -83,14 +86,15 @@ describe('AuthContext', () => {
     const mockProfile = { full_name: 'Usuário de Teste', avatar_url: null };
 
     // Sets up response for .from('profiles').select().eq().maybeSingle()
-    (supabase.from as any).mockReturnValue({
+    const mockQueryBuilder = {
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn().mockResolvedValue({
         data: mockProfile,
         error: null,
       }),
-    } as any);
+    };
+    (supabase.from as any).mockReturnValue(mockQueryBuilder);
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <AuthProvider>{children}</AuthProvider>
