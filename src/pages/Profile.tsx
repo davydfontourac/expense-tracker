@@ -573,7 +573,7 @@ export default function Profile() {
                 <MobileMenuItem icon={Github} label="GitHub" onClick={() => window.open('https://github.com/davydfontourac', '_blank', 'noopener,noreferrer')} />
                 <MobileMenuItem icon={History} label="Changelog" onClick={() => setView('changelog')} />
                 <MobileMenuItem icon={Milestone} label="Roadmap" onClick={() => setView('roadmap')} />
-                <MobileMenuItem icon={Bug} label="Reportar um bug" onClick={() => window.open('https://github.com/davydfontourac/expense-tracker/issues/new', '_blank')} />
+                <MobileMenuItem icon={Bug} label="Reportar um bug" onClick={() => window.open('https://github.com/davydfontourac/expense-tracker/issues/new', '_blank', 'noopener,noreferrer')} />
               </div>
             </div>
           </div>
