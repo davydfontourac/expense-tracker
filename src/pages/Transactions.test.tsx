@@ -128,18 +128,30 @@ describe('Transactions Component', () => {
 
     renderComponent();
     
-    // For simplicity, we just trigger delete all to cover confirm modal
-    const deleteAllBtn = screen.getByText(/Excluir período/i);
-    fireEvent.click(deleteAllBtn);
+    // Find the trash icon button for individual delete
+    const deleteBtn = document.querySelector('button.hover\\:text-red-500');
+    fireEvent.click(deleteBtn!);
     
-    const confirmModal = screen.getAllByTestId('confirm-modal')[0];
-    expect(confirmModal).toBeInTheDocument();
+    await waitFor(() => {
+      const confirmModal = screen.getAllByTestId('confirm-modal')[0];
+      expect(confirmModal).toBeInTheDocument();
+    });
     
+    // Cover "Cancel" first
+    const cancelBtn = screen.getAllByText('Cancel')[0];
+    fireEvent.click(cancelBtn);
+
+    // Click again to proceed with Confirm
+    fireEvent.click(deleteBtn!);
+    await waitFor(() => {
+      expect(screen.getAllByTestId('confirm-modal')[0]).toBeInTheDocument();
+    });
+
     const confirmBtn = screen.getAllByText('Confirm')[0];
     fireEvent.click(confirmBtn);
     
     await waitFor(() => {
-      expect(screen.queryAllByTestId('confirm-modal')).toHaveLength(0);
+      expect(deleteMock).toHaveBeenCalledWith('1');
     });
   });
 
@@ -175,19 +187,41 @@ describe('Transactions Component', () => {
     }
   });
 
-  it('handles delete individual transaction', async () => {
+  it('handles delete all transactions in period', async () => {
+    const deleteMonthMock = vi.fn().mockResolvedValue(undefined);
+    vi.spyOn(useTransactionsModule, 'useTransactions').mockReturnValue({
+      transactions: mockTransactions,
+      summary: { totalIncome: 5000, totalExpense: 500, balance: 4500 },
+      isLoading: false,
+      fetchTransactions: vi.fn(),
+      deleteTransaction: vi.fn(),
+      deleteTransactionsByMonth: deleteMonthMock,
+    } as any);
+
     renderComponent();
     const deleteAllBtn = screen.getByText(/Excluir período/i);
     fireEvent.click(deleteAllBtn);
     
-    const confirmModal = screen.getAllByTestId('confirm-modal')[0];
-    expect(confirmModal).toBeInTheDocument();
+    await waitFor(() => {
+      const confirmModal = screen.getAllByTestId('confirm-modal')[0];
+      expect(confirmModal).toBeInTheDocument();
+    });
     
+    // Cover the "Cancel" action first to increase coverage on onClose props
+    const cancelBtn1 = screen.getAllByText('Cancel')[0];
+    fireEvent.click(cancelBtn1);
+
+    // Click again to proceed with Confirm
+    fireEvent.click(deleteAllBtn);
+    await waitFor(() => {
+      expect(screen.getAllByTestId('confirm-modal')[0]).toBeInTheDocument();
+    });
+
     const confirmBtn = screen.getAllByText('Confirm')[0];
     fireEvent.click(confirmBtn);
     
     await waitFor(() => {
-      expect(screen.queryAllByTestId('confirm-modal')).toHaveLength(0);
+      expect(deleteMonthMock).toHaveBeenCalled();
     });
   });
 

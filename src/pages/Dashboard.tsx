@@ -14,7 +14,7 @@ import { motion } from 'framer-motion';
 
 import TransactionForm from '@/components/TransactionForm';
 import ImportWizard from '@/components/ImportWizard/ImportWizard';
-import ConfirmModal from '@/components/ConfirmModal';
+
 import { MonthYearPicker } from '@/components/MonthYearPicker';
 import { usePrivacy } from '@/context/PrivacyContext';
 import { cn } from '@/utils/cn';
@@ -38,14 +38,13 @@ export default function Dashboard() {
   const [showBalanceLocal, setShowBalanceLocal] = useState(!hideBalance);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
-  const [isConfirmClearOpen, setIsConfirmClearOpen] = useState(false);
+
   const {
     transactions,
     summary,
     history,
     isLoading,
     fetchTransactions,
-    deleteTransactionsByMonth,
   } = useTransactions();
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [modalInitialType, setModalInitialType] = useState<'income' | 'expense' | 'transfer_in' | 'transfer_out' | undefined>(undefined);
@@ -773,18 +772,6 @@ export default function Dashboard() {
         isOpen={isImportOpen}
         onClose={() => setIsImportOpen(false)}
         onSuccess={fetchData}
-      />
-      <ConfirmModal
-        isOpen={isConfirmClearOpen}
-        onClose={() => setIsConfirmClearOpen(false)}
-        onConfirm={async () => {
-          await deleteTransactionsByMonth(Number(filters.month), Number(filters.year));
-          setIsConfirmClearOpen(false);
-          fetchData();
-        }}
-        title="Excluir histórico do mês?"
-        description={`Isso apagará permanentemente todas as transações deste período. Esta ação não pode ser desfeita.`}
-        isLoading={isLoading}
       />
     </PageTransition>
   );

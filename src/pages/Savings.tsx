@@ -157,6 +157,21 @@ export default function Savings() {
           onConfirm={upsertGoal}
           goal={selectedGoal}
         />
+
+        <AporteModal
+          isOpen={isAporteOpen}
+          onClose={() => setIsAporteOpen(false)}
+          onConfirm={addDeposit}
+          goal={selectedGoal}
+        />
+
+        <ConfirmModal
+          isOpen={isDeleteConfirmOpen}
+          onClose={() => setIsDeleteConfirmOpen(false)}
+          onConfirm={confirmDelete}
+          title="Excluir Caixinha"
+          description={`Tem certeza que deseja excluir a caixinha "${selectedGoal?.name}"? O saldo acumulado não será perdido, mas o objetivo deixará de existir.`}
+        />
       </PageTransition>
     );
   }
