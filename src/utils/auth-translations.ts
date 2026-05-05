@@ -1,6 +1,6 @@
 export const AUTH_TRANSLATIONS: any = {
   'pt-BR': {
-    splash: { subtitle: 'Seu dinheiro, sob controle.' },
+    splash: { subtitle: 'Seu dinheiro sob controle.' },
     onboarding: {
       step1: { title: 'Rastreie tudo em um só lugar.', desc: 'Despesas, receitas e caixinhas. Sem planilhas, sem fricção.' },
       step2: { title: 'Importe extratos em 2 cliques.', desc: 'Suporte a CSV de qualquer banco. Nós mapeamos as colunas para você.' },
@@ -52,7 +52,7 @@ export const AUTH_TRANSLATIONS: any = {
       title: 'Crie sua conta',
       subtitle: 'Comece a rastrear seus gastos em menos de 1 minuto.',
       signup: 'Cadastrar',
-      sidebarTitle: 'Seu dinheiro, ',
+      sidebarTitle: 'Seu dinheiro ',
       sidebarSubtitle: 'sob controle.',
       sidebarDesc: 'Dashboard inteligente, importação de extratos em CSV e segurança Supabase.',
       errors: {
@@ -96,7 +96,7 @@ export const AUTH_TRANSLATIONS: any = {
     }
   },
   'en': {
-    splash: { subtitle: 'Your money, under control.' },
+    splash: { subtitle: 'Your money under control.' },
     onboarding: {
       step1: { title: 'Track everything in one place.', desc: 'Expenses, income and goals. No spreadsheets, no friction.' },
       step2: { title: 'Import statements in 2 clicks.', desc: 'CSV support for any bank. We map the columns for you.' },
@@ -148,7 +148,7 @@ export const AUTH_TRANSLATIONS: any = {
       title: 'Create your account',
       subtitle: 'Start tracking your expenses in less than 1 minute.',
       signup: 'Sign up',
-      sidebarTitle: 'Your money, ',
+      sidebarTitle: 'Your money ',
       sidebarSubtitle: 'under control.',
       sidebarDesc: 'Smart dashboard, CSV import and Supabase security.',
       errors: {

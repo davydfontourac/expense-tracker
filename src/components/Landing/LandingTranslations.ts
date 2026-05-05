@@ -10,7 +10,7 @@ export const LANDING_COPY: Record<string, any> = {
     },
     hero: {
       badge: '100% open source · gratuito',
-      h1a: 'Seu dinheiro,',
+      h1a: 'Seu dinheiro',
       h1b: 'sob controle.',
       sub: 'Rastreie despesas, receitas e investimentos em um só lugar. Importe extratos do seu banco, categorize automaticamente e entenda para onde vai cada real.',
       cta: 'Começar grátis',
@@ -231,7 +231,7 @@ export const LANDING_COPY: Record<string, any> = {
     },
     hero: {
       badge: '100% open source · free forever',
-      h1a: 'Your money,',
+      h1a: 'Your money',
       h1b: 'under control.',
       sub: 'Track expenses, income and investments in one place. Import bank statements, auto-categorize, and understand where every dollar goes.',
       cta: 'Start free',

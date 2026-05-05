@@ -45,7 +45,7 @@ export default function Terms() {
           </div>
           <button 
             onClick={downloadTerms}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-sm font-medium transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-blue-500/10 hover:bg-gray-200 dark:hover:bg-blue-500/20 border border-transparent dark:border-blue-500/20 rounded-xl text-sm font-medium text-gray-900 dark:text-blue-400 transition-all"
           >
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Download MD</span>

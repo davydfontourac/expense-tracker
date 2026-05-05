@@ -29,7 +29,7 @@ export default function Profile() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
 
-  const { summary, fetchTransactions, transactions } = useTransactions();
+  const { summary, fetchTransactions, transactions, exportTransactions } = useTransactions();
   const { categories, fetchCategories } = useCategories();
 
   const [fullName, setFullName] = useState('');
@@ -350,16 +350,20 @@ export default function Profile() {
               <MobileMenuItem icon={ShieldCheck} label="Segurança" onClick={() => setView('security')} />
             </MobileSection>
 
-            <MobileSection title="Dados">
-              <MobileMenuItem icon={Database} label="Importar CSV" onClick={() => navigate('/dashboard?import=true')} />
-              <MobileMenuItem icon={HardDrive} label="Exportar dados" value="Em breve" onClick={() => {}} />
-              <MobileMenuItem 
-                icon={Trash2} 
-                label="Limpar cache" 
-                value={isClearingCache ? "Limpando..." : cacheSize} 
-                onClick={handleClearCache} 
-              />
-            </MobileSection>
+              <MobileSection title="Dados">
+                <MobileMenuItem icon={Database} label="Importar CSV" onClick={() => navigate('/dashboard?import=true')} />
+                <MobileMenuItem 
+                  icon={HardDrive} 
+                  label="Exportar dados" 
+                  onClick={exportTransactions} 
+                />
+                <MobileMenuItem 
+                  icon={Trash2} 
+                  label="Limpar cache" 
+                  value={isClearingCache ? "Limpando..." : cacheSize} 
+                  onClick={handleClearCache} 
+                />
+              </MobileSection>
 
             <MobileSection title="Sobre">
               {isInstallable && (
@@ -869,6 +873,55 @@ export default function Profile() {
                   className="w-10 h-6 bg-gray-200 rounded-full appearance-none checked:bg-blue-500 transition-all relative after:content-[''] after:absolute after:top-1 after:left-1 after:w-4 after:h-4 after:bg-white after:rounded-full after:transition-all checked:after:left-5 cursor-pointer" 
                 />
               </div>
+            </div>
+
+            {/* Data & Export Card */}
+            <div className="A-card space-y-8">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-[#0ea5e9] flex items-center justify-center">
+                  <Database size={20} />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white m-0">Dados e Exportação</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button
+                  onClick={exportTransactions}
+                  className="flex items-center justify-between p-5 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-[24px] transition-all group"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white dark:bg-gray-900 rounded-2xl flex items-center justify-center text-blue-500 shadow-sm">
+                      <HardDrive size={24} />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-sm font-bold text-gray-900 dark:text-white">Exportar Backup</div>
+                      <div className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">CSV de transações</div>
+                    </div>
+                  </div>
+                  <ChevronRight size={16} className="text-gray-300 group-hover:translate-x-1 transition-transform" />
+                </button>
+
+                <button
+                  onClick={handleClearCache}
+                  className="flex items-center justify-between p-5 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-[24px] transition-all group"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white dark:bg-gray-900 rounded-2xl flex items-center justify-center text-red-500 shadow-sm">
+                      <Trash2 size={24} />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-sm font-bold text-gray-900 dark:text-white">Limpar Cache</div>
+                      <div className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">{cacheSize} temporários</div>
+                    </div>
+                  </div>
+                  <ChevronRight size={16} className="text-gray-300 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Você pode baixar todas as suas transações em formato CSV para backup ou uso em outras ferramentas. 
+                Os dados exportados incluem data, descrição, categoria, tipo e valor.
+              </p>
             </div>
 
             {/* Danger Zone */}

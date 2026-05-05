@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/services/supabase';
 import { toast } from 'sonner';
+import Papa from 'papaparse';
+import { format } from 'date-fns';
 import type { Transaction } from '@/types';
 
 interface Summary {
@@ -142,6 +144,52 @@ export function useTransactions() {
     }
   };
 
+  const exportTransactions = async () => {
+    try {
+      setIsLoading(true);
+      
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*, categories(name)')
+        .order('date', { ascending: false });
+
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        toast.error('Nenhuma transação encontrada para exportar');
+        return;
+      }
+
+      // Format data for CSV
+      const csvData = data.map(t => ({
+        Data: format(new Date(t.date), 'dd/MM/yyyy'),
+        Descrição: t.description,
+        Categoria: t.categories?.name || 'Sem categoria',
+        Tipo: t.type === 'income' ? 'Receita' : 'Despesa',
+        Valor: t.amount,
+        Observações: t.notes || ''
+      }));
+
+      const csv = Papa.unparse(csvData);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `expense-tracker-export-${format(new Date(), 'yyyy-MM-dd')}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success('Dados exportados com sucesso!');
+    } catch (err: any) {
+      console.error('Erro ao exportar dados:', err);
+      toast.error('Erro ao exportar dados');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     transactions,
     summary,
@@ -150,5 +198,6 @@ export function useTransactions() {
     fetchTransactions,
     deleteTransactionsByMonth,
     deleteTransaction,
+    exportTransactions,
   };
 }
