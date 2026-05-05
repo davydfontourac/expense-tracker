@@ -62,16 +62,17 @@ export default function ImportWizard({ isOpen, onClose, onSuccess }: ImportWizar
           setRawData(data);
           const cols = Object.keys(data[0]);
           setHeaders(cols);
-          
+
           // Auto-detect mappings if possible
           const newMapping = { ...mapping };
-          cols.forEach(col => {
+          cols.forEach((col) => {
             const low = col.toLowerCase();
             if (low.includes('data') || low.includes('date')) newMapping.date = col;
-            if (low.includes('desc') || low.includes('hist') || low.includes('title')) newMapping.description = col;
+            if (low.includes('desc') || low.includes('hist') || low.includes('title'))
+              newMapping.description = col;
             if (low.includes('valor') || low.includes('amount')) {
               newMapping.amount = col;
-              
+
               // Detect decimal separator from the first row of data
               const firstVal = data[0][col];
               if (firstVal && !firstVal.includes(',') && firstVal.includes('.')) {
@@ -114,17 +115,15 @@ export default function ImportWizard({ isOpen, onClose, onSuccess }: ImportWizar
 
   const handleImport = async () => {
     if (!user) return;
-    
+
     setIsImporting(true);
     try {
-      const transactionsToInsert = transformedData.map(t => ({
+      const transactionsToInsert = transformedData.map((t) => ({
         ...t,
         user_id: user.id,
       }));
 
-      const { error } = await supabase
-        .from('transactions')
-        .insert(transactionsToInsert);
+      const { error } = await supabase.from('transactions').insert(transactionsToInsert);
 
       if (error) throw error;
 
@@ -145,19 +144,19 @@ export default function ImportWizard({ isOpen, onClose, onSuccess }: ImportWizar
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center lg:p-4 bg-white dark:bg-[#0c0c1d] lg:bg-transparent">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm hidden lg:block"
       />
-      
+
       <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative w-full max-w-2xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden"
+        className="relative w-full h-full lg:h-auto lg:max-w-2xl bg-white dark:bg-gray-900 lg:rounded-3xl shadow-2xl overflow-hidden flex flex-col"
       >
         {/* Header */}
         <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
@@ -165,9 +164,7 @@ export default function ImportWizard({ isOpen, onClose, onSuccess }: ImportWizar
             <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
               Importar Transações
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {STEPS[step].description}
-            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{STEPS[step].description}</p>
           </div>
           <button
             onClick={onClose}
@@ -181,16 +178,20 @@ export default function ImportWizard({ isOpen, onClose, onSuccess }: ImportWizar
         <div className="px-8 py-4 bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800 flex justify-between">
           {STEPS.map((s, i) => (
             <div key={s.id} className="flex items-center gap-2">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                i <= step 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
-              }`}>
+              <div
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                  i <= step
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                }`}
+              >
                 {i < step ? <Check className="w-3 h-3" /> : i + 1}
               </div>
-              <span className={`text-xs font-semibold ${
-                i <= step ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'
-              }`}>
+              <span
+                className={`text-xs font-semibold ${
+                  i <= step ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'
+                }`}
+              >
                 {s.title}
               </span>
               {i < STEPS.length - 1 && (
@@ -201,7 +202,7 @@ export default function ImportWizard({ isOpen, onClose, onSuccess }: ImportWizar
         </div>
 
         {/* Content */}
-        <div className="p-8 max-h-[60vh] overflow-y-auto">
+        <div className="p-6 lg:p-8 flex-1 overflow-y-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
@@ -210,9 +211,7 @@ export default function ImportWizard({ isOpen, onClose, onSuccess }: ImportWizar
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.2 }}
             >
-              {step === 0 && (
-                <FileUpload file={file} onFileSelect={setFile} />
-              )}
+              {step === 0 && <FileUpload file={file} onFileSelect={setFile} />}
               {step === 1 && (
                 <ColumnMapper
                   headers={headers}
@@ -222,8 +221,8 @@ export default function ImportWizard({ isOpen, onClose, onSuccess }: ImportWizar
                 />
               )}
               {step === 2 && (
-                <ImportPreview 
-                  transactions={transformedData} 
+                <ImportPreview
+                  transactions={transformedData}
                   categories={categories}
                   onTransactionsChange={setTransformedData}
                 />
@@ -238,14 +237,16 @@ export default function ImportWizard({ isOpen, onClose, onSuccess }: ImportWizar
             onClick={step === 0 ? onClose : handleBack}
             className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
           >
-            {step === 0 ? 'Cancelar' : (
+            {step === 0 ? (
+              'Cancelar'
+            ) : (
               <>
                 <ChevronLeft className="w-4 h-4" />
                 Voltar
               </>
             )}
           </button>
-          
+
           <button
             onClick={step === STEPS.length - 1 ? handleImport : handleNext}
             disabled={isImporting || (step === 0 && !file)}

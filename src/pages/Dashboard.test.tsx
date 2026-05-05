@@ -3,172 +3,210 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Dashboard from './Dashboard';
 import { useAuth } from '@/context/AuthContext';
 import { useTransactions } from '@/hooks/useTransactions';
+import { usePrivacy } from '@/context/PrivacyContext';
+import { useMobile } from '@/hooks/useMobile';
+import { BrowserRouter } from 'react-router-dom';
 
 vi.mock('@/context/AuthContext', () => ({
-  useAuth: vi.fn()
+  useAuth: vi.fn(),
+}));
+
+vi.mock('@/context/PrivacyContext', () => ({
+  usePrivacy: vi.fn(),
 }));
 
 vi.mock('@/hooks/useTransactions', () => ({
-  useTransactions: vi.fn()
+  useTransactions: vi.fn(),
 }));
 
-vi.mock('react-router-dom', () => ({
-  Link: ({ children, to }: any) => <a href={to}>{children}</a>,
-  useNavigate: () => vi.fn()
+vi.mock('@/hooks/useMobile', () => ({
+  useMobile: vi.fn(),
 }));
 
-// Mocks for components to avoid rendering deep trees
-vi.mock('@/components/SummaryCards', () => ({ default: () => <div data-testid="summary-cards" /> }));
-vi.mock('@/components/TransactionFilters', () => ({ 
-  default: ({ onSearchChange, onTypeChange, onMonthChange, onYearChange, onClearMonth }: any) => (
-    <div data-testid="filters">
-      <button onClick={() => onSearchChange('test')}>Search</button>
-      <button onClick={() => onTypeChange('income')}>Type</button>
-      <button onClick={() => onMonthChange('1')}>Month</button>
-      <button onClick={() => onYearChange('2026')}>Year</button>
-      <button onClick={() => onClearMonth()}>Clear</button>
-    </div>
-  ) 
-}));
-vi.mock('@/components/TransactionList', () => ({ 
-  default: ({ onDelete, onEdit }: any) => (
-    <div data-testid="list">
-      <button onClick={() => onDelete('1')}>Delete</button>
-      <button onClick={() => onEdit({ id: '1' })}>Edit</button>
-    </div>
-  ) 
-}));
-vi.mock('@/components/CategoryPieChart', () => ({ default: () => <div data-testid="pie" /> }));
-vi.mock('@/components/MonthlyChart', () => ({ default: () => <div data-testid="monthly" /> }));
-vi.mock('@/components/BottomNavigation', () => ({ default: () => <div data-testid="bottom-nav" /> }));
-vi.mock('@/components/PageTransition', () => ({ default: ({ children }: any) => <div>{children}</div> }));
-vi.mock('@/components/ImportWizard/ImportWizard', () => ({ 
-  default: ({ isOpen, onClose, onSuccess }: any) => isOpen ? (
-    <div data-testid="import-wizard">
-      <button onClick={onClose}>Close Import</button>
-      <button onClick={onSuccess}>Success Import</button>
-    </div>
-  ) : null
-}));
-vi.mock('@/components/TransactionForm', () => ({ 
-  default: ({ isOpen, onClose, onSuccess }: any) => isOpen ? (
-    <div data-testid="transaction-form">
-      <button onClick={onClose}>Close Form</button>
-      <button onClick={onSuccess}>Success Form</button>
-    </div>
-  ) : null
+vi.mock('@/components/TransactionForm', () => ({
+  default: ({ isOpen, onClose, initialType }: any) =>
+    isOpen ? (
+      <div data-testid="transaction-form">
+        Mock Form {initialType}
+        <button onClick={onClose}>Close Form</button>
+      </div>
+    ) : null,
 }));
 
-describe('Dashboard', () => {
+vi.mock('@/components/ImportWizard/ImportWizard', () => ({
+  default: ({ isOpen, onClose }: any) =>
+    isOpen ? (
+      <div data-testid="import-wizard">
+        Mock Import
+        <button onClick={onClose}>Close Import</button>
+      </div>
+    ) : null,
+}));
+
+const mockTransactions = [
+  { id: '1', description: 'Mercado', amount: -100, date: new Date().toISOString(), type: 'expense', categories: { name: 'Alimentação' } },
+  { id: '2', description: 'Salário', amount: 5000, date: new Date().toISOString(), type: 'income', categories: { name: 'Salário' } },
+];
+
+const mockSummary = {
+  totalIncome: 5000,
+  totalExpense: 100,
+  availableBalance: 4900,
+  caixinhaBalance: 0,
+};
+
+const mockHistory = [
+  { month: 'Abr', fullMonth: 4, year: 2026, income: 5000, expense: 100 },
+];
+
+const mockFetchTransactions = vi.fn();
+
+describe('Dashboard Component', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     (useAuth as any).mockReturnValue({
-      user: { id: '1', email: 'test@test.com' },
-      profile: { full_name: 'Test User' },
-      signOut: vi.fn()
+      profile: { full_name: 'Test User', avatar_url: '' },
+      isLoading: false,
+    });
+
+    (usePrivacy as any).mockReturnValue({
+      hideBalance: false,
     });
 
     (useTransactions as any).mockReturnValue({
-      transactions: [],
-      summary: {},
-      history: [],
+      transactions: mockTransactions,
+      summary: mockSummary,
+      history: mockHistory,
       isLoading: false,
-      fetchTransactions: vi.fn(),
-      deleteTransactionsByMonth: vi.fn()
+      fetchTransactions: mockFetchTransactions,
+    });
+
+    (useMobile as any).mockReturnValue(false); // Desktop by default
+  });
+
+  const renderComponent = () =>
+    render(
+      <BrowserRouter>
+        <Dashboard />
+      </BrowserRouter>
+    );
+
+  describe('Loading State', () => {
+    it('shows loading spinner when fetching', () => {
+      (useTransactions as any).mockReturnValue({
+        transactions: [],
+        isLoading: true,
+      });
+      const { container } = renderComponent();
+      expect(container.querySelector('.animate-spin')).toBeInTheDocument();
     });
   });
 
-  it('deve abrir o menu flutuante (FAB) ao clicar', () => {
-    render(<Dashboard />);
-    
-    // Procura o botão principal do FAB pelo ícone ou classe
-    const mainFabButton = screen.getAllByRole('button').find(b => b.className.includes('bg-blue-600'));
-    
-    expect(mainFabButton).toBeInTheDocument();
-    
-    // Clica para abrir o menu
-    fireEvent.click(mainFabButton!);
-    
-    // Verifica se os botões do menu apareceram (Nova Transação, Importar CSV)
-    expect(screen.getByText('Nova Transação')).toBeInTheDocument();
-    expect(screen.getByText('Importar CSV')).toBeInTheDocument();
-    expect(screen.getByText('Gerenciar Categorias')).toBeInTheDocument();
-  });
-
-  it('deve lidar com callbacks dos filtros', async () => {
-    render(<Dashboard />);
-    
-    fireEvent.click(screen.getByText('Search'));
-    fireEvent.click(screen.getByText('Type'));
-    fireEvent.click(screen.getByText('Month'));
-    fireEvent.click(screen.getByText('Year'));
-    fireEvent.click(screen.getByText('Clear'));
-
-    // Calling Clear will trigger setIsConfirmClearOpen(true), which achieves branch coverage.
-    // We skip asserting the modal's presence because AnimatePresence can block rendering in JSDOM.
-  });
-
-  it('deve lidar com callbacks da lista', () => {
-    const fetchMock = vi.fn();
-    (useTransactions as any).mockReturnValue({
-      transactions: [],
-      summary: {},
-      history: [],
-      isLoading: false,
-      fetchTransactions: fetchMock,
-      deleteTransactionsByMonth: vi.fn()
+  describe('Desktop View', () => {
+    it('renders greeting, metrics and transactions', () => {
+      renderComponent();
+      expect(screen.getByText(/Test/)).toBeInTheDocument();
+      expect(screen.getByText('Mercado')).toBeInTheDocument();
+      expect(screen.getAllByText('Salário').length).toBeGreaterThan(0);
+      expect(screen.getByText('Nova transação')).toBeInTheDocument();
     });
 
-    render(<Dashboard />);
-    
-    fireEvent.click(screen.getByText('Delete'));
-    expect(fetchMock).toHaveBeenCalled();
-
-    fireEvent.click(screen.getByText('Edit'));
-    expect(screen.getByTestId('transaction-form')).toBeInTheDocument();
-  });
-
-  it('deve lidar com o FAB de nova transação e modal', async () => {
-    render(<Dashboard />);
-    const mainFabButton = screen.getAllByRole('button').find(b => b.className.includes('bg-blue-600'));
-    fireEvent.click(mainFabButton!);
-    
-    fireEvent.click(screen.getByText('Nova Transação'));
-    await waitFor(() => {
-      expect(screen.getByTestId('transaction-form')).toBeInTheDocument();
+    it('toggles privacy mode', async () => {
+      renderComponent();
+      // Click all eye buttons just to be sure
+      const eyeButtons = screen.getAllByRole('button').filter(b => b.querySelector('svg.lucide-eye') || b.querySelector('svg.lucide-eye-off'));
+      eyeButtons.forEach(b => fireEvent.click(b));
+      
+      await waitFor(() => expect(screen.getAllByText('R$ 4.900,00')[0]).toHaveClass('blur-md'));
     });
 
-    fireEvent.click(screen.getByText('Close Form'));
-    await waitFor(() => {
-      expect(screen.queryByTestId('transaction-form')).not.toBeInTheDocument();
+    it('handles filter by type', () => {
+      renderComponent();
+      fireEvent.click(screen.getByText('Receitas', { selector: 'button' }));
+      fireEvent.click(screen.getByText('Despesas', { selector: 'button' }));
+      fireEvent.click(screen.getByText('Todos', { selector: 'button' }));
+      // We are just verifying that buttons don't crash and click logic fires.
+    });
+
+    it('handles search input and clear search', async () => {
+      renderComponent();
+      const searchInput = screen.getByPlaceholderText('Buscar por descrição...');
+      fireEvent.change(searchInput, { target: { value: 'teste' } });
+      await waitFor(() => expect(searchInput).toHaveValue('teste'));
+
+      // Now the X button should appear
+      const xSvg = document.querySelector('svg.lucide-x');
+      if (xSvg) fireEvent.click(xSvg);
+      await waitFor(() => expect(searchInput).toHaveValue(''));
+
+      // Clear all filters button
+      fireEvent.click(screen.getByText('Limpar filtros'));
+      await waitFor(() => expect(searchInput).toHaveValue(''));
+    });
+
+    it('opens and closes transaction modal', async () => {
+      renderComponent();
+      fireEvent.click(screen.getByText('Nova transação'));
+      expect(await screen.findByTestId('transaction-form')).toBeInTheDocument();
+      fireEvent.click(screen.getByText('Close Form'));
+      await waitFor(() => expect(screen.queryByTestId('transaction-form')).not.toBeInTheDocument());
+    });
+
+    it('opens import modal', async () => {
+      renderComponent();
+      fireEvent.click(screen.getByText('Importar CSV'));
+      expect(await screen.findByTestId('import-wizard')).toBeInTheDocument();
+      fireEvent.click(screen.getByText('Close Import'));
+    });
+
+    it('opens edit modal when clicking a transaction', async () => {
+      renderComponent();
+      fireEvent.click(screen.getByText('Mercado'));
+      expect(await screen.findByTestId('transaction-form')).toBeInTheDocument();
     });
   });
 
-  it('deve lidar com o FAB de importar csv e modal', async () => {
-    const fetchMock = vi.fn();
-    (useTransactions as any).mockReturnValue({
-      transactions: [],
-      summary: {},
-      history: [],
-      isLoading: false,
-      fetchTransactions: fetchMock,
-      deleteTransactionsByMonth: vi.fn()
+  describe('Mobile View', () => {
+    beforeEach(() => {
+      (useMobile as any).mockReturnValue(true);
     });
 
-    render(<Dashboard />);
-    const mainFabButton = screen.getAllByRole('button').find(b => b.className.includes('bg-blue-600'));
-    fireEvent.click(mainFabButton!);
-    
-    fireEvent.click(screen.getByText('Importar CSV'));
-    await waitFor(() => {
-      expect(screen.getByTestId('import-wizard')).toBeInTheDocument();
+    it('renders mobile specific layout', () => {
+      renderComponent();
+      expect(screen.getByText('Expense Tracker')).toBeInTheDocument();
+      expect(screen.getByText('Saldo ·', { exact: false })).toBeInTheDocument();
+      expect(screen.getByText('Importar dados do banco')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText('Success Import'));
-    expect(fetchMock).toHaveBeenCalled();
+    it('toggles privacy mode in mobile', () => {
+      renderComponent();
+      const eyeButtons = screen.getAllByRole('button').filter(b => b.querySelector('svg.lucide-eye') || b.querySelector('svg.lucide-eye-off'));
+      fireEvent.click(eyeButtons[0]);
+      expect(screen.getByText('R$ 4.900,00')).toHaveClass('blur-md');
+    });
 
-    fireEvent.click(screen.getByText('Close Import'));
-    await waitFor(() => {
-      expect(screen.queryByTestId('import-wizard')).not.toBeInTheDocument();
+    it('opens specific modals by type', async () => {
+      renderComponent();
+      
+      // Receitas
+      fireEvent.click(screen.getAllByText('Receitas', { selector: 'span' })[0].closest('button')!);
+      expect(await screen.findByText(/Mock Form income/)).toBeInTheDocument();
+      fireEvent.click(screen.getByText('Close Form'));
+      
+      // Despesas
+      fireEvent.click(screen.getAllByText('Despesas', { selector: 'span' })[0].closest('button')!);
+      expect(await screen.findByText(/Mock Form expense/)).toBeInTheDocument();
+      fireEvent.click(screen.getByText('Close Form'));
+      
+      // Transf.
+      fireEvent.click(screen.getAllByText('Transf.', { selector: 'span' })[0].closest('button')!);
+      expect(await screen.findByText(/Mock Form transfer_out/)).toBeInTheDocument();
+    });
+
+    it('opens import modal from mobile shortcut', async () => {
+      renderComponent();
+      fireEvent.click(screen.getByText('Importar dados do banco').closest('button')!);
+      expect(await screen.findByTestId('import-wizard')).toBeInTheDocument();
     });
   });
 });

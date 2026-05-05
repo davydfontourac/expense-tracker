@@ -6,6 +6,7 @@ import { supabase } from '@/services/supabase';
 export interface ProfileData {
   full_name: string | null;
   avatar_url: string | null;
+  username: string | null;
 }
 
 interface AuthContextType {
@@ -30,10 +31,10 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, avatar_url')
+        .select('full_name, avatar_url, username')
         .eq('id', userId)
         .maybeSingle(); // Use maybeSingle to avoid error if it doesn't exist
-      
+
       if (error) throw error;
       setProfile(data);
     } catch (error) {
@@ -61,12 +62,14 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
 
     const fetchSession = async () => {
       try {
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        const {
+          data: { session: currentSession },
+        } = await supabase.auth.getSession();
         if (!isMounted) return;
 
         setSession(currentSession);
         setUser(currentSession?.user || null);
-        
+
         if (currentSession?.user) {
           fetchProfile(currentSession.user.id);
         }
@@ -82,24 +85,24 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
 
     fetchSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, currentSession) => {
-        if (!isMounted) return;
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+      if (!isMounted) return;
 
-        const previousUser = user;
-        setSession(currentSession);
-        setUser(currentSession?.user || null);
+      const previousUser = user;
+      setSession(currentSession);
+      setUser(currentSession?.user || null);
 
-        if (currentSession?.user && (!previousUser || previousUser.id !== currentSession.user.id)) {
-          fetchProfile(currentSession.user.id);
-        } else if (!currentSession) {
-          setProfile(null);
-        }
-        
-        setIsLoading(false);
-        clearTimeout(timeout);
+      if (currentSession?.user && (!previousUser || previousUser.id !== currentSession.user.id)) {
+        fetchProfile(currentSession.user.id);
+      } else if (!currentSession) {
+        setProfile(null);
       }
-    );
+
+      setIsLoading(false);
+      clearTimeout(timeout);
+    });
 
     return () => {
       isMounted = false;
@@ -114,14 +117,10 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
 
   const contextValue = useMemo(
     () => ({ user, session, profile, isLoading, signOut, refreshProfile, setProfile }),
-    [user, session, profile, isLoading, signOut, refreshProfile, setProfile]
+    [user, session, profile, isLoading, signOut, refreshProfile, setProfile],
   );
 
-  return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 }
 
 // Custom hook to use context more easily

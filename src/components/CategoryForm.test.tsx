@@ -14,9 +14,7 @@ vi.mock('@/services/supabase', () => ({
   supabase: {
     from: vi.fn(() => mockQuery),
     auth: {
-      getUser: vi
-        .fn()
-        .mockResolvedValue({ data: { user: { id: 'u-123' } }, error: null }),
+      getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'u-123' } }, error: null }),
     },
   },
 }));
@@ -52,13 +50,25 @@ describe('CategoryForm', () => {
   });
 
   it('deve renderizar "Editar Categoria" quando uma categoria é passada', () => {
-    const category = { id: 'c-1', name: 'Alimentação', icon: 'utensils', color: '#EF4444' };
+    const category = {
+      id: 'c-1',
+      name: 'Alimentação',
+      icon: 'utensils',
+      color: '#EF4444',
+      monthly_limit: 0,
+    };
     render(<CategoryForm {...defaultProps} category={category} />);
     expect(screen.getByText('Editar Categoria')).toBeInTheDocument();
   });
 
   it('deve preencher campos ao editar uma categoria existente', () => {
-    const category = { id: 'c-1', name: 'Alimentação', icon: 'utensils', color: '#EF4444' };
+    const category = {
+      id: 'c-1',
+      name: 'Alimentação',
+      icon: 'utensils',
+      color: '#EF4444',
+      monthly_limit: 0,
+    };
     render(<CategoryForm {...defaultProps} category={category} />);
 
     expect(screen.getByPlaceholderText(/Ex: Alimentação/)).toHaveValue('Alimentação');
@@ -104,10 +114,21 @@ describe('CategoryForm', () => {
     const toast = await import('sonner');
     const onSuccess = vi.fn();
     const onClose = vi.fn();
-    const category = { id: 'c-1', name: 'Alimentação', icon: 'utensils', color: '#EF4444' };
+    const category = {
+      id: 'c-1',
+      name: 'Alimentação',
+      icon: 'utensils',
+      color: '#EF4444',
+      monthly_limit: 0,
+    };
 
     render(
-      <CategoryForm {...defaultProps} category={category} onSuccess={onSuccess} onClose={onClose} />,
+      <CategoryForm
+        {...defaultProps}
+        category={category}
+        onSuccess={onSuccess}
+        onClose={onClose}
+      />,
     );
 
     fireEvent.change(screen.getByPlaceholderText(/Ex: Alimentação/), {
@@ -127,9 +148,7 @@ describe('CategoryForm', () => {
 
   it('deve exibir erro ao falhar na criação', async () => {
     const toast = await import('sonner');
-    mockQuery.then.mockImplementationOnce((cb) =>
-      cb({ error: { message: 'Insert failed' } }),
-    );
+    mockQuery.then.mockImplementationOnce((cb) => cb({ error: { message: 'Insert failed' } }));
 
     render(<CategoryForm {...defaultProps} />);
 

@@ -1,0 +1,733 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, Eye, EyeOff, CheckCircle2, X, LogOut, Loader2, Mail } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useAuthActions } from '@/hooks/useAuthActions';
+import { AuthHeader, SocialAuth, AuthFooter, Input, StrengthMeter } from '@/components/AuthUI';
+
+// --- SCHEMAS ---
+import { getLoginSchema, getRegisterSchema, getForgotPasswordSchema } from '@/utils/auth-schemas';
+import { AUTH_TRANSLATIONS } from '@/utils/auth-translations';
+
+const COPY: any = AUTH_TRANSLATIONS;
+
+type Step = 'splash' | 'onboarding1' | 'onboarding2' | 'onboarding3' | 'register' | 'login' | 'forgot_password' | 'register_success';
+
+export default function MobileAuthFlow() {
+  const [step, setStep] = useState<Step>('splash');
+  const [direction, setDirection] = useState(0); // 1 for next, -1 for back
+  const [lang, setLang] = useState(() => {
+    const saved = localStorage.getItem('language');
+    if (saved === 'en' || saved === 'pt-BR') return saved;
+    return 'pt-BR';
+  });
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialMode = searchParams.get('mode');
+
+  useEffect(() => {
+    localStorage.setItem('language', lang);
+  }, [lang]);
+
+  useEffect(() => {
+    if (initialMode === 'login') {
+      setStep('login');
+    }
+  }, [initialMode]);
+
+  const t = COPY[lang];
+
+  // Handle splash timeout
+  useEffect(() => {
+    if (step === 'splash') {
+      const timer = setTimeout(() => {
+        nextStep('onboarding1');
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [step]);
+
+  function nextStep(next: Step) {
+    setDirection(1);
+    setStep(next);
+  }
+
+  function prevStep(prev: Step) {
+    setDirection(-1);
+    setStep(prev);
+  }
+
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? '100%' : '-100%',
+      opacity: 0
+    }),
+    center: {
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: number) => ({
+      x: direction < 0 ? '100%' : '-100%',
+      opacity: 0
+    })
+  };
+
+  return (
+    <div className="min-h-screen bg-white dark:bg-[#0c0c1d] flex flex-col font-sans overflow-hidden">
+      <AnimatePresence initial={false} custom={direction} mode="wait">
+        <motion.div
+          key={step}
+          custom={direction}
+          variants={variants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{
+            x: { type: "spring", stiffness: 300, damping: 30 },
+            opacity: { duration: 0.2 }
+          }}
+          className="flex-1 flex flex-col"
+        >
+          {step === 'splash' && <SplashStep t={t} />}
+          {step === 'onboarding1' && <OnboardingStep
+            num="01"
+            title={t.onboarding.step1.title}
+            desc={t.onboarding.step1.desc}
+            t={t}
+            onNext={() => nextStep('onboarding2')}
+            onSkip={() => nextStep('register')}
+            image={<TrackIllustration t={t} />}
+          />}
+          {step === 'onboarding2' && <OnboardingStep
+            num="02"
+            title={t.onboarding.step2.title}
+            desc={t.onboarding.step2.desc}
+            t={t}
+            onNext={() => nextStep('onboarding3')}
+            onSkip={() => nextStep('register')}
+            image={<ImportIllustration t={t} />}
+          />}
+          {step === 'onboarding3' && <OnboardingStep
+            num="03"
+            title={t.onboarding.step3.title}
+            desc={t.onboarding.step3.desc}
+            t={t}
+            onNext={() => nextStep('register')}
+            onSkip={() => nextStep('register')}
+            isLast
+            image={<InsightsIllustration t={t} />}
+          />}
+          {step === 'register' && <RegisterStep
+            t={t}
+            onSuccess={(email) => {
+              setRegisteredEmail(email);
+              nextStep('register_success');
+            }}
+            onLogin={() => setStep('login')}
+            onOpenMenu={() => setIsMenuOpen(true)}
+          />}
+          {step === 'login' && <LoginStep
+            t={t}
+            onBack={() => prevStep('register')}
+            onRegister={() => nextStep('register')}
+            onForgotPassword={() => nextStep('forgot_password')}
+            onOpenMenu={() => setIsMenuOpen(true)}
+          />}
+          {step === 'forgot_password' && <ForgotPasswordStep
+            t={t}
+            lang={lang}
+            onBack={() => prevStep('login')}
+          />}
+          {step === 'register_success' && <RegisterSuccessStep
+            t={t}
+            email={registeredEmail}
+            onLogin={() => setStep('login')}
+            onOpenMenu={() => setIsMenuOpen(true)}
+          />}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Hamburger Menu Overlay */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMenuOpen(false)}
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-60"
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 bottom-0 w-[280px] bg-white dark:bg-[#0c0c1d] shadow-2xl z-70 flex flex-col p-8"
+            >
+              <div className="flex justify-end mb-8">
+                <button onClick={() => setIsMenuOpen(false)} className="p-2 text-gray-500 dark:text-gray-400">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="flex flex-col items-center w-full mb-12">
+                <img src="/logo-expense-tracker.webp" alt="Logo" style={{ width: 180, height: 130, objectFit: 'contain' }} />
+              </div>
+
+              <div className="space-y-6 flex-1">
+                <button 
+                  onClick={() => navigate('/')} 
+                  className="flex items-center gap-4 w-full text-left text-gray-600 dark:text-gray-300 font-bold hover:text-indigo-500 transition-colors"
+                >
+                  <LogOut className="w-5 h-5" />
+                  {t.menu.home}
+                </button>
+                
+                <div className="flex items-center justify-between py-2 border-t border-gray-100 dark:border-white/5 pt-6">
+                  <span className="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{t.menu.theme}</span>
+                  <ThemeToggle dropdownPosition="top" align="right" />
+                </div>
+
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{t.menu.language}</span>
+                  <div className="flex bg-gray-100 dark:bg-white/5 rounded-lg p-1">
+                    <button 
+                      onClick={() => setLang('pt-BR')}
+                      className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${lang === 'pt-BR' ? 'bg-white dark:bg-white/10 shadow-sm text-indigo-500' : 'text-gray-500'}`}
+                    >
+                      PT
+                    </button>
+                    <button 
+                      onClick={() => setLang('en')}
+                      className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${lang === 'en' ? 'bg-white dark:bg-white/10 shadow-sm text-indigo-500' : 'text-gray-500'}`}
+                    >
+                      EN
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center text-[10px] text-gray-400 dark:text-gray-600 font-medium">
+                &copy; 2026 Expense Tracker
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// --- SHARED COMPONENTS ---
+// --- SUB-COMPONENTS ---
+
+function SplashStep({ t }: { t: any }) {
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center bg-linear-to-br from-[#f8f5ff] to-[#ffffff] dark:from-[#0c0c1d] dark:to-[#161629] relative overflow-hidden">
+      {/* Decorative Blur */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-indigo-500/10 blur-[80px] rounded-full"></div>
+      
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative z-10 flex flex-col items-center"
+      >
+        <div className="flex flex-col items-center mb-8">
+          <img src="/logo-expense-tracker.webp" alt="Logo" style={{ width: 180, height: 130, objectFit: 'contain' }} />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-4 tracking-tight">Expense Tracker</h1>
+        </div>
+        <p className="text-gray-500 dark:text-gray-400 font-medium mb-12">{t.splash.subtitle}</p>
+        
+        <div className="w-6 h-6 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+      </motion.div>
+    </div>
+  );
+}
+
+function OnboardingStep({ num, title, desc, onNext, onSkip, isLast, image, t }: { num: string, title: string, desc: string, onNext: () => void, onSkip: () => void, isLast?: boolean, image: React.ReactNode, t: any }) {
+  return (
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#0c0c1d]">
+      <header className="p-8 flex justify-between items-center">
+        <div className="text-xl font-mono font-bold text-indigo-500">{num}</div>
+        {!isLast && (
+          <button onClick={onSkip} className="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            {t.onboarding.skip}
+          </button>
+        )}
+      </header>
+      
+      <div className="flex-1 flex flex-col items-center justify-center py-8 px-8">
+        <div className="w-full max-w-[280px] aspect-square mb-12">
+          {image}
+        </div>
+        
+        <div className="w-full text-left space-y-4">
+          <h2 className="text-[32px] font-bold leading-[1.1] text-gray-900 dark:text-white tracking-tight">
+            {title}
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 leading-relaxed text-sm">
+            {desc}
+          </p>
+        </div>
+      </div>
+      
+      <div className="p-8 mt-auto flex flex-col items-center gap-8">
+        <div className="flex gap-1.5">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className={`h-1 rounded-full transition-all duration-300 ${
+                parseInt(num) === i ? 'w-8 bg-gray-900 dark:bg-white' : 'w-2 bg-gray-200 dark:bg-gray-800'
+              }`}
+            />
+          ))}
+        </div>
+        
+        <button
+          onClick={onNext}
+          className="w-full bg-[#0c0c1d] dark:bg-white text-white dark:text-[#0c0c1d] font-bold py-5 rounded-2xl transition-all shadow-xl active:scale-[0.98]"
+        >
+          {isLast ? t.onboarding.finish : t.onboarding.next}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// --- ILLUSTRATIONS ---
+
+function TrackIllustration({ t }: { t: any }) {
+  return (
+    <div className="relative w-full h-full flex items-center justify-center">
+      <div className="absolute inset-0 bg-blue-500/5 blur-3xl rounded-full"></div>
+      <div className="relative w-full bg-white dark:bg-[#161629] p-6 rounded-[24px] shadow-2xl border border-gray-100 dark:border-white/5">
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{t.mock.balance}</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">R$ 2.014,70</div>
+          </div>
+          <div className="w-10 h-10 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-500">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg>
+          </div>
+        </div>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-white/5 rounded-xl">
+             <div className="w-8 h-8 bg-orange-500/20 text-orange-500 rounded-lg flex items-center justify-center text-xs">🍔</div>
+             <div className="flex-1">
+               <div className="text-xs font-bold text-gray-900 dark:text-white">{t.mock.lunch}</div>
+               <div className="text-[10px] text-gray-500">{t.mock.today}, 12:30</div>
+             </div>
+             <div className="text-xs font-bold text-red-500">- R$ 32,50</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ImportIllustration({ t }: { t: any }) {
+  return (
+    <div className="relative w-full h-full flex items-center justify-center">
+      <div className="absolute inset-0 bg-indigo-500/5 blur-3xl rounded-full"></div>
+      <div className="relative w-48 h-48 bg-white dark:bg-[#161629] rounded-[32px] shadow-2xl border border-gray-100 dark:border-white/5 flex flex-col items-center justify-center gap-4">
+        <div className="w-16 h-16 bg-indigo-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+          <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div className="text-center">
+          <div className="text-sm font-bold text-gray-900 dark:text-white">extrato.csv</div>
+          <div className="text-[10px] text-gray-500 uppercase tracking-widest font-mono mt-1">124 {t.mock.transactions}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function InsightsIllustration({ t }: { t: any }) {
+  return (
+    <div className="relative w-full h-full flex items-center justify-center">
+      <div className="absolute inset-0 bg-cyan-500/5 blur-3xl rounded-full"></div>
+      <div className="relative w-56 h-56 flex items-center justify-center">
+        {/* Simple Donut Chart SVG */}
+        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-gray-100 dark:text-white/5" />
+          <circle cx="50" cy="50" r="40" stroke="#6366f1" strokeWidth="12" fill="transparent" strokeDasharray="251.2" strokeDashoffset="62.8" />
+          <circle cx="50" cy="50" r="40" stroke="#f59e0b" strokeWidth="12" fill="transparent" strokeDasharray="251.2" strokeDashoffset="200" />
+          <circle cx="50" cy="50" r="40" stroke="#06b6d4" strokeWidth="12" fill="transparent" strokeDasharray="251.2" strokeDashoffset="230" />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t.mock.apr}</div>
+          <div className="text-xl font-bold text-gray-900 dark:text-white">R$ 1.292</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- FORMS ---
+
+function RegisterStep({ onLogin, onOpenMenu, t, onSuccess }: { onLogin: () => void, onOpenMenu: () => void, t: any, onSuccess: (email: string) => void }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { isLoading, handleSocialLogin, handleRegister } = useAuthActions();
+  
+  const onRegisterSuccess = (data: any) => {
+    onSuccess(data.email);
+  };
+
+  const { register, handleSubmit, watch, formState: { errors } } = useForm({
+    resolver: zodResolver(getRegisterSchema(t))
+  });
+
+  const passwordValue = watch('password', '');
+  const confirmPasswordValue = watch('confirmPassword', '');
+
+  const getPasswordScore = (pass: string) => {
+    if (!pass) return 0;
+    let score = 0;
+    if (pass.length >= 8) score++;
+    if (/[A-Z]/.test(pass)) score++;
+    if (/[0-9]/.test(pass)) score++;
+    if (/[^A-Za-z0-9]/.test(pass)) score++;
+    return score;
+  };
+
+  const getMatchScore = (pass: string, confirm: string) => {
+    if (!pass || !confirm) return 0;
+    if (confirm === pass) return 4;
+    
+    let matchCount = 0;
+    for (let i = 0; i < confirm.length; i++) {
+      if (confirm[i] === pass[i]) matchCount++;
+      else {
+        // If there is any mismatch, return 1 (red bar indicator of error)
+        return 1;
+      }
+    }
+    
+    // Calculate progress based on original password length
+    const score = Math.floor((matchCount / pass.length) * 4);
+    return Math.max(1, score);
+  };
+
+  const passwordScore = getPasswordScore(passwordValue);
+  const matchScore = getMatchScore(passwordValue, confirmPasswordValue);
+
+  const onSubmit = (data: any) => handleRegister(data, () => onRegisterSuccess(data));
+
+  return (
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#0c0c1d] p-8 overflow-y-auto">
+      <AuthHeader 
+        onOpenMenu={onOpenMenu}
+        title={t.register.title}
+        subtitle={t.register.subtitle}
+        hideLogo={true}
+      />
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <Input label={t.register.name} placeholder={t.register.namePlaceholder} {...register('fullName')} error={errors.fullName?.message as string} />
+        <Input label={t.register.email} placeholder={t.register.emailPlaceholder} type="email" {...register('email')} error={errors.email?.message as string} />
+        <div className="relative">
+          <Input label={t.register.password} placeholder={t.register.passwordPlaceholder} type={showPassword ? 'text' : 'password'} {...register('password')} error={errors.password?.message as string} />
+          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-[42px] text-gray-400">
+            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+          </button>
+          <StrengthMeter score={passwordScore} />
+          <div className="mt-3 px-1 h-6 flex items-center">
+            <AnimatePresence mode="wait">
+              {(() => {
+                const allReqs = [
+                  { label: t.register.reqLen, met: passwordValue.length >= 8 },
+                  { label: t.register.reqUpper, met: /[A-Z]/.test(passwordValue) },
+                  { label: t.register.reqNum, met: /[0-9]/.test(passwordValue) },
+                  { label: t.register.reqSymbol, met: /[^A-Za-z0-9]/.test(passwordValue) },
+                ];
+                const unmet = allReqs.find(r => !r.met);
+                
+                if (!unmet) {
+                  return (
+                    <motion.div 
+                      key="success"
+                      initial={{ opacity: 0, y: 5 }} 
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      className="flex items-center gap-2"
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-green-500" />
+                      <span className="text-[11px] font-bold text-green-500 uppercase tracking-wider">
+                        {t.register.reqSuccess}
+                      </span>
+                    </motion.div>
+                  );
+                }
+
+                return (
+                  <motion.div 
+                    key={unmet.label}
+                    initial={{ opacity: 0, y: 5 }} 
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="flex items-center gap-2"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                    <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
+                      {unmet.label}
+                    </span>
+                  </motion.div>
+                );
+              })()}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        <div className="relative">
+          <Input label={t.register.confirmPassword} placeholder={t.register.confirmPasswordPlaceholder} type={showConfirmPassword ? 'text' : 'password'} {...register('confirmPassword')} error={errors.confirmPassword?.message as string} />
+          <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-[42px] text-gray-400">
+            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+          </button>
+          <StrengthMeter score={matchScore} mode="match" />
+        </div>
+
+        <div className="flex flex-col gap-1 py-2">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input 
+              type="checkbox" 
+              {...register('acceptTerms')}
+              className="mt-1 w-5 h-5 rounded-md border-gray-200 dark:border-white/10 dark:bg-white/5 text-indigo-600 focus:ring-indigo-600/20" 
+            />
+            <p className="text-xs text-gray-500 leading-relaxed">
+              {t.register.terms.split(t.register.termsLink).map((part: string, i: number) => (
+                <React.Fragment key={i}>
+                  {part}
+                  {i === 0 && <Link to="/terms" className="text-blue-500 font-bold underline">{t.register.termsLink}</Link>}
+                </React.Fragment>
+              ))}
+            </p>
+          </label>
+          {errors.acceptTerms && (
+            <p className="text-[10px] text-red-500 font-medium ml-8">
+              {t.register.termsError}
+            </p>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-[#0c0c1d] dark:bg-white text-white dark:text-[#0c0c1d] font-bold py-5 rounded-2xl transition-all shadow-xl active:scale-[0.98] mt-4 flex items-center justify-center"
+        >
+          {isLoading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            t.register.button
+          )}
+        </button>
+      </form>
+
+      <div className="mt-8 flex flex-col items-center gap-6">
+        <SocialAuth t={t} onSocialLogin={handleSocialLogin} />
+
+        <p className="text-[10px] text-gray-400 dark:text-gray-500 text-center px-4 leading-relaxed">
+          {t.register.termsText}{' '}
+          <Link to="/terms" className="text-indigo-500 font-bold underline">
+            {t.register.termsLink}
+          </Link>
+        </p>
+
+        <AuthFooter 
+          text={t.register.hasAccount}
+          linkText={t.register.hasAccountLink}
+          onClick={onLogin}
+        />
+      </div>
+    </div>
+  );
+}
+
+function LoginStep({ onBack, onRegister, onForgotPassword, onOpenMenu, t }: { onBack: () => void, onRegister: () => void, onForgotPassword: () => void, onOpenMenu: () => void, t: any }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const { isLoading, handleSocialLogin, handleLogin } = useAuthActions();
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(getLoginSchema(t))
+  });
+
+  const onSubmit = (data: any) => handleLogin(data);
+
+  return (
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#0c0c1d] p-8 overflow-y-auto">
+      <AuthHeader 
+        onBack={onBack}
+        onOpenMenu={onOpenMenu}
+        title={t.login.title}
+        subtitle={t.login.subtitle}
+      />
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <Input label={t.register.email} placeholder={t.register.emailPlaceholder} type="email" {...register('email')} error={errors.email?.message as string} />
+        <div className="space-y-2">
+          <div className="relative">
+            <Input label={t.register.password} placeholder={t.register.passwordPlaceholder} type={showPassword ? 'text' : 'password'} {...register('password')} error={errors.password?.message as string} />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-[42px] text-gray-400">
+              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          </div>
+          <div className="flex justify-end">
+            <button type="button" onClick={onForgotPassword} className="text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors">
+              {t.login.forgot}
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-[#0c0c1d] dark:bg-white text-white dark:text-[#0c0c1d] font-bold py-5 rounded-2xl transition-all shadow-xl active:scale-[0.98] mt-4 flex items-center justify-center"
+        >
+          {isLoading ? (
+            <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+          ) : (
+            t.login.button
+          )}
+        </button>
+      </form>
+
+      <div className="mt-8 flex flex-col items-center gap-6">
+        <SocialAuth t={t} onSocialLogin={handleSocialLogin} />
+
+        <AuthFooter 
+          text={t.login.noAccount}
+          linkText={t.login.noAccountLink}
+          onClick={onRegister}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ForgotPasswordStep({ onBack, t, lang }: { onBack: () => void, t: any, lang: string }) {
+  const [isSuccess, setIsSuccess] = useState(false);
+  const { isLoading, handleForgotPassword } = useAuthActions();
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(getForgotPasswordSchema(t))
+  });
+
+  const onSubmit = (data: any) => handleForgotPassword(data.email, () => setIsSuccess(true));
+
+  if (isSuccess) {
+    return (
+      <div className="flex-1 flex flex-col bg-white dark:bg-[#0c0c1d] p-8 items-center justify-center text-center">
+        <div className="w-20 h-20 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mb-8">
+          <CheckCircle2 className="w-10 h-10" />
+        </div>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          {lang === 'pt-BR' ? 'Verifique seu inbox.' : 'Check your inbox.'}
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-12">
+          {lang === 'pt-BR' 
+            ? 'Enviamos um link de recuperação para o seu e-mail. Se não chegar em alguns minutos, verifique sua caixa de spam.' 
+            : "We've sent a recovery link to your email. If it doesn't arrive in a few minutes, check your spam folder."}
+        </p>
+        <button onClick={onBack} className="w-full bg-[#0c0c1d] dark:bg-white text-white dark:text-[#0c0c1d] font-bold py-5 rounded-2xl">
+          {lang === 'pt-BR' ? 'Voltar para o Login' : 'Back to Login'}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#0c0c1d] p-8">
+       <header className="flex items-center mb-12">
+        <button onClick={onBack} className="p-2 -ml-2 text-gray-900 dark:text-white flex items-center gap-2 font-bold text-sm">
+          <ArrowLeft className="w-5 h-5" /> Voltar
+        </button>
+      </header>
+
+      <div className="mb-12">
+        <h1 className="text-[32px] font-bold leading-tight text-gray-900 dark:text-white mb-2">{t.forgot.title}</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">{t.forgot.subtitle}</p>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <Input label={t.register.email} placeholder={t.register.emailPlaceholder} type="email" {...register('email')} error={errors.email?.message as string} />
+        
+        <div className="space-y-4">
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-[#0c0c1d] dark:bg-white text-white dark:text-[#0c0c1d] font-bold py-5 rounded-2xl transition-all shadow-xl active:scale-[0.98] flex items-center justify-center"
+          >
+            {isLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+            ) : (
+              t.forgot.button
+            )}
+          </button>
+          <button type="button" onClick={onBack} className="w-full py-5 text-gray-500 font-bold text-sm">
+            {t.forgot.cancel}
+          </button>
+        </div>
+      </form>
+
+      <div className="mt-auto text-center py-8">
+        <p className="text-[10px] font-mono uppercase tracking-widest text-gray-400">{t.forgot.footer}</p>
+      </div>
+    </div>
+  );
+}
+
+function RegisterSuccessStep({ t, email, onLogin, onOpenMenu }: { t: any, email: string, onLogin: () => void, onOpenMenu: () => void }) {
+  const { isLoading, handleResendConfirmation } = useAuthActions();
+
+  return (
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#0c0c1d] p-8 overflow-y-auto">
+      <AuthHeader 
+        onOpenMenu={onOpenMenu}
+        title={t.success.title}
+        subtitle={t.success.subtitle}
+      />
+
+      <div className="flex-1 flex flex-col items-center justify-center py-12">
+        <div className="relative mb-12">
+          <div className="w-24 h-24 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 rounded-full flex items-center justify-center shadow-inner">
+            <Mail className="w-10 h-10" />
+          </div>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.3, type: 'spring' }}
+            className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 border-4 border-white dark:border-[#0c0c1d] rounded-full flex items-center justify-center text-white"
+          >
+            <CheckCircle2 className="w-4 h-4" />
+          </motion.div>
+        </div>
+
+        <div className="w-full space-y-6 text-center">
+          <button
+            onClick={onLogin}
+            className="w-full bg-[#0c0c1d] dark:bg-white text-white dark:text-[#0c0c1d] font-bold py-5 rounded-2xl transition-all shadow-xl active:scale-[0.98]"
+          >
+            {t.success.button} →
+          </button>
+
+          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+            {t.success.noEmail}{' '}
+            <button 
+              onClick={() => handleResendConfirmation(email)}
+              disabled={isLoading}
+              className="text-indigo-500 font-bold hover:underline disabled:opacity-50"
+            >
+              {isLoading ? <Loader2 className="w-3 h-3 animate-spin inline mr-1" /> : null}
+              {t.success.resend}
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

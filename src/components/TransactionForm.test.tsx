@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { BrowserRouter } from 'react-router-dom';
 import TransactionForm from './TransactionForm';
 import { supabase } from '@/services/supabase';
 
@@ -28,10 +29,16 @@ vi.mock('sonner', () => ({
   },
 }));
 
+let mockIsMobile = false;
+vi.mock('@/hooks/useMobile', () => ({
+  useMobile: () => mockIsMobile,
+}));
+
 describe('TransactionForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockQuery.then.mockImplementation((cb) => cb({ data: [], error: null }));
+    mockIsMobile = false;
   });
 
   it('deve renderizar o formulário quando estiver aberto', () => {
@@ -274,7 +281,7 @@ describe('TransactionForm', () => {
   it('deve lidar com erro na submissão sem mensagem do servidor', async () => {
     const toast = await import('sonner');
     mockQuery.then.mockImplementationOnce((cb) => cb({ data: [], error: null })); // get categories
-    mockQuery.then.mockImplementationOnce((cb) => cb({ error: new Error('Generic Error') })); // insert error
+    mockQuery.then.mockImplementationOnce((cb) => cb({ error: new Error('') })); // insert error
 
     render(<TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
 
@@ -386,4 +393,120 @@ describe('TransactionForm', () => {
     const select = screen.getByLabelText(/Categoria/i) as HTMLSelectElement;
     expect(select.value).toBe('');
   });
+
+  describe('Modo Mobile', () => {
+    beforeEach(() => {
+      mockIsMobile = true;
+    });
+
+    it('deve renderizar o formulário no mobile', () => {
+      render(
+        <BrowserRouter>
+          <TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />
+        </BrowserRouter>
+      );
+      expect(screen.getByText('Nova transação')).toBeInTheDocument();
+      expect(screen.getByText('Salvar')).toBeInTheDocument();
+    });
+
+    it('deve fechar ao clicar no botão fechar no mobile', () => {
+      const onClose = vi.fn();
+      render(
+        <BrowserRouter>
+          <TransactionForm isOpen={true} onClose={onClose} onSuccess={() => {}} />
+        </BrowserRouter>
+      );
+      const closeBtn = screen.getByText('Nova transação').previousElementSibling!;
+      fireEvent.click(closeBtn);
+      expect(onClose).toHaveBeenCalled();
+    });
+
+    it('deve lidar com tabs e seleção de categoria no mobile', async () => {
+      const mockCategories = [{ id: 'cat-mob', name: 'Alimentação' }];
+      mockQuery.then.mockImplementationOnce((cb) => cb({ data: mockCategories, error: null }));
+
+      render(
+        <BrowserRouter>
+          <TransactionForm isOpen={true} onClose={() => {}} onSuccess={() => {}} />
+        </BrowserRouter>
+      );
+
+      const alimentacaoText = await screen.findByText('Alimentação');
+      expect(alimentacaoText).toBeInTheDocument();
+
+      // Click Receita
+      fireEvent.click(screen.getByText('Receita'));
+      
+      // Click Despesa
+      fireEvent.click(screen.getByText('Despesa'));
+
+      // Click Transfer
+      fireEvent.click(screen.getByText('Transfer.'));
+
+      // Click Categoria Alimentação (button container)
+      fireEvent.click(screen.getByText('Alimentação').closest('button')!);
+    });
+
+    it('deve salvar nova transação no mobile', async () => {
+      const onSuccess = vi.fn();
+      const onClose = vi.fn();
+      mockQuery.then.mockImplementationOnce((cb) => cb({ data: [], error: null })); // get categories
+      mockQuery.then.mockImplementationOnce((cb) => cb({ error: null })); // insert
+
+      render(
+        <BrowserRouter>
+          <TransactionForm isOpen={true} onClose={onClose} onSuccess={onSuccess} />
+        </BrowserRouter>
+      );
+
+      // Fill inputs
+      fireEvent.change(screen.getByPlaceholderText('0,00'), { target: { value: '80' } });
+      fireEvent.change(screen.getByPlaceholderText('Ex: iFood - Almoço'), { target: { value: 'Almoço Mobile' } });
+
+      // Click Salvar
+      fireEvent.click(screen.getByText('Salvar'));
+
+      await waitFor(() => {
+        expect(supabase.from).toHaveBeenCalledWith('transactions');
+        expect(mockQuery.insert).toHaveBeenCalledWith([
+          expect.objectContaining({
+            description: 'Almoço Mobile',
+            amount: 80,
+          }),
+        ]);
+        expect(onSuccess).toHaveBeenCalled();
+        expect(onClose).toHaveBeenCalled();
+      });
+    });
+
+    it('deve inicializar com valores de edição se uma transação for passada no mobile', async () => {
+      const mockTransaction = {
+        id: '2',
+        description: 'Edit Mobile',
+        amount: 200,
+        date: '2026-03-10',
+        type: 'income',
+        category_id: 'cat-mob',
+      } as any;
+
+      const mockCategories = [{ id: 'cat-mob', name: 'Lazer' }];
+      mockQuery.then.mockImplementationOnce((cb) => cb({ data: mockCategories, error: null }));
+
+      render(
+        <BrowserRouter>
+          <TransactionForm
+            isOpen={true}
+            onClose={() => {}}
+            onSuccess={() => {}}
+            transaction={mockTransaction}
+          />
+        </BrowserRouter>
+      );
+
+      await screen.findByText('Lazer');
+      expect(screen.getByPlaceholderText('Ex: iFood - Almoço')).toHaveValue('Edit Mobile');
+      expect(screen.getByPlaceholderText('0,00')).toHaveValue(200);
+    });
+  });
 });
+

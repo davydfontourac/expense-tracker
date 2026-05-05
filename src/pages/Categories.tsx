@@ -1,33 +1,91 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/services/supabase';
-import { Plus, Trash2, Edit2, ArrowLeft, Tag, User } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Plus, MoreHorizontal, ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import ConfirmModal from '@/components/ConfirmModal';
 import CategoryForm from '@/components/CategoryForm';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import BottomNavigation from '@/components/BottomNavigation';
 import PageTransition from '@/components/PageTransition';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import { cn } from '@/utils/cn';
+import { Link } from 'react-router-dom';
+import { Donut } from '@/components/Donut';
+import { useMobile } from '@/hooks/useMobile';
+import { MonthYearPicker } from '@/components/MonthYearPicker';
 import { useCategories } from '@/hooks/useCategories';
 import type { Category } from '@/hooks/useCategories';
 
-const SKELETON_CAT_IDS = ['sk-c-1', 'sk-c-2', 'sk-c-3', 'sk-c-4', 'sk-c-5', 'sk-c-6'];
+const SKELETON_CAT_IDS = ['sk-c-1', 'sk-c-2', 'sk-c-3', 'sk-c-4'];
+
+const fmt = (n: number) =>
+  'R$ ' +
+  Math.abs(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 export default function Categories() {
-  const { profile } = useAuth();
   const { categories, isLoading, fetchCategories } = useCategories();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const isMobile = useMobile();
+  const [filters, setFilters] = useState({
+    month: String(new Date().getMonth() + 1),
+    year: String(new Date().getFullYear()),
+  });
+
+  const [categoryTotals, setCategoryTotals] = useState<Record<string, number>>({});
+  const [totalSpentMonth, setTotalSpentMonth] = useState(0);
+
+  const currentMonthShort = useMemo(() => {
+    const date = new Date(Number(filters.year), Number(filters.month) - 1);
+    return format(date, 'MMM', { locale: ptBR }).toUpperCase();
+  }, [filters.month, filters.year]);
+
+  const fetchTotals = useCallback(async () => {
+    try {
+      const startDate = new Date(Number(filters.year), Number(filters.month) - 1, 1).toISOString();
+      const endDate = new Date(
+        Number(filters.year),
+        Number(filters.month),
+        0,
+        23,
+        59,
+        59,
+      ).toISOString();
+
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('amount, category_id, type')
+        .gte('date', startDate)
+        .lte('date', endDate);
+
+      if (error) throw error;
+
+      const totals: Record<string, number> = {};
+      let totalExpense = 0;
+
+      data?.forEach((t: { amount: number; category_id: string | null; type: string }) => {
+        if (t.type === 'expense') {
+          const cid = t.category_id || 'unassigned';
+          const amt = Math.abs(Number(t.amount));
+          totals[cid] = (totals[cid] || 0) + amt;
+          totalExpense += amt;
+        }
+      });
+
+      setCategoryTotals(totals);
+      setTotalSpentMonth(totalExpense);
+    } catch (err) {
+      console.error('Error fetching totals:', err);
+    }
+  }, [filters]);
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+    fetchTotals();
+  }, [fetchCategories, fetchTotals]);
 
   const handleDelete = async () => {
     if (!deletingCategory) return;
@@ -39,7 +97,7 @@ export default function Categories() {
       fetchCategories();
       setDeletingCategory(null);
     } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Erro ao excluir categoria');
+      toast.error(err.message || 'Erro ao excluir categoria');
     } finally {
       setIsDeleting(false);
     }
@@ -50,160 +108,269 @@ export default function Categories() {
     setIsFormOpen(true);
   };
 
-  const renderContent = () => {
-    if (isLoading) {
-      return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {SKELETON_CAT_IDS.map((id) => (
-            <div
-              key={id}
-              className="bg-white dark:bg-gray-900 p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm flex items-center justify-between"
-            >
-              <div className="flex items-center gap-4">
-                <Skeleton className="w-12 h-12 rounded-xl" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-3 w-20" />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    }
+  const donutData = useMemo(() => {
+    return categories.map(c => ({
+      name: c.name,
+      total: categoryTotals[c.id] || 0,
+      pct: totalSpentMonth > 0 ? Math.round(((categoryTotals[c.id] || 0) / totalSpentMonth) * 100) : 0,
+      color: c.color
+    })).sort((a, b) => b.total - a.total);
+  }, [categories, categoryTotals, totalSpentMonth]);
 
-    if (categories.length === 0) {
-      return (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white dark:bg-gray-900 p-12 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700 text-center transition-colors"
-        >
-          <div className="w-16 h-16 bg-blue-50 dark:bg-blue-500/10 text-blue-500 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-            <Tag className="w-8 h-8" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Nenhuma categoria
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-sm mx-auto">
-            Crie categorias para organizar melhor suas finanças e ver relatórios por tipo de gasto.
-          </p>
-          <button
-            onClick={() => setIsFormOpen(true)}
-            className="px-6 py-2.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-bold rounded-xl hover:bg-black dark:hover:bg-white transition-colors"
-          >
-            Criar Primeira Categoria
-          </button>
-        </motion.div>
-      );
-    }
-
+  if (isMobile) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="grid grid-cols-1 sm:grid-cols-2 gap-4"
-      >
-        <AnimatePresence>
-          {categories.map((category, index) => (
-            <motion.div
-              layout
-              key={category.id}
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="bg-white dark:bg-gray-900 p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm flex items-center justify-between group hover:shadow-md transition-all"
-            >
-              <div className="flex items-center gap-4">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-xl shadow-sm"
-                  style={{ backgroundColor: `${category.color}20`, color: category.color }}
-                >
-                  <Tag className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 dark:text-gray-100">{category.name}</h3>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-wider">
-                    {category.color}
-                  </p>
-                </div>
-              </div>
+      <PageTransition className="min-h-screen bg-[#f8f9fc] dark:bg-[#0c0c1d] pb-32">
+        <header className="px-6 pt-12 pb-6 flex items-center justify-between sticky top-0 bg-[#f8f9fc]/80 dark:bg-[#0c0c1d]/80 backdrop-blur-xl z-20">
+           <div className="flex items-center gap-4">
+              <Link to="/dashboard" className="p-2.5 bg-white dark:bg-[#161629] rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
+                 <ChevronLeft size={20} className="text-gray-600 dark:text-gray-400" />
+              </Link>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Categorias</h1>
+           </div>
+           <button 
+             onClick={() => { setEditingCategory(null); setIsFormOpen(true); }}
+             className="p-2.5 bg-white dark:bg-[#161629] rounded-xl border border-gray-100 dark:border-white/5 shadow-sm"
+           >
+              <Plus size={20} className="text-gray-600 dark:text-gray-400" />
+           </button>
+        </header>
 
-              <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                <button
-                  onClick={() => handleEdit(category)}
-                  className="p-2 text-blue-600 sm:text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 dark:hover:text-blue-400 rounded-lg transition-colors"
-                >
-                  <Edit2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setDeletingCategory(category)}
-                  className="p-2 text-red-500 sm:text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 dark:hover:text-red-400 rounded-lg transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+        {/* Period Selector */}
+        <div className="px-6 mb-8">
+           <div className="bg-white dark:bg-[#161629] p-3 rounded-[24px] border border-gray-100 dark:border-white/5 shadow-sm">
+              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">Período de análise</div>
+              <MonthYearPicker
+                month={filters.month}
+                year={filters.year}
+                onChange={(m, y) => setFilters((f) => ({ ...f, month: m, year: y }))}
+              />
+           </div>
+        </div>
+
+        {/* Donut Summary Card */}
+        <div className="px-6 mb-8">
+           <div className="bg-white dark:bg-[#161629] p-6 rounded-[32px] border border-gray-100 dark:border-white/5 shadow-sm">
+              <div className="flex items-center gap-8">
+                 <div className="w-32 h-32 shrink-0">
+                    <Donut 
+                      segs={donutData} 
+                      centerLabel={currentMonthShort} 
+                      centerValue={fmt(totalSpentMonth).replace('R$ ', '').split(',')[0] + 'k'} 
+                    />
+                 </div>
+                 <div>
+                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">TOTAL NO MÊS</div>
+                    <div className="text-2xl font-bold text-gray-900 dark:text-white">{fmt(totalSpentMonth)}</div>
+                    <div className="mt-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                       0% este mês
+                    </div>
+                 </div>
               </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </motion.div>
+           </div>
+        </div>
+
+        {/* List Content */}
+        <div className="px-6">
+           <div className="text-[10px] font-bold text-gray-400 tracking-widest mb-6 uppercase">Todas categorias</div>
+           <div className="space-y-4">
+              {categories.map((c) => {
+                const spent = categoryTotals[c.id] || 0;
+                const hasLimit = (c.monthly_limit || 0) > 0;
+                const pctOfLimit = hasLimit ? (spent / c.monthly_limit) * 100 : 0;
+                const pctOfTotal = totalSpentMonth > 0 ? (spent / totalSpentMonth) * 100 : 0;
+                const barWidth = Math.min(pctOfLimit, 100);
+                const isOverLimit = hasLimit && spent > c.monthly_limit;
+
+                return (
+                  <button 
+                    key={c.id} 
+                    className="w-full text-left bg-white dark:bg-[#161629] p-4 rounded-[24px] border border-gray-100 dark:border-white/5 shadow-sm active:scale-[0.98] transition-transform"
+                    onClick={() => handleEdit(c)}
+                  >
+                    <div className="flex items-center gap-4 mb-4">
+                       <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl shadow-inner" style={{ backgroundColor: `${c.color}15`, color: c.color }}>
+                          {c.icon || '💰'}
+                       </div>
+                       <div className="flex-1">
+                          <div className="text-sm font-bold text-gray-900 dark:text-white">{c.name}</div>
+                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+                             {hasLimit ? `14 TX · ORÇ. ${fmt(c.monthly_limit)}` : '14 TX · SEM LIMITE'}
+                          </div>
+                       </div>
+                       <div className="text-right">
+                          <div className="text-sm font-bold text-gray-900 dark:text-white">{fmt(spent)}</div>
+                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{Math.round(hasLimit ? pctOfLimit : pctOfTotal)}%</div>
+                       </div>
+                    </div>
+                    {/* Progress Bar */}
+                    <div className="h-1.5 w-full bg-gray-50 dark:bg-white/5 rounded-full overflow-hidden">
+                       <div 
+                         className="h-full rounded-full transition-all duration-1000" 
+                         style={{ 
+                            width: `${barWidth}%`, 
+                            backgroundColor: isOverLimit ? '#ef4444' : c.color 
+                         }} 
+                       />
+                    </div>
+                  </button>
+                );
+              })}
+           </div>
+        </div>
+
+        <CategoryForm
+          isOpen={isFormOpen}
+          onClose={() => setIsFormOpen(false)}
+          onSuccess={fetchCategories}
+          category={editingCategory}
+        />
+      </PageTransition>
     );
-  };
+  }
 
   return (
-    <PageTransition className="min-h-screen bg-gray-50/50 dark:bg-gray-950 transition-colors">
-      <nav className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-sm sticky top-0 z-40 transition-colors">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center gap-4">
-              <Link
-                to="/dashboard"
-                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 border-l border-gray-100 dark:border-gray-800 pl-4">
-                Minhas Categorias
-              </h1>
-            </div>
-            <div className="flex items-center gap-3">
-              <ThemeToggle />
-              <Link
-                to="/profile"
-                className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800 shadow-sm relative overflow-hidden group/avatar bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0 hover:border-blue-100 dark:hover:border-gray-600 transition-all"
-                title="Meu Perfil"
-              >
-                {profile?.avatar_url ? (
-                  <img
-                    src={profile.avatar_url}
-                    alt="Avatar"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <User className="w-5 h-5 text-gray-400 group-hover/avatar:text-blue-500 transition-colors" />
-                )}
-              </Link>
-              <button
-                onClick={() => {
-                  setEditingCategory(null);
-                  setIsFormOpen(true);
-                }}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-blue-200 active:scale-95"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Nova Categoria</span>
-              </button>
-            </div>
-          </div>
+    <PageTransition className="A-main h-screen overflow-y-auto w-full">
+      <div className="A-top">
+        <div>
+          <h1 className="text-gray-900 dark:text-white">Minhas Categorias</h1>
+          <div className="sub">{categories.length} categorias cadastradas</div>
         </div>
-      </nav>
+        <div className="flex gap-2">
+          <MonthYearPicker
+            month={filters.month}
+            year={filters.year}
+            onChange={(m, y) => setFilters((f) => ({ ...f, month: m, year: y }))}
+          />
+          <button
+            onClick={() => {
+              setEditingCategory(null);
+              setIsFormOpen(true);
+            }}
+            className="A-chip primary"
+          >
+            <Plus size={14} className="mr-1" /> Nova Categoria
+          </button>
+        </div>
+      </div>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24 lg:pb-10">
-        {renderContent()}
-      </main>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {isLoading ? (
+          SKELETON_CAT_IDS.map((id) => (
+            <div key={id} className="A-card animate-pulse">
+              <div className="flex justify-between mb-4">
+                <Skeleton className="w-11 h-11 rounded-xl" />
+                <Skeleton className="w-4 h-4 rounded" />
+              </div>
+              <Skeleton className="h-5 w-32 mb-2" />
+              <Skeleton className="h-4 w-20 mb-4" />
+              <Skeleton className="h-8 w-full rounded-lg" />
+            </div>
+          ))
+        ) : (
+          <AnimatePresence>
+            {categories.map((c, i) => {
+              const spent = categoryTotals[c.id] || 0;
+              const hasLimit = (c.monthly_limit || 0) > 0;
+              const pctOfLimit = hasLimit ? Math.min((spent / c.monthly_limit) * 100, 100) : 0;
+              const pctOfTotal =
+                totalSpentMonth > 0 ? Math.round((spent / totalSpentMonth) * 100) : 0;
+              const isOverLimit = hasLimit && spent > c.monthly_limit;
 
-      {/* Modais */}
+              return (
+                <motion.div
+                  key={c.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className={cn(
+                    'A-card flex flex-col gap-3 group hover:border-gray-400 dark:hover:border-gray-500 transition-colors cursor-pointer',
+                    isOverLimit && 'border-red-500/50! bg-red-50/5 dark:bg-red-900/5',
+                  )}
+                  onClick={() => handleEdit(c)}
+                >
+                  <div className="flex justify-between items-center">
+                    <div
+                      className="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+                      style={{ backgroundColor: `${c.color}15`, color: c.color }}
+                    >
+                      {c.icon || '💰'}
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeletingCategory(c);
+                      }}
+                      className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                    >
+                      <MoreHorizontal size={18} />
+                    </button>
+                  </div>
+
+                  <div>
+                    <div className="text-base font-semibold text-gray-900 dark:text-white flex items-center justify-between">
+                      <span>{c.name}</span>
+                      {isOverLimit && (
+                        <span className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
+                          Limite Excedido
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-500 font-mono mt-1">
+                      Transações classificadas
+                    </div>
+                  </div>
+
+                  <div className="mt-2">
+                    <div className="flex items-baseline gap-2">
+                      <div className="text-xl font-bold text-gray-900 dark:text-white">
+                        {fmt(spent)}
+                      </div>
+                      {hasLimit && (
+                        <div className="text-[11px] text-gray-400">/ {fmt(c.monthly_limit)}</div>
+                      )}
+                    </div>
+
+                    <div className="flex justify-between text-[10px] font-mono text-gray-500 uppercase tracking-widest mt-3 mb-2">
+                      {hasLimit ? (
+                        <span>{Math.round((spent / c.monthly_limit) * 100)}% DO LIMITE</span>
+                      ) : (
+                        <span>{pctOfTotal}% DO TOTAL</span>
+                      )}
+                    </div>
+
+                    <div className="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${hasLimit ? pctOfLimit : pctOfTotal || 0}%` }}
+                        className={cn('h-full rounded-full', isOverLimit ? 'bg-red-500' : '')}
+                        style={{ backgroundColor: !isOverLimit ? c.color : undefined }}
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        )}
+
+        {!isLoading && categories.length === 0 && (
+          <div className="col-span-full py-12 text-center text-gray-500">Nenhuma categoria</div>
+        )}
+
+        <button
+          onClick={() => {
+            setEditingCategory(null);
+            setIsFormOpen(true);
+          }}
+          className="border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-2xl p-6 flex flex-col items-center justify-center gap-2 text-gray-500 hover:border-blue-500 hover:text-blue-500 transition-all group min-h-[180px]"
+        >
+          <Plus size={24} className="group-hover:scale-110 transition-transform" />
+          <span className="text-sm font-medium">
+            {categories.length === 0 ? 'Criar Primeira Categoria' : 'Criar categoria personalizada'}
+          </span>
+        </button>
+      </div>
+
       <CategoryForm
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
@@ -219,8 +386,6 @@ export default function Categories() {
         description={`Tem certeza que deseja excluir "${deletingCategory?.name}"? Transações vinculadas a esta categoria ficarão "Sem categoria".`}
         isLoading={isDeleting}
       />
-
-      <BottomNavigation />
     </PageTransition>
   );
 }

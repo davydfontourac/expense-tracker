@@ -32,20 +32,24 @@ export const parseCSV = (file: File): Promise<ParsedCSVRow[]> => {
 export const transformCSVData = (
   data: ParsedCSVRow[],
   mapping: CSVMapping,
-  categories: any[] = []
+  categories: any[] = [],
 ) => {
   return data.map((row) => {
     const rawAmount = row[mapping.amount] || '0';
-    
+
     // Sanitize amount string: remove currency symbols and whitespace
     let cleanAmount = rawAmount.toString().replace(/[R$\s]/g, '');
-    
+
     // Intelligent decimal detection if we're unsure or if the chosen separator isn't present
     let effectiveSeparator = mapping.decimalSeparator;
     if (effectiveSeparator === ',' && !cleanAmount.includes(',') && cleanAmount.includes('.')) {
       // If we expect comma but find point and no comma, it's likely point-based (like Nubank)
       effectiveSeparator = '.';
-    } else if (effectiveSeparator === '.' && !cleanAmount.includes('.') && cleanAmount.includes(',')) {
+    } else if (
+      effectiveSeparator === '.' &&
+      !cleanAmount.includes('.') &&
+      cleanAmount.includes(',')
+    ) {
       // Vice-versa
       effectiveSeparator = ',';
     }
@@ -76,7 +80,12 @@ export const transformCSVData = (
     let type: 'income' | 'expense' | 'transfer_in' | 'transfer_out' = 'expense';
     if (mapping.type && row[mapping.type]) {
       const typeVal = row[mapping.type].toLowerCase();
-      if (typeVal.includes('receita') || typeVal.includes('income') || typeVal.includes('entrada') || typeVal.includes('credit')) {
+      if (
+        typeVal.includes('receita') ||
+        typeVal.includes('income') ||
+        typeVal.includes('entrada') ||
+        typeVal.includes('credit')
+      ) {
         type = 'income';
       }
     } else {
@@ -86,20 +95,56 @@ export const transformCSVData = (
 
     // Intelligent Category Guessing
     let category_id = null;
-    const normalize = (str: string) => 
-      str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    
+    const normalize = (str: string) =>
+      str
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+
     const desc = normalize(row[mapping.description] || '');
-    
+
     const categoryRules = [
       { keywords: ['fatura', 'pagamento de fatura', 'cartao', 'credit card'], category: 'cartão' },
-      { keywords: ['uber', '99', 'trip', 'taxi', 'transporte', 'combustivel', 'posto'], category: 'transporte' },
-      { keywords: ['ifood', 'mcdonalds', 'restaurante', 'lanche', 'pizza', 'burger', 'bk', 'confeitaria', 'padaria'], category: 'alimentação' },
-      { keywords: ['mercado', 'viezzer', 'zaffari', 'bourbon', 'carrefour', 'super'], category: 'supermercado' },
+      {
+        keywords: ['uber', '99', 'trip', 'taxi', 'transporte', 'combustivel', 'posto'],
+        category: 'transporte',
+      },
+      {
+        keywords: [
+          'ifood',
+          'mcdonalds',
+          'restaurante',
+          'lanche',
+          'pizza',
+          'burger',
+          'bk',
+          'confeitaria',
+          'padaria',
+        ],
+        category: 'alimentação',
+      },
+      {
+        keywords: ['mercado', 'viezzer', 'zaffari', 'bourbon', 'carrefour', 'super'],
+        category: 'supermercado',
+      },
       { keywords: ['pix', 'transferencia recebida', 'transferencia enviada'], category: 'pix' },
       { keywords: ['compra no debito', 'debito'], category: 'débito' },
-      { keywords: ['aplicacao rdb', 'resgate rdb', 'rdb', 'caixinha', 'investimento'], category: 'caixinha' },
-      { keywords: ['netflix', 'spotify', 'disney', 'hbomax', 'prime video', 'apple.com', 'google services'], category: 'assinaturas' },
+      {
+        keywords: ['aplicacao rdb', 'resgate rdb', 'rdb', 'caixinha', 'investimento'],
+        category: 'caixinha',
+      },
+      {
+        keywords: [
+          'netflix',
+          'spotify',
+          'disney',
+          'hbomax',
+          'prime video',
+          'apple.com',
+          'google services',
+        ],
+        category: 'assinaturas',
+      },
       { keywords: ['luz', 'zap', 'energia', 'ceee', 'equatorial'], category: 'conta de luz' },
       { keywords: ['agua', 'corsan', 'dmae'], category: 'conta de água' },
       { keywords: ['claro', 'vivo', 'tim', 'oi', 'internet', 'net '], category: 'internet' },
@@ -107,11 +152,11 @@ export const transformCSVData = (
     ];
 
     for (const rule of categoryRules) {
-      if (rule.keywords.some(k => desc.includes(normalize(k)))) {
-        const found = categories.find(c => normalize(c.name).includes(normalize(rule.category)));
+      if (rule.keywords.some((k) => desc.includes(normalize(k)))) {
+        const found = categories.find((c) => normalize(c.name).includes(normalize(rule.category)));
         if (found) {
           category_id = found.id;
-          
+
           // Special handling for Caixinha (RDB) to mark as transfer
           if (rule.category === 'caixinha') {
             type = amount >= 0 ? 'transfer_in' : 'transfer_out';

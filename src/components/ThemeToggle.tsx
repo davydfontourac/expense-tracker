@@ -3,7 +3,13 @@ import { useTheme } from '@/context/ThemeContext';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/utils/cn';
 
-export function ThemeToggle() {
+export function ThemeToggle({
+  dropdownPosition = 'bottom',
+  align = 'right',
+}: {
+  dropdownPosition?: 'top' | 'bottom';
+  align?: 'left' | 'right';
+}) {
   const { theme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -23,7 +29,7 @@ export function ThemeToggle() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-10 h-10 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center transition-all shadow-sm"
+        className="w-8 h-8 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center transition-all shadow-sm"
         title="Alternar tema"
       >
         <Sun className="h-5 w-5 dark:hidden" />
@@ -32,15 +38,23 @@ export function ThemeToggle() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-36 py-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 z-50 overflow-hidden">
+        <div
+          className={cn(
+            'absolute w-36 py-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 z-50 overflow-hidden',
+            dropdownPosition === 'top' ? 'bottom-full mb-2' : 'top-full mt-2',
+            align === 'right' ? 'right-0' : 'left-0',
+          )}
+        >
           <button
             onClick={() => {
               setTheme('light');
               setIsOpen(false);
             }}
             className={cn(
-              "w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors",
-              theme === 'light' ? "text-blue-600 dark:text-blue-400 font-semibold" : "text-gray-700 dark:text-gray-300 font-medium"
+              'w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors',
+              theme === 'light'
+                ? 'text-blue-600 dark:text-blue-400 font-semibold'
+                : 'text-gray-700 dark:text-gray-300 font-medium',
             )}
           >
             <Sun className="w-4 h-4" />
@@ -52,8 +66,10 @@ export function ThemeToggle() {
               setIsOpen(false);
             }}
             className={cn(
-              "w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors",
-              theme === 'dark' ? "text-blue-600 dark:text-blue-400 font-semibold" : "text-gray-700 dark:text-gray-300 font-medium"
+              'w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors',
+              theme === 'dark'
+                ? 'text-blue-600 dark:text-blue-400 font-semibold'
+                : 'text-gray-700 dark:text-gray-300 font-medium',
             )}
           >
             <Moon className="w-4 h-4" />
@@ -65,8 +81,10 @@ export function ThemeToggle() {
               setIsOpen(false);
             }}
             className={cn(
-              "w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors",
-              theme === 'system' ? "text-blue-600 dark:text-blue-400 font-semibold" : "text-gray-700 dark:text-gray-300 font-medium"
+              'w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors',
+              theme === 'system'
+                ? 'text-blue-600 dark:text-blue-400 font-semibold'
+                : 'text-gray-700 dark:text-gray-300 font-medium',
             )}
           >
             <Monitor className="w-4 h-4" />

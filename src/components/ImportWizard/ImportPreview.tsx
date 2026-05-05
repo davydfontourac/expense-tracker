@@ -23,10 +23,10 @@ interface ImportPreviewProps {
   onTransactionsChange: (transactions: PreviewTransaction[]) => void;
 }
 
-export default function ImportPreview({ 
-  transactions, 
+export default function ImportPreview({
+  transactions,
   categories,
-  onTransactionsChange 
+  onTransactionsChange,
 }: ImportPreviewProps) {
   const summary = transactions.reduce(
     (acc, t) => {
@@ -34,7 +34,7 @@ export default function ImportPreview({
       else if (t.type === 'expense') acc.expense += t.amount;
       return acc;
     },
-    { income: 0, expense: 0 }
+    { income: 0, expense: 0 },
   );
 
   const handleCategoryChange = (index: number, categoryId: string) => {
@@ -52,7 +52,9 @@ export default function ImportPreview({
             Total Receitas
           </p>
           <p className="text-xl font-bold text-green-700 dark:text-green-300">
-            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.income)}
+            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+              summary.income,
+            )}
           </p>
         </div>
         <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-800/50 p-4 rounded-2xl">
@@ -60,14 +62,19 @@ export default function ImportPreview({
             Total Despesas
           </p>
           <p className="text-xl font-bold text-red-700 dark:text-red-300">
-            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.expense)}
+            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+              summary.expense,
+            )}
           </p>
         </div>
       </div>
 
       <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/50 p-3 rounded-xl flex items-center gap-3 text-xs text-blue-700 dark:text-blue-400">
         <Info className="w-4 h-4 shrink-0" />
-        <p>Revise e altere as categorias se necessário. Transações sem categoria serão marcadas como "Sem categoria".</p>
+        <p>
+          Revise e altere as categorias se necessário. Transações sem categoria serão marcadas como
+          "Sem categoria".
+        </p>
       </div>
 
       {/* Table Preview */}
@@ -84,12 +91,17 @@ export default function ImportPreview({
             </thead>
             <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
               {transactions.map((t, i) => (
-                <tr key={i} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                <tr
+                  key={i}
+                  className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors"
+                >
                   <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                     {format(parseISO(t.date), 'dd/MM/yy')}
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100 min-w-[150px]">
-                    <p className="truncate max-w-[200px]" title={t.description}>{t.description}</p>
+                    <p className="truncate max-w-[200px]" title={t.description}>
+                      {t.description}
+                    </p>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -97,7 +109,7 @@ export default function ImportPreview({
                         value={t.category_id || ''}
                         onChange={(e) => handleCategoryChange(i, e.target.value)}
                         className={`text-xs p-1.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer min-w-[140px] ${
-                          t.category_id 
+                          t.category_id
                             ? 'bg-blue-50/50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800 text-blue-700 dark:text-blue-400 font-semibold'
                             : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500'
                         }`}
@@ -111,17 +123,23 @@ export default function ImportPreview({
                       </select>
                     </div>
                   </td>
-                  <td className={`px-4 py-3 text-sm font-bold text-right flex items-center justify-end gap-2 whitespace-nowrap ${
-                    t.type === 'transfer_in' || t.type === 'transfer_out' 
-                      ? 'text-blue-500' 
-                      : (t.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400')
-                  }`}>
+                  <td
+                    className={`px-4 py-3 text-sm font-bold text-right flex items-center justify-end gap-2 whitespace-nowrap ${
+                      t.type === 'transfer_in' || t.type === 'transfer_out'
+                        ? 'text-blue-500'
+                        : t.type === 'income'
+                          ? 'text-green-600 dark:text-green-400'
+                          : 'text-red-600 dark:text-red-400'
+                    }`}
+                  >
                     {t.type === 'income' || t.type === 'transfer_in' ? (
                       <ArrowUpCircle className="w-3.5 h-3.5" />
                     ) : (
                       <ArrowDownCircle className="w-3.5 h-3.5" />
                     )}
-                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(t.amount)}
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                      t.amount,
+                    )}
                   </td>
                 </tr>
               ))}

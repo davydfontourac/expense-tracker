@@ -7,11 +7,11 @@ import { supabase } from '@/services/supabase';
 
 vi.mock('@/utils/csvParser', () => ({
   parseCSV: vi.fn(),
-  transformCSVData: vi.fn()
+  transformCSVData: vi.fn(),
 }));
 
 vi.mock('@/context/AuthContext', () => ({
-  useAuth: vi.fn()
+  useAuth: vi.fn(),
 }));
 
 vi.mock('@/services/supabase', () => ({
@@ -19,13 +19,13 @@ vi.mock('@/services/supabase', () => ({
     from: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
     order: vi.fn().mockResolvedValue({ data: [{ id: '1', name: 'Cat' }], error: null }),
-    insert: vi.fn().mockResolvedValue({ error: null })
-  }
+    insert: vi.fn().mockResolvedValue({ error: null }),
+  },
 }));
 
 // Mock sonner toast
 vi.mock('sonner', () => ({
-  toast: { error: vi.fn(), success: vi.fn() }
+  toast: { error: vi.fn(), success: vi.fn() },
 }));
 
 describe('ImportWizard', () => {
@@ -33,10 +33,10 @@ describe('ImportWizard', () => {
     vi.clearAllMocks();
     (useAuth as any).mockReturnValue({ user: { id: 'user-1' } });
     (parseCSV as any).mockResolvedValue([
-      { date: '2026-04-20', description: 'Test', amount: '100' }
+      { date: '2026-04-20', description: 'Test', amount: '100' },
     ]);
     (transformCSVData as any).mockReturnValue([
-      { date: '2026-04-20', description: 'Test', amount: 100, type: 'expense', category_id: '1' }
+      { date: '2026-04-20', description: 'Test', amount: 100, type: 'expense', category_id: '1' },
     ]);
   });
 
@@ -56,9 +56,9 @@ describe('ImportWizard', () => {
   it('deve simular o fluxo completo de importação', async () => {
     const onSuccessMock = vi.fn();
     const onCloseMock = vi.fn();
-    
+
     render(<ImportWizard isOpen={true} onClose={onCloseMock} onSuccess={onSuccessMock} />);
-    
+
     // Simulate File Upload step by clicking Próximo without file (should show error and not advance)
     const nextBtn = screen.getByRole('button', { name: /Próximo/i });
     fireEvent.click(nextBtn);
@@ -84,7 +84,7 @@ describe('ImportWizard', () => {
     // Let's just advance again assuming auto-mapping worked
     const nextBtnStep2 = screen.getByRole('button', { name: /Próximo/i });
     fireEvent.click(nextBtnStep2);
-    
+
     // Step 3 (Preview)
     await waitFor(() => {
       expect(transformCSVData).toHaveBeenCalled();
@@ -105,9 +105,9 @@ describe('ImportWizard', () => {
 
   it('deve lidar com erro na importação', async () => {
     (supabase.from('transactions').insert as any).mockRejectedValueOnce(new Error('Insert error'));
-    
+
     render(<ImportWizard isOpen={true} onClose={() => {}} onSuccess={() => {}} />);
-    
+
     // Simulate jumping to step 2 (import) by manually triggering states
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = new File(['data'], 'test.csv', { type: 'text/csv' });

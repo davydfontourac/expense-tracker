@@ -114,7 +114,7 @@ export default function TransactionFilters({
         </select>
 
         <div className="flex-1" />
-        
+
         {onClearMonth && (
           <button
             onClick={onClearMonth}

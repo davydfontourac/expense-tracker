@@ -80,7 +80,7 @@ export default function TransactionItem({ transaction, onDelete, onEdit }: Reado
           {/* Valor */}
           <div
             className={`flex items-center gap-2 font-bold text-lg sm:text-base ${
-              isTransfer ? 'text-blue-500' : (isIncome ? 'text-emerald-600' : 'text-red-500')
+              isTransfer ? 'text-blue-500' : isIncome ? 'text-emerald-600' : 'text-red-500'
             }`}
           >
             {isIncome ? (

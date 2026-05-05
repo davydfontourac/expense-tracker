@@ -1,0 +1,600 @@
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { Plus, Search, Download, Upload, Trash2, MoreHorizontal, ChevronLeft, Filter, Loader2, Receipt, X, Eye, EyeOff } from 'lucide-react';
+import { useTransactions } from '@/hooks/useTransactions';
+import { useMobile } from '@/hooks/useMobile';
+import { format, isToday, isYesterday } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import TransactionForm from '@/components/TransactionForm';
+import ImportWizard from '@/components/ImportWizard/ImportWizard';
+import PageTransition from '@/components/PageTransition';
+import { MonthYearPicker } from '@/components/MonthYearPicker';
+import { usePrivacy } from '@/context/PrivacyContext';
+import ConfirmModal from '@/components/ConfirmModal';
+import { cn } from '@/utils/cn';
+import type { Transaction } from '@/types';
+import { CAT_EMOJI, formatCurrency as fmt } from '@/utils/formatters';
+
+
+
+export default function Transactions() {
+  const { hideBalance } = usePrivacy();
+  const [showBalanceLocal, setShowBalanceLocal] = useState(!hideBalance);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [isConfirmDeleteAllOpen, setIsConfirmDeleteAllOpen] = useState(false);
+  const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
+  const isMobile = useMobile();
+
+  const {
+    transactions,
+    summary,
+    isLoading,
+    fetchTransactions,
+    deleteTransaction,
+    deleteTransactionsByMonth,
+  } = useTransactions();
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+
+  const [filters, setFilters] = useState({
+    search: '',
+    type: 'all',
+    month: String(new Date().getMonth() + 1),
+    year: String(new Date().getFullYear()),
+    category: undefined as string | undefined,
+  });
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+
+  const fetchData = useCallback(async () => {
+    await fetchTransactions(filters);
+  }, [filters, fetchTransactions]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleEdit = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingTransaction(null);
+  };
+
+  const currentMonthName = useMemo(() => {
+    const date = new Date(Number(filters.year), Number(filters.month) - 1);
+    return format(date, 'MMMM yyyy', { locale: ptBR });
+  }, [filters.month, filters.year]);
+
+  const handleDeleteIndividual = async () => {
+    if (transactionToDelete) {
+      await deleteTransaction(transactionToDelete);
+      setTransactionToDelete(null);
+      setIsConfirmDeleteOpen(false);
+      fetchData();
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    await deleteTransactionsByMonth(Number(filters.month), Number(filters.year));
+    setIsConfirmDeleteAllOpen(false);
+    fetchData();
+  };
+
+  // Group transactions by date for mobile
+  const groupedTransactions = useMemo(() => {
+    const groups: Record<string, Transaction[]> = {};
+    transactions.forEach((t) => {
+      const date = new Date(t.date);
+      let label = '';
+      if (isToday(date)) label = 'HOJE';
+      else if (isYesterday(date)) label = 'ONTEM';
+      else label = format(date, "dd 'de' MMM", { locale: ptBR }).toUpperCase();
+      
+      if (!groups[label]) groups[label] = [];
+      groups[label].push(t);
+    });
+    return Object.entries(groups);
+  }, [transactions]);
+
+  if (isMobile) {
+    return (
+      <PageTransition className="min-h-screen bg-[#f8f9fc] dark:bg-[#0c0c1d] pb-32">
+        {/* Mobile Header */}
+        <header className="px-6 pt-12 pb-6 flex items-center justify-between sticky top-0 bg-[#f8f9fc]/80 dark:bg-[#0c0c1d]/80 backdrop-blur-xl z-20">
+           <div className="flex items-center gap-4">
+              <Link to="/dashboard" className="p-2.5 bg-white dark:bg-[#161629] rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
+                 <ChevronLeft size={20} className="text-gray-600 dark:text-gray-400" />
+              </Link>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Transações</h1>
+              <button onClick={() => setShowBalanceLocal(!showBalanceLocal)} className="ml-1 p-1.5 hover:bg-white dark:hover:bg-[#161629] rounded-xl transition-colors text-gray-400 border border-transparent hover:border-gray-100 dark:hover:border-white/5">
+                 {showBalanceLocal ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
+           </div>
+           <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setIsSearchVisible(!isSearchVisible)}
+                className={cn("p-2.5 rounded-xl border transition-all", isSearchVisible ? "bg-indigo-50 border-indigo-200 text-indigo-600" : "bg-white dark:bg-[#161629] border-gray-100 dark:border-white/5 text-gray-600 dark:text-gray-400")}
+              >
+                 <Search size={20} />
+              </button>
+              <button 
+                onClick={() => setIsFilterPanelOpen(true)}
+                className="p-2.5 bg-white dark:bg-[#161629] rounded-xl border border-gray-100 dark:border-white/5 shadow-sm"
+              >
+                 <Filter size={20} className="text-gray-600 dark:text-gray-400" />
+              </button>
+           </div>
+        </header>
+
+        {/* Mobile Search Bar */}
+        <AnimatePresence>
+          {isSearchVisible && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="px-6 mb-4 overflow-hidden"
+            >
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <input 
+                  autoFocus
+                  placeholder="Buscar transação..."
+                  value={filters.search}
+                  onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
+                  className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-[#161629] rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm text-sm focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all dark:text-white"
+                />
+                {filters.search && (
+                  <button 
+                    onClick={() => setFilters(f => ({ ...f, search: '' }))}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  >
+                    <X size={18} />
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Filter Chips */}
+        <div className="px-6 mb-6 flex gap-2 overflow-x-auto no-scrollbar py-2">
+          {['Todas', 'Entradas', 'Saídas', 'Pix', 'Débito', 'Crédito'].map((tag) => {
+             const isActive = (tag === 'Todas' && filters.type === 'all' && !filters.category) || 
+                            (tag === 'Entradas' && filters.type === 'income') ||
+                            (tag === 'Saídas' && filters.type === 'expense') ||
+                            (tag === 'Pix' && filters.category === 'Pix') ||
+                            (tag === 'Débito' && filters.category === 'Débito') ||
+                            (tag === 'Crédito' && filters.category === 'Crédito');
+             return (
+               <button
+                 key={tag}
+                 onClick={() => {
+                    if (tag === 'Todas') setFilters(f => ({...f, type: 'all', category: undefined}));
+                    if (tag === 'Entradas') setFilters(f => ({...f, type: 'income', category: undefined}));
+                    if (tag === 'Saídas') setFilters(f => ({...f, type: 'expense', category: undefined}));
+                    if (tag === 'Pix') setFilters(f => ({...f, type: 'all', category: 'Pix'}));
+                    if (tag === 'Débito') setFilters(f => ({...f, type: 'all', category: 'Débito'}));
+                    if (tag === 'Crédito') setFilters(f => ({...f, type: 'all', category: 'Crédito'}));
+                 }}
+                 className={cn(
+                   "px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-sm border",
+                   isActive 
+                    ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white" 
+                    : "bg-white dark:bg-[#161629] text-gray-400 border-gray-100 dark:border-white/5"
+                 )}
+               >
+                 {tag}
+               </button>
+             );
+          })}
+        </div>
+
+        {/* List Content */}
+        <div className="px-6 space-y-8">
+           {groupedTransactions.map(([label, txs]) => (
+             <div key={label}>
+                <div className="flex items-center justify-between mb-4">
+                   <div className="text-[10px] font-bold text-gray-400 tracking-widest">{label}</div>
+                   <div className={cn("text-[10px] font-bold text-gray-400 tracking-widest transition-all", !showBalanceLocal && "blur-md select-none")}>
+                      {fmt(txs.reduce((acc, t) => acc + (t.type === 'income' ? t.amount : -t.amount), 0))}
+                   </div>
+                </div>
+                <div className="space-y-3">
+                   {txs.map((t) => (
+                      <button 
+                        key={t.id} 
+                        className="w-full text-left bg-white dark:bg-[#161629] p-4 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm flex items-center gap-4 active:scale-[0.98] transition-transform"
+                        onClick={() => handleEdit(t)}
+                      >
+                        <div className="w-12 h-12 bg-gray-50 dark:bg-white/5 rounded-xl flex items-center justify-center text-xl shadow-inner">
+                           {CAT_EMOJI[t.categories?.name || ''] || '💰'}
+                        </div>
+                        <div className="flex-1">
+                           <div className="text-sm font-bold text-gray-900 dark:text-white truncate max-w-[150px]">{t.description}</div>
+                           <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{t.categories?.name} · {format(new Date(t.date), 'HH:mm')}</div>
+                        </div>
+                        <div className={cn("text-sm font-bold transition-all", t.type === 'income' ? 'text-green-500' : 'text-gray-900 dark:text-white', !showBalanceLocal && "blur-md select-none")}>
+                           {t.type === 'income' ? '+' : '−'} {fmt(t.amount)}
+                        </div>
+                      </button>
+                   ))}
+                </div>
+             </div>
+           ))}
+
+           {transactions.length === 0 && !isLoading && (
+              <div className="py-20 text-center flex flex-col items-center gap-4">
+                 <div className="w-16 h-16 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center">
+                    <Receipt className="text-gray-400" size={32} />
+                 </div>
+                 <div className="text-sm font-medium text-gray-500">Nenhuma transação encontrada</div>
+              </div>
+           )}
+
+           {isLoading && (
+              <div className="py-20 text-center flex flex-col items-center gap-4">
+                 <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
+                 <div className="text-sm font-medium text-gray-500">Buscando transações...</div>
+              </div>
+           )}
+        </div>
+
+        <TransactionForm
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSuccess={fetchData}
+          transaction={editingTransaction}
+        />
+
+        {/* Mobile Filter Panel */}
+        <AnimatePresence>
+          {isFilterPanelOpen && (
+            <>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsFilterPanelOpen(false)}
+                className="fixed inset-0 bg-black/40 backdrop-blur-sm z-100"
+              />
+              <motion.div 
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="fixed bottom-0 left-0 right-0 bg-[#f8f9fc] dark:bg-[#0f0f1e] rounded-t-[32px] p-8 z-101 shadow-2xl max-h-[80vh] overflow-y-auto"
+              >
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">Filtros</h2>
+                  <button onClick={() => setIsFilterPanelOpen(false)} className="p-2 bg-white dark:bg-white/5 rounded-full shadow-sm border border-gray-100 dark:border-white/5">
+                    <X size={20} className="text-gray-400" />
+                  </button>
+                </div>
+
+                <div className="space-y-8">
+                  <div>
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-4">Período</label>
+                    <MonthYearPicker
+                      month={filters.month}
+                      year={filters.year}
+                      onChange={(m, y) => setFilters(f => ({ ...f, month: m, year: y }))}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-4">Tipo</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { id: 'all', label: 'Todos' },
+                        { id: 'income', label: 'Receitas' },
+                        { id: 'expense', label: 'Despesas' }
+                      ].map((t) => (
+                        <button
+                          key={t.id}
+                          onClick={() => setFilters(f => ({ ...f, type: t.id, category: undefined }))}
+                          className={cn(
+                            "py-3 rounded-2xl text-xs font-bold border transition-all",
+                            filters.type === t.id && !filters.category
+                              ? "bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900 shadow-lg shadow-gray-900/20"
+                              : "bg-white dark:bg-white/5 border-gray-100 dark:border-white/5 text-gray-500 shadow-sm"
+                          )}
+                        >
+                          {t.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <button 
+                      onClick={() => {
+                        setFilters({
+                          search: '',
+                          type: 'all',
+                          month: String(new Date().getMonth() + 1),
+                          year: String(new Date().getFullYear()),
+                          category: undefined,
+                        });
+                        setIsFilterPanelOpen(false);
+                      }}
+                      className="flex-1 py-4 rounded-2xl border border-gray-100 dark:border-white/5 text-sm font-bold text-gray-500 bg-white dark:bg-white/5 active:scale-[0.98] transition-all"
+                    >
+                      Limpar
+                    </button>
+
+                    <button 
+                      onClick={() => setIsFilterPanelOpen(false)}
+                      className="flex-2 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-2xl text-sm font-bold shadow-lg shadow-gray-900/20 active:scale-[0.98] transition-all"
+                    >
+                      Aplicar
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </PageTransition>
+    );
+  }
+
+  return (
+    <PageTransition className="A-main h-screen overflow-y-auto w-full">
+      {/* Top Header */}
+      <div className="A-top">
+        <div>
+          <h1 className="text-gray-900 dark:text-white">Transações</h1>
+          <div className="sub flex items-center gap-2">
+            <span>{transactions.length} registros · {currentMonthName}</span>
+            <button onClick={() => setShowBalanceLocal(!showBalanceLocal)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors text-gray-400">
+              {showBalanceLocal ? <Eye size={14} /> : <EyeOff size={14} />}
+            </button>
+          </div>
+        </div>
+        <div className="flex gap-2 items-center flex-wrap">
+          <button
+            onClick={() => setIsConfirmDeleteAllOpen(true)}
+            className="A-chip text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors border-red-200 dark:border-red-900/30"
+            disabled={transactions.length === 0}
+          >
+            <Trash2 size={14} className="mr-1" /> Excluir período
+          </button>
+          <button className="A-chip">
+            <Download size={14} className="mr-1" /> Exportar CSV
+          </button>
+          <button onClick={() => setIsImportOpen(true)} className="A-chip">
+            <Upload size={14} className="mr-1" /> Importar
+          </button>
+          <button onClick={() => setIsModalOpen(true)} className="A-chip primary">
+            <Plus size={14} className="mr-1" /> Nova transação
+          </button>
+        </div>
+      </div>
+
+      {/* Transaction Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <div className="A-card p-4!">
+          <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+            Total no período
+          </div>
+          <div className={cn("text-2xl font-bold mt-2 text-red-500 transition-all duration-300", !showBalanceLocal && "blur-md select-none")}>− {fmt(summary.totalExpense)}</div>
+        </div>
+        <div className="A-card p-4!">
+          <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+            Receitas
+          </div>
+          <div className={cn("text-2xl font-bold mt-2 text-green-500 transition-all duration-300", !showBalanceLocal && "blur-md select-none")}>+ {fmt(summary.totalIncome)}</div>
+        </div>
+        <div className="A-card p-4!">
+          <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+            {filters.type === 'income' ? 'Maior receita' : 'Maior gasto'}
+          </div>
+          <div className={cn("text-2xl font-bold mt-2 text-gray-900 dark:text-white transition-all duration-300", !showBalanceLocal && "blur-md select-none")}>
+            {fmt(
+              Math.max(
+                ...transactions
+                  .filter((t) =>
+                    filters.type === 'all' ? t.type === 'expense' : t.type === filters.type,
+                  )
+                  .map((t) => t.amount),
+                0,
+              ),
+            )}
+          </div>
+        </div>
+        <div className="A-card p-4!">
+          <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+            Média diária
+          </div>
+          <div className={cn("text-2xl font-bold mt-2 text-gray-900 dark:text-white transition-all duration-300", !showBalanceLocal && "blur-md select-none")}>
+            {fmt((filters.type === 'income' ? summary.totalIncome : summary.totalExpense) / 30)}
+          </div>
+        </div>
+      </div>
+
+      {/* Filters Row */}
+      <div className="flex gap-2 items-center flex-wrap mb-6">
+        <div className="A-search flex-1 max-w-md">
+          <Search size={14} className="text-gray-400" />
+          <input
+            placeholder="Buscar por descrição, valor, categoria..."
+            value={filters.search}
+            onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
+            className="text-gray-900 dark:text-white"
+          />
+        </div>
+        <MonthYearPicker
+          month={filters.month}
+          year={filters.year}
+          onChange={(m, y) => setFilters((f) => ({ ...f, month: m, year: y }))}
+        />
+        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+          <button
+            onClick={() => setFilters((f) => ({ ...f, type: 'all' }))}
+            className={cn(
+              'px-4 py-1.5 rounded-md text-xs font-medium transition-all',
+              filters.type === 'all'
+                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500',
+            )}
+          >
+            Todos
+          </button>
+          <button
+            onClick={() => setFilters((f) => ({ ...f, type: 'income' }))}
+            className={cn(
+              'px-4 py-1.5 rounded-md text-xs font-medium transition-all',
+              filters.type === 'income'
+                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500',
+            )}
+          >
+            Receitas
+          </button>
+          <button
+            onClick={() => setFilters((f) => ({ ...f, type: 'expense' }))}
+            className={cn(
+              'px-4 py-1.5 rounded-md text-xs font-medium transition-all',
+              filters.type === 'expense'
+                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500',
+            )}
+          >
+            Despesas
+          </button>
+        </div>
+        <div className="flex-1" />
+        <button
+          onClick={() =>
+            setFilters({
+              search: '',
+              type: 'all',
+              month: String(new Date().getMonth() + 1),
+              year: String(new Date().getFullYear()),
+              category: undefined,
+            })
+          }
+          className="A-chip"
+        >
+          Limpar
+        </button>
+      </div>
+
+      {/* Transactions Table */}
+      <div className="A-card p-0! overflow-hidden mb-12">
+        <div className="grid grid-cols-[48px_1fr_140px_110px_130px_80px] gap-4 px-6 py-3 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+          <span />
+          <span className="min-w-0 truncate">Descrição</span>
+          <span>Categoria</span>
+          <span>Data</span>
+          <span className="text-right">Valor</span>
+          <span />
+        </div>
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
+          {transactions.map((t) => (
+            <button
+              key={t.id}
+              className="w-full text-left grid grid-cols-[48px_1fr_140px_110px_130px_80px] gap-4 px-6 py-4 items-center hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors cursor-pointer group"
+              onClick={() => handleEdit(t)}
+            >
+              <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-lg">
+                {CAT_EMOJI[t.categories?.name || ''] || '💰'}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div
+                  className="text-sm font-medium text-gray-900 dark:text-white truncate"
+                  title={t.description}
+                >
+                  {t.description}
+                </div>
+                <div className="text-[11px] text-gray-400 mt-0.5">Conta Corrente · Principais</div>
+              </div>
+              <div>
+                <span className="inline-flex px-2 py-1 rounded-full bg-indigo-500/10 text-indigo-500 text-[10px] font-bold uppercase tracking-wider">
+                  {t.categories?.name || 'Outros'}
+                </span>
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                {format(new Date(t.date), 'dd/MM/yyyy')}
+              </div>
+              <div
+                className={cn(
+                  'text-sm font-semibold text-right transition-all',
+                  t.type === 'income' ? 'text-green-500' : 'text-gray-900 dark:text-white',
+                  !showBalanceLocal && "blur-md select-none"
+                )}
+              >
+                {t.type === 'income' ? '+' : '−'} {fmt(t.amount)}
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTransactionToDelete(t.id);
+                    setIsConfirmDeleteOpen(true);
+                  }}
+                  className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all opacity-0 group-hover:opacity-100"
+                >
+                  <Trash2 size={16} />
+                </button>
+                <button className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                  <MoreHorizontal size={18} />
+                </button>
+              </div>
+            </button>
+          ))}
+          {transactions.length === 0 && !isLoading && (
+            <div className="py-20 text-center text-gray-500">
+              Nenhuma transação encontrada para este período.
+            </div>
+          )}
+          {isLoading && (
+            <div className="py-20 text-center text-gray-500 flex flex-col items-center gap-3">
+              <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+              Carregando transações...
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Modals */}
+      <TransactionForm
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSuccess={fetchData}
+        transaction={editingTransaction}
+      />
+      <ImportWizard
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        onSuccess={fetchData}
+      />
+
+      <ConfirmModal
+        isOpen={isConfirmDeleteOpen}
+        onClose={() => {
+          setIsConfirmDeleteOpen(false);
+          setTransactionToDelete(null);
+        }}
+        onConfirm={handleDeleteIndividual}
+        title="Excluir Transação"
+        description="Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita."
+      />
+
+      <ConfirmModal
+        isOpen={isConfirmDeleteAllOpen}
+        onClose={() => setIsConfirmDeleteAllOpen(false)}
+        onConfirm={handleDeleteAll}
+        title="Excluir Todo o Período"
+        description={`Tem certeza que deseja excluir TODAS as ${transactions.length} transações de ${currentMonthName}? Esta ação é irreversível.`}
+      />
+    </PageTransition>
+  );
+}

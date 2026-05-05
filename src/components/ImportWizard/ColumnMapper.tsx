@@ -23,8 +23,8 @@ export default function ColumnMapper({
       <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/50 p-4 rounded-xl flex gap-3 text-sm text-amber-700 dark:text-amber-400">
         <HelpCircle className="w-5 h-5 shrink-0" />
         <p>
-          Mapeie as colunas do seu arquivo CSV para os campos do sistema. 
-          Confira se os formatos de data e separadores estão corretos.
+          Mapeie as colunas do seu arquivo CSV para os campos do sistema. Confira se os formatos de
+          data e separadores estão corretos.
         </p>
       </div>
 
@@ -42,7 +42,9 @@ export default function ColumnMapper({
             >
               <option value="">Selecione...</option>
               {headers.map((h) => (
-                <option key={h} value={h}>{h}</option>
+                <option key={h} value={h}>
+                  {h}
+                </option>
               ))}
             </select>
           </div>
@@ -58,7 +60,9 @@ export default function ColumnMapper({
             >
               <option value="">Selecione...</option>
               {headers.map((h) => (
-                <option key={h} value={h}>{h}</option>
+                <option key={h} value={h}>
+                  {h}
+                </option>
               ))}
             </select>
           </div>
@@ -74,7 +78,9 @@ export default function ColumnMapper({
             >
               <option value="">Selecione...</option>
               {headers.map((h) => (
-                <option key={h} value={h}>{h}</option>
+                <option key={h} value={h}>
+                  {h}
+                </option>
               ))}
             </select>
           </div>
@@ -131,7 +137,7 @@ export default function ColumnMapper({
             {headers.slice(0, 8).map((header) => {
               const isAmount = header === mapping.amount;
               const rawValue = sampleData[0]?.[header] || '-';
-              
+
               return (
                 <div key={header} className="flex flex-col gap-1">
                   <div className="flex justify-between text-sm">
@@ -143,15 +149,27 @@ export default function ColumnMapper({
                   {isAmount && rawValue !== '-' && (
                     <div className="flex justify-end">
                       <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded">
-                        Processado: {(() => {
+                        Processado:{' '}
+                        {(() => {
                           try {
-                            const val = mapping.decimalSeparator === ',' 
-                              ? rawValue.toString().replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.')
-                              : rawValue.toString().replace(/[R$\s]/g, '').replace(/,/g, '');
+                            const val =
+                              mapping.decimalSeparator === ','
+                                ? rawValue
+                                    .toString()
+                                    .replace(/[R$\s]/g, '')
+                                    .replace(/\./g, '')
+                                    .replace(',', '.')
+                                : rawValue
+                                    .toString()
+                                    .replace(/[R$\s]/g, '')
+                                    .replace(/,/g, '');
                             const parsed = parseFloat(val);
-                            return isNaN(parsed) 
-                              ? 'Valor inválido' 
-                              : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Math.abs(parsed));
+                            return isNaN(parsed)
+                              ? 'Valor inválido'
+                              : new Intl.NumberFormat('pt-BR', {
+                                  style: 'currency',
+                                  currency: 'BRL',
+                                }).format(Math.abs(parsed));
                           } catch (e) {
                             return 'Erro no formato';
                           }
