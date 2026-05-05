@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Rocket, Zap, Bug, Sparkles } from 'lucide-react';
+import { ArrowLeft, Rocket, Zap, Sparkles } from 'lucide-react';
 import PageTransition from '@/components/PageTransition';
 
 const COPY: any = {
