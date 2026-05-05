@@ -239,8 +239,9 @@ function SplashStep({ t }: { t: any }) {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="relative z-10 flex flex-col items-center"
       >
-        <div className="flex flex-col items-center mb-16">
+        <div className="flex flex-col items-center mb-8">
           <img src="/logo-expense-tracker.webp" alt="Logo" style={{ width: 180, height: 130, objectFit: 'contain' }} />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-4 tracking-tight">Expense Tracker</h1>
         </div>
         <p className="text-gray-500 dark:text-gray-400 font-medium mb-12">{t.splash.subtitle}</p>
         
