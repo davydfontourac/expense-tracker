@@ -1,5 +1,5 @@
-import { render, screen, fireEvent, renderHook } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { render, screen, renderHook } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { PrivacyProvider, usePrivacy } from './PrivacyContext';
 import React from 'react';
 

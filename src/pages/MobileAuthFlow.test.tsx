@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import MobileAuthFlow from './MobileAuthFlow';
 
@@ -171,7 +171,7 @@ describe('MobileAuthFlow Component', () => {
   });
 
   it('submits registration form successfully and goes to success screen', async () => {
-    mockHandleRegister.mockImplementation((data, cb) => {
+    mockHandleRegister.mockImplementation((_data, cb) => {
       cb();
     });
 
@@ -236,7 +236,7 @@ describe('MobileAuthFlow Component', () => {
   });
 
   it('handles forgot password submission and success state', async () => {
-    mockHandleForgotPassword.mockImplementation((email, cb) => {
+    mockHandleForgotPassword.mockImplementation((_email, cb) => {
       cb();
     });
 

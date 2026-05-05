@@ -14,7 +14,7 @@ const mockQuery = {
   delete: vi.fn().mockReturnThis(),
   then: vi.fn(function (callback) {
     callback({ data: [], error: null });
-    return this;
+    return mockQuery;
   }),
 };
 
