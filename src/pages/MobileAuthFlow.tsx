@@ -427,6 +427,7 @@ function RegisterStep({ onLogin, onOpenMenu, t, onSuccess }: { onLogin: () => vo
         onOpenMenu={onOpenMenu}
         title={t.register.title}
         subtitle={t.register.subtitle}
+        hideLogo={true}
       />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

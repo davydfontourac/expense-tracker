@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowLeft, Menu, Chrome, Github } from 'lucide-react';
 
-export function AuthHeader({ onBack, onOpenMenu, title, subtitle }: { onBack?: () => void, onOpenMenu: () => void, title: string, subtitle: string }) {
+export function AuthHeader({ onBack, onOpenMenu, title, subtitle, hideLogo }: { onBack?: () => void, onOpenMenu: () => void, title: string, subtitle: string, hideLogo?: boolean }) {
   return (
     <>
       <header className="flex items-center justify-between mb-8">
@@ -11,7 +11,7 @@ export function AuthHeader({ onBack, onOpenMenu, title, subtitle }: { onBack?: (
           </button>
         ) : (
           <div className="flex items-center">
-            <img src="/logo-expense-tracker.webp" alt="Logo" className="w-11 h-11 object-contain" />
+            {!hideLogo && <img src="/logo-expense-tracker.webp" alt="Logo" className="w-11 h-11 object-contain" />}
           </div>
         )}
         <button onClick={onOpenMenu} className="p-2 -mr-2 text-gray-900 dark:text-white">
