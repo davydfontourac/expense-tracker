@@ -166,7 +166,7 @@ export default function Dashboard() {
              <button className="p-2.5 bg-white dark:bg-[#161629] rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
                 <Bell size={20} className="text-gray-600 dark:text-gray-400" />
              </button>
-             <Link to="/profile" className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/20 overflow-hidden">
+             <Link to="/profile" className="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/20 overflow-hidden">
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
@@ -178,7 +178,7 @@ export default function Dashboard() {
 
         {/* Balance Card */}
         <div className="px-6 mb-8">
-          <div className="relative overflow-hidden bg-gradient-to-br from-[#4f46e5] via-[#6366f1] to-[#8b5cf6] rounded-[32px] p-6 shadow-2xl shadow-indigo-500/30">
+          <div className="relative overflow-hidden bg-linear-to-br from-[#4f46e5] via-[#6366f1] to-[#8b5cf6] rounded-[32px] p-6 shadow-2xl shadow-indigo-500/30">
             {/* Background Chart (Wavy Line) */}
             <div className="absolute inset-0 opacity-20 mt-12 pointer-events-none">
               <svg viewBox="0 0 400 150" preserveAspectRatio="none" className="w-full h-full">
@@ -387,9 +387,9 @@ export default function Dashboard() {
           </div>
           <div className="space-y-3">
             {transactions.slice(0, 5).map((t) => (
-              <div 
+              <button 
                 key={t.id} 
-                className="bg-white dark:bg-[#161629] p-4 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm flex items-center gap-4 active:scale-[0.98] transition-transform"
+                className="w-full text-left bg-white dark:bg-[#161629] p-4 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm flex items-center gap-4 active:scale-[0.98] transition-transform"
                 onClick={() => handleEdit(t)}
               >
                 <div className="w-12 h-12 bg-gray-50 dark:bg-white/5 rounded-xl flex items-center justify-center text-xl shadow-inner">
@@ -409,7 +409,7 @@ export default function Dashboard() {
                 <div className={cn("text-sm font-bold transition-all", t.type === 'income' ? 'text-green-500' : 'text-gray-900 dark:text-white', !showBalanceLocal && "blur-md select-none")}>
                    {t.type === 'income' ? '+' : '−'} {fmt(t.amount)}
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -586,7 +586,7 @@ export default function Dashboard() {
                     />
 
                     {/* Tooltip */}
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-[100]">
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-100">
                       <div className="bg-gray-900 text-white text-[10px] py-2 px-3 rounded-lg shadow-xl whitespace-nowrap pointer-events-none border border-gray-700">
                         <div className="text-[9px] text-gray-400 mb-1 font-mono uppercase">
                           {h.month} {h.year}
@@ -676,7 +676,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="head mt-4 text-gray-700 dark:text-gray-300">
-            <span className="i !bg-green-500/10 !text-green-500">↗</span>
+            <span className="i bg-green-500/10! text-green-500!">↗</span>
             Previsão
           </div>
           <div className="body text-sm text-gray-900 dark:text-gray-100">
@@ -723,9 +723,9 @@ export default function Dashboard() {
         </div>
         <div className="divide-y divide-gray-100 dark:divide-gray-800">
           {transactions.slice(0, 8).map((t) => (
-            <div
+            <button
               key={t.id}
-              className="A-txrow hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+              className="A-txrow w-full text-left hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors cursor-pointer"
               onClick={() => handleEdit(t)}
             >
               <div className="ic text-xl">{CAT_EMOJI[t.categories?.name || ''] || '💰'}</div>
@@ -751,10 +751,10 @@ export default function Dashboard() {
                 )}
               >
                 {t.type === 'income' ? '+' : '−'} {fmt(t.amount)}
-              </div>
-            </div>
-          ))}
-          {transactions.length === 0 && !isLoading && (
+                </div>
+              </button>
+            ))}
+            {transactions.length === 0 && !isLoading && (
             <div className="py-12 text-center text-gray-500">Nenhuma transação encontrada.</div>
           )}
           {isLoading && (

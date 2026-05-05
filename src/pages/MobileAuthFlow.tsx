@@ -161,14 +161,14 @@ export default function MobileAuthFlow() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[60]"
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-60"
             />
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-[280px] bg-white dark:bg-[#0c0c1d] shadow-2xl z-[70] flex flex-col p-8"
+              className="fixed top-0 right-0 bottom-0 w-[280px] bg-white dark:bg-[#0c0c1d] shadow-2xl z-70 flex flex-col p-8"
             >
               <div className="flex justify-end mb-8">
                 <button onClick={() => setIsMenuOpen(false)} className="p-2 text-gray-500 dark:text-gray-400">
@@ -229,7 +229,7 @@ export default function MobileAuthFlow() {
 
 function SplashStep({ t }: { t: any }) {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-br from-[#f8f5ff] to-[#ffffff] dark:from-[#0c0c1d] dark:to-[#161629] relative overflow-hidden">
+    <div className="flex-1 flex flex-col items-center justify-center bg-linear-to-br from-[#f8f5ff] to-[#ffffff] dark:from-[#0c0c1d] dark:to-[#161629] relative overflow-hidden">
       {/* Decorative Blur */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-indigo-500/10 blur-[80px] rounded-full"></div>
       

@@ -260,6 +260,9 @@ function DashboardMock({ t }: { t: LandingCopy }) {
               <div
                 key={label.toString()}
                 onClick={() => setActiveTab(index as number)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setActiveTab(index as number); }}
+                role="button"
+                tabIndex={0}
                 style={{
                   padding: '7px 10px',
                   borderRadius: 7,
@@ -496,7 +499,16 @@ function DashboardMock({ t }: { t: LandingCopy }) {
         {/* Mobile Tab Bar */}
         <div style={{ display: 'flex', justifyContent: 'space-around', borderTop: '1px solid var(--ink-100)', marginTop: 24, paddingTop: 12 }}>
           {['▦', '≡', '◫', '⎘'].map((ic, i) => (
-            <div key={i} onClick={() => setActiveTab(i)} style={{ fontSize: 18, color: activeTab === i ? 'var(--brand-500)' : 'var(--ink-300)', cursor: 'pointer' }}>{ic}</div>
+            <div 
+              key={i} 
+              onClick={() => setActiveTab(i)} 
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setActiveTab(i); }}
+              role="button"
+              tabIndex={0}
+              style={{ fontSize: 18, color: activeTab === i ? 'var(--brand-500)' : 'var(--ink-300)', cursor: 'pointer' }}
+            >
+              {ic}
+            </div>
           ))}
         </div>
       </div>

@@ -210,7 +210,7 @@ export default function Auth() {
         <div className="relative z-10 max-w-lg">
           <h2 className="text-6xl font-bold text-white leading-[1.1] tracking-tight mb-6">
             {t.register.sidebarTitle}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-500">
               {t.register.sidebarSubtitle}
             </span>
           </h2>
@@ -291,7 +291,7 @@ export default function Auth() {
                   </div>
                   <div>
                     <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 font-mono">{t.login.password}</label>
-                    <PasswordInput {...loginForm.register('password')} placeholder={t.login.passwordPlaceholder} error={loginForm.formState.errors.password?.message} className="!bg-gray-50 dark:!bg-[#161629] !border-gray-200 dark:!border-gray-800 !rounded-xl !py-3.5" />
+                    <PasswordInput {...loginForm.register('password')} placeholder={t.login.passwordPlaceholder} error={loginForm.formState.errors.password?.message} className="bg-gray-50! dark:bg-[#161629]! border-gray-200! dark:border-gray-800! rounded-xl! py-3.5!" />
                   </div>
                   <button type="submit" disabled={isLoading} className="w-full bg-[#0c0c1d] dark:bg-white hover:bg-[#1a1a33] dark:hover:bg-gray-100 text-white dark:text-[#0c0c1d] font-bold py-4 rounded-xl transition-all shadow-lg active:scale-[0.98] flex items-center justify-center gap-2">
                     {isLoading ? (
@@ -315,7 +315,7 @@ export default function Auth() {
                   </div>
                   <div className="relative">
                     <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 font-mono">{t.register.password}</label>
-                    <PasswordInput {...registerForm.register('password')} placeholder={t.register.passwordPlaceholder} error={registerForm.formState.errors.password?.message} className="!bg-gray-50 dark:!bg-[#161629] !border-gray-200 dark:!border-gray-800 !rounded-xl !py-3.5" />
+                    <PasswordInput {...registerForm.register('password')} placeholder={t.register.passwordPlaceholder} error={registerForm.formState.errors.password?.message} className="bg-gray-50! dark:bg-[#161629]! border-gray-200! dark:border-gray-800! rounded-xl! py-3.5!" />
                     <StrengthMeter score={passwordScore} />
                     <div className="mt-2 flex flex-wrap gap-2">
                        {[
@@ -332,7 +332,7 @@ export default function Auth() {
                   </div>
                   <div className="relative">
                     <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 font-mono">{t.register.confirm}</label>
-                    <PasswordInput {...registerForm.register('confirmPassword')} placeholder={t.register.confirmPasswordPlaceholder} error={registerForm.formState.errors.confirmPassword?.message} className="!bg-gray-50 dark:!bg-[#161629] !border-gray-200 dark:!border-gray-800 !rounded-xl !py-3.5" />
+                    <PasswordInput {...registerForm.register('confirmPassword')} placeholder={t.register.confirmPasswordPlaceholder} error={registerForm.formState.errors.confirmPassword?.message} className="bg-gray-50! dark:bg-[#161629]! border-gray-200! dark:border-gray-800! rounded-xl! py-3.5!" />
                     <StrengthMeter score={matchScore} mode="match" />
                   </div>
                   <div className="flex flex-col gap-1 py-2">

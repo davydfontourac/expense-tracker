@@ -178,7 +178,7 @@ export default function TransactionForm({
 
   if (isMobile) {
     return (
-      <div className="fixed inset-0 z-[100] bg-white dark:bg-[#0c0c1d] flex flex-col animate-in slide-in-from-bottom duration-300">
+      <div className="fixed inset-0 z-100 bg-white dark:bg-[#0c0c1d] flex flex-col animate-in slide-in-from-bottom duration-300">
         <header className="px-6 pt-12 pb-6 flex items-center justify-between">
            <button onClick={onClose} className="p-2.5 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5">
               <X size={20} className="text-gray-600 dark:text-gray-400" />

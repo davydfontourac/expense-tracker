@@ -144,7 +144,7 @@ export default function ImportWizard({ isOpen, onClose, onSuccess }: ImportWizar
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center lg:p-4 bg-white dark:bg-[#0c0c1d] lg:bg-transparent">
+    <div className="fixed inset-0 z-100 flex items-center justify-center lg:p-4 bg-white dark:bg-[#0c0c1d] lg:bg-transparent">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

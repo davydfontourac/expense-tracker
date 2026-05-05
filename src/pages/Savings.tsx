@@ -121,9 +121,9 @@ export default function Savings() {
               {goals.map((goal) => {
                 const pct = goal.target_amount > 0 ? Math.min(Math.round((goal.current_amount / goal.target_amount) * 100), 100) : 0;
                 return (
-                  <div 
+                  <button 
                     key={goal.id} 
-                    className="bg-white dark:bg-[#161629] p-5 rounded-[24px] border border-gray-100 dark:border-white/5 shadow-sm active:scale-[0.98] transition-transform"
+                    className="w-full text-left bg-white dark:bg-[#161629] p-5 rounded-[24px] border border-gray-100 dark:border-white/5 shadow-sm active:scale-[0.98] transition-transform"
                     onClick={() => handleAddAporte(goal)}
                   >
                     <div className="flex items-center gap-4 mb-5">
@@ -145,7 +145,7 @@ export default function Savings() {
                           <div className="h-full rounded-full bg-green-500 transition-all duration-1000" style={{ width: `${pct}%` }} />
                        </div>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
            </div>
@@ -280,7 +280,7 @@ export default function Savings() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleAddAporte(goal)}
-                      className="A-chip !py-1 text-[11px]"
+                      className="A-chip py-1! text-[11px]"
                     >
                       + Aportar
                     </button>

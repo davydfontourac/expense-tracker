@@ -112,7 +112,7 @@ export function StrengthMeter({ score, segments = 4, mode = 'strength' }: { scor
         return (
           <div 
             key={i} 
-            className={`h-1 flex-1 rounded-full transition-all duration-500 ${colorClass} ${active ? 'opacity-100' : 'opacity-100'}`} 
+            className={`h-1 flex-1 rounded-full transition-all duration-500 ${colorClass} ${active ? 'opacity-100' : 'opacity-20'}`} 
           />
         );
       })}

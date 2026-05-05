@@ -208,9 +208,9 @@ export default function Transactions() {
                 </div>
                 <div className="space-y-3">
                    {txs.map((t) => (
-                      <div 
+                      <button 
                         key={t.id} 
-                        className="bg-white dark:bg-[#161629] p-4 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm flex items-center gap-4 active:scale-[0.98] transition-transform"
+                        className="w-full text-left bg-white dark:bg-[#161629] p-4 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm flex items-center gap-4 active:scale-[0.98] transition-transform"
                         onClick={() => handleEdit(t)}
                       >
                         <div className="w-12 h-12 bg-gray-50 dark:bg-white/5 rounded-xl flex items-center justify-center text-xl shadow-inner">
@@ -223,7 +223,7 @@ export default function Transactions() {
                         <div className={cn("text-sm font-bold transition-all", t.type === 'income' ? 'text-green-500' : 'text-gray-900 dark:text-white', !showBalanceLocal && "blur-md select-none")}>
                            {t.type === 'income' ? '+' : '−'} {fmt(t.amount)}
                         </div>
-                      </div>
+                      </button>
                    ))}
                 </div>
              </div>
@@ -262,14 +262,14 @@ export default function Transactions() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setIsFilterPanelOpen(false)}
-                className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100]"
+                className="fixed inset-0 bg-black/40 backdrop-blur-sm z-100"
               />
               <motion.div 
                 initial={{ y: '100%' }}
                 animate={{ y: 0 }}
                 exit={{ y: '100%' }}
                 transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="fixed bottom-0 left-0 right-0 bg-[#f8f9fc] dark:bg-[#0f0f1e] rounded-t-[32px] p-8 z-[101] shadow-2xl max-h-[80vh] overflow-y-auto"
+                className="fixed bottom-0 left-0 right-0 bg-[#f8f9fc] dark:bg-[#0f0f1e] rounded-t-[32px] p-8 z-101 shadow-2xl max-h-[80vh] overflow-y-auto"
               >
                 <div className="flex items-center justify-between mb-8">
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white">Filtros</h2>
@@ -331,7 +331,7 @@ export default function Transactions() {
 
                     <button 
                       onClick={() => setIsFilterPanelOpen(false)}
-                      className="flex-[2] py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-2xl text-sm font-bold shadow-lg shadow-gray-900/20 active:scale-[0.98] transition-all"
+                      className="flex-2 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-2xl text-sm font-bold shadow-lg shadow-gray-900/20 active:scale-[0.98] transition-all"
                     >
                       Aplicar
                     </button>
@@ -380,19 +380,19 @@ export default function Transactions() {
 
       {/* Transaction Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <div className="A-card !p-4">
+        <div className="A-card p-4!">
           <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
             Total no período
           </div>
           <div className={cn("text-2xl font-bold mt-2 text-red-500 transition-all duration-300", !showBalanceLocal && "blur-md select-none")}>− {fmt(summary.totalExpense)}</div>
         </div>
-        <div className="A-card !p-4">
+        <div className="A-card p-4!">
           <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
             Receitas
           </div>
           <div className={cn("text-2xl font-bold mt-2 text-green-500 transition-all duration-300", !showBalanceLocal && "blur-md select-none")}>+ {fmt(summary.totalIncome)}</div>
         </div>
-        <div className="A-card !p-4">
+        <div className="A-card p-4!">
           <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
             {filters.type === 'income' ? 'Maior receita' : 'Maior gasto'}
           </div>
@@ -409,7 +409,7 @@ export default function Transactions() {
             )}
           </div>
         </div>
-        <div className="A-card !p-4">
+        <div className="A-card p-4!">
           <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
             Média diária
           </div>
@@ -488,7 +488,7 @@ export default function Transactions() {
       </div>
 
       {/* Transactions Table */}
-      <div className="A-card !p-0 overflow-hidden mb-12">
+      <div className="A-card p-0! overflow-hidden mb-12">
         <div className="grid grid-cols-[48px_1fr_140px_110px_130px_80px] gap-4 px-6 py-3 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 text-[10px] font-mono text-gray-400 uppercase tracking-widest">
           <span />
           <span className="min-w-0 truncate">Descrição</span>
@@ -499,9 +499,9 @@ export default function Transactions() {
         </div>
         <div className="divide-y divide-gray-100 dark:divide-gray-800">
           {transactions.map((t) => (
-            <div
+            <button
               key={t.id}
-              className="grid grid-cols-[48px_1fr_140px_110px_130px_80px] gap-4 px-6 py-4 items-center hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors cursor-pointer group"
+              className="w-full text-left grid grid-cols-[48px_1fr_140px_110px_130px_80px] gap-4 px-6 py-4 items-center hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors cursor-pointer group"
               onClick={() => handleEdit(t)}
             >
               <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-lg">
@@ -548,7 +548,7 @@ export default function Transactions() {
                   <MoreHorizontal size={18} />
                 </button>
               </div>
-            </div>
+            </button>
           ))}
           {transactions.length === 0 && !isLoading && (
             <div className="py-20 text-center text-gray-500">

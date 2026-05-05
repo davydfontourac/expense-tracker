@@ -58,7 +58,7 @@ export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps)
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl z-[100] p-4 animate-in fade-in zoom-in duration-200">
+        <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl z-100 p-4 animate-in fade-in zoom-in duration-200">
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={handlePrevYear}

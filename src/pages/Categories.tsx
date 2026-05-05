@@ -182,9 +182,9 @@ export default function Categories() {
                 const isOverLimit = hasLimit && spent > c.monthly_limit;
 
                 return (
-                  <div 
+                  <button 
                     key={c.id} 
-                    className="bg-white dark:bg-[#161629] p-4 rounded-[24px] border border-gray-100 dark:border-white/5 shadow-sm active:scale-[0.98] transition-transform"
+                    className="w-full text-left bg-white dark:bg-[#161629] p-4 rounded-[24px] border border-gray-100 dark:border-white/5 shadow-sm active:scale-[0.98] transition-transform"
                     onClick={() => handleEdit(c)}
                   >
                     <div className="flex items-center gap-4 mb-4">
@@ -212,7 +212,7 @@ export default function Categories() {
                          }} 
                        />
                     </div>
-                  </div>
+                  </button>
                 );
               })}
            </div>
@@ -284,7 +284,7 @@ export default function Categories() {
                   transition={{ delay: i * 0.05 }}
                   className={cn(
                     'A-card flex flex-col gap-3 group hover:border-gray-400 dark:hover:border-gray-500 transition-colors cursor-pointer',
-                    isOverLimit && '!border-red-500/50 bg-red-50/5 dark:bg-red-900/5',
+                    isOverLimit && 'border-red-500/50! bg-red-50/5 dark:bg-red-900/5',
                   )}
                   onClick={() => handleEdit(c)}
                 >

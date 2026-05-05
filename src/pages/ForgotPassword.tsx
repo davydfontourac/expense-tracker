@@ -84,7 +84,7 @@ export default function ForgotPassword() {
           </div>
           <h2 className="text-5xl font-bold text-white leading-[1.1] tracking-tight mb-6">
             Redefina sua senha em{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-500">
               3 passos.
             </span>
           </h2>
@@ -154,7 +154,7 @@ export default function ForgotPassword() {
               >
                 <div className="mb-10">
                   <div className="w-16 h-16 bg-cyan-400 rounded-2xl flex items-center justify-center mb-6 shadow-xl shadow-cyan-400/20 relative group overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="absolute inset-0 bg-linear-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     <Mail className="w-8 h-8 text-white relative z-10" />
                   </div>
                   <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-4 tracking-tight">

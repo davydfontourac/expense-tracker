@@ -83,31 +83,19 @@ export default function Profile() {
     try {
       setIsClearingCache(true);
       
-      const clearPromise = new Promise(async (resolve, reject) => {
-        try {
-          // Clear Cache Storage (Service Worker caches)
-          if ('caches' in window) {
-            const cacheNames = await caches.keys();
-            await Promise.all(cacheNames.map(name => caches.delete(name)));
-          }
+      // Clear Cache Storage (Service Worker caches)
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+      }
 
-          // Artificial delay for UX
-          setTimeout(() => {
-            calculateCacheSize();
-            resolve(true);
-          }, 1500);
-        } catch (e) {
-          reject(e);
-        }
-      });
-
-      toast.promise(clearPromise, {
-        loading: 'Limpando arquivos temporários...',
-        success: 'Cache limpo com sucesso!',
-        error: 'Erro ao limpar cache'
-      });
-
+      // Artificial delay for UX
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      calculateCacheSize();
+      toast.success('Cache limpo com sucesso!');
     } catch (error) {
+      toast.error('Erro ao limpar cache');
       console.error('Error clearing cache:', error);
     } finally {
       setTimeout(() => setIsClearingCache(false), 2000);
@@ -270,7 +258,7 @@ export default function Profile() {
 
             {/* Profile Info */}
             <div className="px-6 flex flex-col items-center mb-10 text-center">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-xl shadow-blue-500/20 border-4 border-white dark:border-[#161629]">
+              <div className="w-24 h-24 rounded-full bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-xl shadow-blue-500/20 border-4 border-white dark:border-[#161629]">
                 {avatarUrl ? (
                   <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                 ) : (
@@ -508,7 +496,7 @@ export default function Profile() {
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Digite sua senha atual"
-                    className="!bg-white dark:!bg-[#161629] !border-gray-100 dark:!border-white/5 !rounded-2xl !py-4 !px-5"
+                    className="bg-white! dark:bg-[#161629]! border-gray-100! dark:border-white/5! rounded-2xl! py-4! px-5!"
                   />
                 </div>
                 <div className="space-y-2">
@@ -517,7 +505,7 @@ export default function Profile() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Digite a nova senha"
-                    className="!bg-white dark:!bg-[#161629] !border-gray-100 dark:!border-white/5 !rounded-2xl !py-4 !px-5"
+                    className="bg-white! dark:bg-[#161629]! border-gray-100! dark:border-white/5! rounded-2xl! py-4! px-5!"
                   />
                   <p className="text-[10px] text-gray-500 ml-1">Mínimo 8 caracteres.</p>
                 </div>
@@ -527,7 +515,7 @@ export default function Profile() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Repita a nova senha"
-                    className="!bg-white dark:!bg-[#161629] !border-gray-100 dark:!border-white/5 !rounded-2xl !py-4 !px-5"
+                    className="bg-white! dark:bg-[#161629]! border-gray-100! dark:border-white/5! rounded-2xl! py-4! px-5!"
                   />
                 </div>
               </div>
@@ -666,7 +654,7 @@ export default function Profile() {
           <div className="flex flex-col gap-6">
             <div className="A-card flex flex-col items-center py-10 h-fit text-center">
             <div className="relative mb-6">
-              <div className="w-32 h-32 rounded-full overflow-hidden border-[6px] border-white dark:border-gray-800 shadow-2xl bg-gradient-to-br from-[#0ea5e9] to-[#22d3ee] flex items-center justify-center text-white text-5xl font-bold">
+              <div className="w-32 h-32 rounded-full overflow-hidden border-[6px] border-white dark:border-gray-800 shadow-2xl bg-linear-to-br from-[#0ea5e9] to-[#22d3ee] flex items-center justify-center text-white text-5xl font-bold">
                 {avatarUrl ? (
                   <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
@@ -816,7 +804,7 @@ export default function Profile() {
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="**********"
-                    className="!bg-gray-50 dark:!bg-gray-800/50 !border-gray-100 dark:!border-gray-700 !rounded-2xl !py-4"
+                    className="bg-gray-50! dark:bg-gray-800/50! border-gray-100! dark:border-gray-700! rounded-2xl! py-4!"
                   />
                 </div>
                 <div className="space-y-2">
@@ -828,7 +816,7 @@ export default function Profile() {
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Digite a nova senha"
                     helperText="Mínimo 8 caracteres, incluindo letras maiúsculas, números e símbolos."
-                    className="!bg-gray-50 dark:!bg-gray-800/50 !border-gray-100 dark:!border-gray-700 !rounded-2xl !py-4"
+                    className="bg-gray-50! dark:bg-gray-800/50! border-gray-100! dark:border-gray-700! rounded-2xl! py-4!"
                   />
                 </div>
               </div>

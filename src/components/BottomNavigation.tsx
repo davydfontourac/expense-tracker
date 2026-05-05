@@ -51,7 +51,7 @@ export default function BottomNavigation() {
                   onClick={() => setIsModalOpen(true)}
                   className="flex flex-col items-center justify-center -mt-8"
                 >
-                  <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-500/40 active:scale-90 transition-transform">
+                  <div className="w-14 h-14 bg-linear-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-500/40 active:scale-90 transition-transform">
                     <Plus size={28} />
                   </div>
                   <span className="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-tighter">Novo</span>

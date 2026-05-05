@@ -122,7 +122,7 @@ export default function Changelog() {
             </p>
           </section>
 
-          <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-100 dark:before:via-white/5 before:to-transparent">
+          <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-linear-to-b before:from-transparent before:via-gray-100 dark:before:via-white/5 before:to-transparent">
             {t.entries.map((entry: any, idx: number) => (
               <motion.div 
                 key={entry.version}
