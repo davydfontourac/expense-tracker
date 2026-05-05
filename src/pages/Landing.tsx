@@ -68,8 +68,7 @@ function Nav({ lang, setLang, t, scrolled, isMobile }: any) {
       <nav className={`nav ${scrolled ? 'scrolled' : ''}`}>
         <div className="container nav-inner">
           <a href="#" className="brand">
-            <img src="/logo-expense-tracker.webp" alt="" className="w-10 h-10 rounded-lg" />
-            <span>Expense Tracker</span>
+            <img src="/logo-expense-tracker.webp" alt="Logo" />
           </a>
           <div className="nav-links">
             <a href="#features">{t.nav.features}</a>
@@ -111,8 +110,7 @@ function Nav({ lang, setLang, t, scrolled, isMobile }: any) {
         <div className="mobile-sheet">
           <div className="top">
             <a href="#" className="brand" onClick={() => setMenuOpen(false)}>
-              <img src="/logo-expense-tracker.webp" alt="" className="w-12 h-12 rounded-lg" />
-              <span>Expense Tracker</span>
+              <img src="/logo-expense-tracker.webp" alt="Logo" />
             </a>
             <button className="x-btn" onClick={() => setMenuOpen(false)} aria-label="Close menu">
               ✕
@@ -998,10 +996,9 @@ function Footer({ t }: any) {
             <a href="#" className="brand">
               <img
                 src="/logo-expense-tracker.webp"
-                alt=""
-                style={{ width: 32, height: 32, objectFit: 'contain' }}
+                alt="Logo"
+                style={{ width: 110, height: 80, objectFit: 'contain' }}
               />
-              <span style={{ fontSize: 16 }}>Expense Tracker</span>
             </a>
             <div
               style={{

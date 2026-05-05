@@ -65,12 +65,12 @@ export default function ResetPassword() {
             <img
               src="/logo-expense-tracker.webp"
               alt="Expense Tracker Logo"
-              className="object-contain rounded-xl"
+              style={{ width: 110, height: 80, objectFit: 'contain' }}
             />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Nova Senha</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 text-center">
-            Digite sua nova senha abaixo para acessar sua conta
-          </p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-4">Nova Senha</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 text-center">
+              Digite sua nova senha abaixo para acessar sua conta
+            </p>
         </div>
 
         {error && (

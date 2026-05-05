@@ -49,9 +49,8 @@ export function Sidebar() {
 
   return (
     <aside className="A-sb hidden lg:flex">
-      <div className="A-sb-brand">
-        <img src="/logo-expense-tracker.webp" alt="Logo" className="rounded-lg" />
-        <b className="text-gray-900 dark:text-white">Expense Tracker</b>
+      <div className="A-sb-brand !justify-center !pt-4 !pb-8">
+        <img src="/logo-expense-tracker.webp" alt="Logo" style={{ width: 110, height: 80, objectFit: 'contain' }} />
       </div>
 
       <div className="flex-1 overflow-y-auto py-4">

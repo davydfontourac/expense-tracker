@@ -10,9 +10,8 @@ export function AuthHeader({ onBack, onOpenMenu, title, subtitle }: { onBack?: (
             <ArrowLeft className="w-6 h-6" />
           </button>
         ) : (
-          <div className="flex items-center gap-2">
-            <img src="/logo-expense-tracker.webp" alt="Logo" className="w-8 h-8 rounded-lg" />
-            <span className="text-sm font-bold dark:text-white">Expense Tracker</span>
+          <div className="flex items-center">
+            <img src="/logo-expense-tracker.webp" alt="Logo" style={{ width: 110, height: 80, objectFit: 'contain' }} />
           </div>
         )}
         <button onClick={onOpenMenu} className="p-2 -mr-2 text-gray-900 dark:text-white">
