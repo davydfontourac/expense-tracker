@@ -4,7 +4,14 @@ import Privacy from './Privacy';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 
 vi.mock('react-markdown', () => ({
-  default: () => <div data-testid="markdown-content">Markdown Content</div>
+  default: ({ components }: any) => {
+    if (components) {
+      if (components.table) components.table({ children: null });
+      if (components.th) components.th({ children: null });
+      if (components.td) components.td({ children: null });
+    }
+    return <div data-testid="markdown-content">Markdown Content</div>;
+  }
 }));
 
 vi.mock('@/components/PageTransition', () => ({
