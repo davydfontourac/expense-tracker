@@ -5,8 +5,8 @@ import SavingsForm from './SavingsForm';
 describe('SavingsForm Component', () => {
   it('renders correctly when open', () => {
     render(
-      <SavingsForm isOpen={true} onClose={vi.fn()} onSuccess={vi.fn()} />
+      <SavingsForm isOpen={true} onClose={vi.fn()} onConfirm={vi.fn().mockResolvedValue(true)} />
     );
-    expect(screen.getByText(/Nova Economia|Editar Economia/i)).toBeInTheDocument();
+    expect(screen.getByText(/Nova Caixinha|Editar Caixinha/i)).toBeInTheDocument();
   });
 });

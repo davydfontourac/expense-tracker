@@ -37,8 +37,8 @@ describe('Terms', () => {
     } as any;
 
     vi.spyOn(document, 'createElement').mockReturnValue(mockAnchor);
-    document.body.appendChild = mockAppendChild;
-    document.body.removeChild = mockRemoveChild;
+    const spyAppend = vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node);
+    const spyRemove = vi.spyOn(document.body, 'removeChild').mockImplementation((node) => node);
 
     render(
       <BrowserRouter>
@@ -49,9 +49,9 @@ describe('Terms', () => {
     const downloadBtn = screen.getByText('Download MD').closest('button');
     if (downloadBtn) fireEvent.click(downloadBtn);
 
-    expect(mockAppendChild).toHaveBeenCalledWith(mockAnchor);
+    expect(spyAppend).toHaveBeenCalledWith(mockAnchor);
     expect(mockClick).toHaveBeenCalled();
-    expect(mockRemoveChild).toHaveBeenCalledWith(mockAnchor);
+    expect(spyRemove).toHaveBeenCalledWith(mockAnchor);
   });
 
   it('navigates back when clicking the back button', () => {

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAuthActions } from './useAuthActions';
 import { supabase } from '@/services/supabase';
@@ -40,7 +40,7 @@ describe('useAuthActions', () => {
 
   describe('handleSocialLogin', () => {
     it('should call signInWithOAuth and handle success', async () => {
-      (supabase.auth.signInWithOAuth as vi.Mock).mockResolvedValueOnce({ data: {}, error: null });
+      (supabase.auth.signInWithOAuth as Mock).mockResolvedValueOnce({ data: {}, error: null });
       const { result } = renderHook(() => useAuthActions());
       
       await act(async () => {
@@ -55,7 +55,7 @@ describe('useAuthActions', () => {
 
     it('should handle errors during social login', async () => {
       const error = new Error('Social login failed');
-      (supabase.auth.signInWithOAuth as vi.Mock).mockResolvedValueOnce({ data: null, error });
+      (supabase.auth.signInWithOAuth as Mock).mockResolvedValueOnce({ data: null, error });
       const { result } = renderHook(() => useAuthActions());
       
       await act(async () => {
@@ -68,7 +68,7 @@ describe('useAuthActions', () => {
 
   describe('handleLogin', () => {
     it('should call signInWithPassword and navigate on success', async () => {
-      (supabase.auth.signInWithPassword as vi.Mock).mockResolvedValueOnce({ data: {}, error: null });
+      (supabase.auth.signInWithPassword as Mock).mockResolvedValueOnce({ data: {}, error: null });
       const { result } = renderHook(() => useAuthActions());
       
       await act(async () => {
@@ -81,7 +81,7 @@ describe('useAuthActions', () => {
     });
 
     it('should call onSuccess callback if provided', async () => {
-      (supabase.auth.signInWithPassword as vi.Mock).mockResolvedValueOnce({ data: {}, error: null });
+      (supabase.auth.signInWithPassword as Mock).mockResolvedValueOnce({ data: {}, error: null });
       const { result } = renderHook(() => useAuthActions());
       const onSuccess = vi.fn();
 
@@ -95,7 +95,7 @@ describe('useAuthActions', () => {
 
     it('should handle login error', async () => {
       const error = new Error('Invalid credentials');
-      (supabase.auth.signInWithPassword as vi.Mock).mockResolvedValueOnce({ data: null, error });
+      (supabase.auth.signInWithPassword as Mock).mockResolvedValueOnce({ data: null, error });
       const { result } = renderHook(() => useAuthActions());
       
       await act(async () => {
@@ -108,7 +108,7 @@ describe('useAuthActions', () => {
 
   describe('handleRegister', () => {
     it('should call signUp and onSuccess callback', async () => {
-      (supabase.auth.signUp as vi.Mock).mockResolvedValueOnce({ data: {}, error: null });
+      (supabase.auth.signUp as Mock).mockResolvedValueOnce({ data: {}, error: null });
       const { result } = renderHook(() => useAuthActions());
       const onSuccess = vi.fn();
       
@@ -126,7 +126,7 @@ describe('useAuthActions', () => {
 
     it('should handle register error', async () => {
       const error = new Error('Registration failed');
-      (supabase.auth.signUp as vi.Mock).mockResolvedValueOnce({ data: null, error });
+      (supabase.auth.signUp as Mock).mockResolvedValueOnce({ data: null, error });
       const { result } = renderHook(() => useAuthActions());
       
       await act(async () => {
@@ -139,7 +139,7 @@ describe('useAuthActions', () => {
 
   describe('handleForgotPassword', () => {
     it('should call resetPasswordForEmail and onSuccess callback', async () => {
-      (supabase.auth.resetPasswordForEmail as vi.Mock).mockResolvedValueOnce({ data: {}, error: null });
+      (supabase.auth.resetPasswordForEmail as Mock).mockResolvedValueOnce({ data: {}, error: null });
       const { result } = renderHook(() => useAuthActions());
       const onSuccess = vi.fn();
       
@@ -155,7 +155,7 @@ describe('useAuthActions', () => {
 
     it('should handle forgot password error', async () => {
       const error = new Error('Reset failed');
-      (supabase.auth.resetPasswordForEmail as vi.Mock).mockResolvedValueOnce({ data: null, error });
+      (supabase.auth.resetPasswordForEmail as Mock).mockResolvedValueOnce({ data: null, error });
       const { result } = renderHook(() => useAuthActions());
       const onSuccess = vi.fn();
       
@@ -170,7 +170,7 @@ describe('useAuthActions', () => {
 
   describe('handleResendConfirmation', () => {
     it('should call resend and show success toast', async () => {
-      (supabase.auth.resend as vi.Mock).mockResolvedValueOnce({ data: {}, error: null });
+      (supabase.auth.resend as Mock).mockResolvedValueOnce({ data: {}, error: null });
       const { result } = renderHook(() => useAuthActions());
       
       await act(async () => {
@@ -189,7 +189,7 @@ describe('useAuthActions', () => {
 
     it('should handle resend error', async () => {
       const error = new Error('Resend failed');
-      (supabase.auth.resend as jest.Mock).mockResolvedValueOnce({ data: null, error });
+      (supabase.auth.resend as Mock).mockResolvedValueOnce({ data: null, error });
       const { result } = renderHook(() => useAuthActions());
       
       await act(async () => {
