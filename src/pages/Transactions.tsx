@@ -14,22 +14,9 @@ import { usePrivacy } from '@/context/PrivacyContext';
 import ConfirmModal from '@/components/ConfirmModal';
 import { cn } from '@/utils/cn';
 import type { Transaction } from '@/types';
+import { CAT_EMOJI, formatCurrency as fmt } from '@/utils/formatters';
 
-const CAT_EMOJI: Record<string, string> = {
-  Alimentação: '🍔',
-  Transporte: '🚗',
-  Supermercado: '🛒',
-  Pix: '⚡',
-  Receita: '💰',
-  Débito: '💳',
-  Saúde: '💊',
-  Lazer: '🎬',
-  Educação: '📚',
-};
 
-const fmt = (n: number) =>
-  'R$ ' +
-  Math.abs(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 export default function Transactions() {
   const { hideBalance } = usePrivacy();

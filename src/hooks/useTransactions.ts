@@ -14,7 +14,7 @@ interface Summary {
 }
 
 interface MonthlyHistory {
-  month: any;
+  month: string | number;
   fullMonth?: number;
   year: number;
   income: number;
@@ -118,8 +118,9 @@ export function useTransactions() {
 
       toast.success('Histórico do mês excluído com sucesso');
       return true;
-    } catch (err: any) {
-      console.error('Erro ao excluir histórico:', err);
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error('Erro ao excluir histórico:', error);
       toast.error('Erro ao excluir histórico do mês');
       return false;
     } finally {
@@ -135,8 +136,9 @@ export function useTransactions() {
       if (error) throw error;
       toast.success('Transação excluída com sucesso');
       return true;
-    } catch (err: any) {
-      console.error('Erro ao excluir transação:', err);
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error('Erro ao excluir transação:', error);
       toast.error('Erro ao excluir transação');
       return false;
     } finally {
@@ -182,8 +184,9 @@ export function useTransactions() {
       document.body.removeChild(link);
       
       toast.success('Dados exportados com sucesso!');
-    } catch (err: any) {
-      console.error('Erro ao exportar dados:', err);
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error('Erro ao exportar dados:', error);
       toast.error('Erro ao exportar dados');
     } finally {
       setIsLoading(false);

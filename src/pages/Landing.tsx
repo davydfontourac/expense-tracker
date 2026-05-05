@@ -60,7 +60,7 @@ const Icon = {
 // ─────────────────────────────────────────────────────────────────────────────
 // Nav
 // ─────────────────────────────────────────────────────────────────────────────
-function Nav({ lang, setLang, t, scrolled, isMobile }: any) {
+function Nav({ lang, setLang, t, scrolled, isMobile }: { lang: string, setLang: (l: string) => void, t: LandingCopy, scrolled: boolean, isMobile: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -163,7 +163,7 @@ function Nav({ lang, setLang, t, scrolled, isMobile }: any) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Dashboard mockup (clean, data-driven, not slop)
 // ─────────────────────────────────────────────────────────────────────────────
-function DashboardMock({ t }: any) {
+function DashboardMock({ t }: { t: LandingCopy }) {
   const [activeTab, setActiveTab] = useState(0);
 
   useEffect(() => {
@@ -503,7 +503,7 @@ function DashboardMock({ t }: any) {
   );
 }
 
-function Donut({ t }: any) {
+function Donut({ t }: { t: LandingCopy }) {
   const segs = [
     { v: 38, c: '#6366f1' },
     { v: 30, c: '#8b5cf6' },
@@ -557,7 +557,7 @@ function Donut({ t }: any) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Hero
 // ─────────────────────────────────────────────────────────────────────────────
-function Hero({ t, isMobile }: any) {
+function Hero({ t, isMobile }: { t: LandingCopy, isMobile: boolean }) {
   return (
     <section className="hero">
       <div className="hero-bg" />
@@ -599,7 +599,7 @@ function Hero({ t, isMobile }: any) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Problems
 // ─────────────────────────────────────────────────────────────────────────────
-function Problems({ t }: any) {
+function Problems({ t }: { t: LandingCopy }) {
   return (
     <section className="section">
       <div className="container">
@@ -852,7 +852,7 @@ function FeatureVisuals(t: any) {
   };
 }
 
-function Features({ t }: any) {
+function Features({ t }: { t: LandingCopy }) {
   const v = FeatureVisuals(t);
   const visuals = [v.dashboard, v.csv, v.categories, v.dark, v.security];
   const classes = ['span-3', 'span-3', 'span-2', 'span-2', 'span-2'];
@@ -889,7 +889,7 @@ function Features({ t }: any) {
 // ─────────────────────────────────────────────────────────────────────────────
 // How it works + stats
 // ─────────────────────────────────────────────────────────────────────────────
-function HowItWorks({ t, lang }: any) {
+function HowItWorks({ t, lang }: { t: LandingCopy, lang: string }) {
   const stats =
     lang === 'pt-BR'
       ? [
@@ -956,7 +956,7 @@ function HowItWorks({ t, lang }: any) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Final CTA
 // ─────────────────────────────────────────────────────────────────────────────
-function FinalCTA({ t, isMobile }: any) {
+function FinalCTA({ t, isMobile }: { t: LandingCopy, isMobile: boolean }) {
   return (
     <section className="section" style={{ paddingTop: 0 }}>
       <div className="container">
@@ -987,7 +987,7 @@ function FinalCTA({ t, isMobile }: any) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Footer
 // ─────────────────────────────────────────────────────────────────────────────
-function Footer({ t }: any) {
+function Footer({ t }: { t: LandingCopy }) {
   return (
     <footer className="footer">
       <div className="container">
