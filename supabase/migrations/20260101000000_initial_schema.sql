@@ -20,10 +20,12 @@ create table public.categories (
   constraint categories_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE
 ) TABLESPACE pg_default;
 
+CREATE TYPE public.transaction_type AS ENUM ('income', 'expense');
+
 create table public.transactions (
   id uuid not null default gen_random_uuid (),
   amount numeric(12, 2) not null,
-  type character varying(50) not null,
+  type public.transaction_type not null,
   description text not null,
   date date not null,
   category_id uuid null,
