@@ -8,7 +8,7 @@ ADD COLUMN IF NOT EXISTS installments INTEGER DEFAULT 1;
 COMMENT ON COLUMN public.transactions.installments IS 'Número de parcelas ou ocorrências da transação';
 
 -- Remove versões antigas da função para evitar conflitos de overload
-DROP FUNCTION IF EXISTS public.handle_recurring_transactions(text, decimal, date, transaction_type, uuid, text, int);
+DROP FUNCTION IF EXISTS public.handle_recurring_transactions(text, decimal, date, public.transaction_type, uuid, text, int);
 DROP FUNCTION IF EXISTS public.handle_recurring_transactions(text, decimal, date, text, uuid, text, int);
 
 -- Função para lidar com transações recorrentes
@@ -28,14 +28,14 @@ DECLARE
   v_user_id uuid;
   v_current_date date;
   v_first_id uuid;
-  v_type transaction_type;
-  v_freq recurrence_frequency;
+  v_type public.transaction_type;
+  v_freq public.recurrence_frequency;
   i int;
 BEGIN
   v_user_id := auth.uid();
   v_current_date := p_date;
-  v_type := p_type::transaction_type;
-  v_freq := p_frequency::recurrence_frequency;
+  v_type := p_type::public.transaction_type;
+  v_freq := p_frequency::public.recurrence_frequency;
 
   -- 1. Insere a primeira transação (a "Pai")
   INSERT INTO public.transactions (

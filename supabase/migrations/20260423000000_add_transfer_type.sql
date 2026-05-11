@@ -1,10 +1,10 @@
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = 'transfer_in' AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'transaction_type')) THEN
-    ALTER TYPE transaction_type ADD VALUE 'transfer_in';
+    ALTER TYPE public.transaction_type ADD VALUE 'transfer_in';
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = 'transfer_out' AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'transaction_type')) THEN
-    ALTER TYPE transaction_type ADD VALUE 'transfer_out';
+    ALTER TYPE public.transaction_type ADD VALUE 'transfer_out';
   END IF;
 END $$;
 
